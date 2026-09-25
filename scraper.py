@@ -1,4 +1,4 @@
-```python
+python
 from datetime import datetime, timedelta
 import urllib.request
 import urllib.parse
@@ -1087,4 +1087,3 @@ function filterFlights(category, event) {{
 if __name__ == "__main__":
 
     update_html()
-```
