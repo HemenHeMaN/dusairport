@@ -11,7 +11,7 @@ import html
 # AIRLABS API
 # ============================================================
 
-API_KEY = "87637651-6134-4169-94ad-14e32eaa5c2a"
+API_KEY = os.environ.get("AIRLABS_API_KEY")
 
 AIRPORT = "DUS"
 
