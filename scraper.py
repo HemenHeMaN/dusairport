@@ -52,11 +52,9 @@ def get_flight_type(airline_name, airline_iata, flight_iata):
     airline_lower = str(airline_name or "").lower()
     iata_upper = str(airline_iata or "").upper()
     
-    # Prüfe IATA Codes
     if iata_upper in CHARTER_CODES:
         return "Charter"
 
-    # Prüfe Airline-Namen
     for keyword in CHARTER_AIRLINES:
         if keyword in airline_lower:
             return "Charter"
@@ -201,11 +199,10 @@ def update_html():
         ):
             continue
 
-        departure_iata = flight.get("dep_iata") or ""
         departure_city = (
             flight.get("dep_city")
             or flight.get("dep_name")
-            or departure_iata
+            or flight.get("dep_iata")
             or "Unbekannt"
         )
 
@@ -213,7 +210,7 @@ def update_html():
         if terminal_raw:
             terminal = f"Terminal {terminal_raw}"
         else:
-            terminal = f"Terminal A/B"
+            terminal = "Terminal A/B"
 
         status = flight.get("status") or "scheduled"
 
@@ -233,7 +230,6 @@ def update_html():
             "flight_no": flight_iata,
             "airline": airline_name,
             "city": departure_city,
-            "dep_iata": departure_iata,
             "terminal": terminal,
             "type": flight_type,
             "gate": gate,
@@ -243,11 +239,9 @@ def update_html():
 
     valid_list = sorted(valid_list, key=lambda x: x["dt"])
 
-    # Duplikate bei exakt gleicher Uhrzeit, Herkunft und Airline/Flugnummer bereinigen
     unique_flights = []
     seen = set()
     for flight in valid_list:
-        # Gruppierungsschlüssel gegen identische Mehrfacheinträge
         unique_key = (
             flight["city"],
             flight["time_formatted"],
@@ -276,7 +270,8 @@ def update_html():
 
         status_translation = {
             "scheduled": "Geplant",
-            "en-route": "Unterwegs",
+            "en-route": "Im Anflug",
+            "active": "Im Anflug",
             "landed": "Gelandet",
             "cancelled": "Storniert",
             "incident": "Störung",
@@ -306,7 +301,7 @@ def update_html():
                 <div class="detail-grid">
                     <div><strong>Flug-Nr.:</strong> {clean_text(f['flight_no'])}</div>
                     <div><strong>Airline:</strong> {clean_text(f['airline'])}</div>
-                    <div><strong>Von:</strong> {clean_text(f['dep_iata'])}</div>
+                    <div><strong>Von:</strong> {clean_text(f['city'])}</div>
                     <div><strong>Terminal:</strong> {clean_text(f['terminal'])}</div>
                     <div><strong>Status:</strong> {clean_text(status_text)}</div>
                     <div><strong>Typ:</strong> {clean_text(f['type'])}</div>
@@ -374,7 +369,7 @@ h1 {{ color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }}
     display: inline-block; margin-top: 3px; padding: 2px 5px; border-radius: 4px; background: #ffebee; color: #c62828; font-size: 0.7rem; font-weight: bold;
 }}
 .card-details {{
-    margin-top: 10px; font-size: 0.85rem; color: #444; display: block;
+    margin-top: 10px; font-size: 0.85rem; color: --444; display: block;
 }}
 .detail-divider {{ border: none; border-top: 1px solid #eee; margin: 8px 0; }}
 .detail-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }}
