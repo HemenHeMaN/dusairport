@@ -36,46 +36,6 @@ CHARTER_CODES = [
 
 
 # ============================================================
-# FLUGHAFEN-NAMEN MAPPING (Falls API nur den Code liefert)
-# ============================================================
-
-AIRPORT_NAMES = {
-    "DXB": "Dubai",
-    "DOH": "Doha",
-    "IST": "Istanbul",
-    "SAW": "Istanbul - Sabiha Gökçen",
-    "AYT": "Antalya",
-    "ESB": "Ankara",
-    "ADB": "Izmir",
-    "LHR": "London Heathrow",
-    "LGW": "London Gatwick",
-    "STN": "London Stansted",
-    "CDG": "Paris Charles de Gaulle",
-    "ORY": "Paris Orly",
-    "AMS": "Amsterdam",
-    "VIE": "Wien",
-    "ZRH": "Zürich",
-    "PMI": "Palma de Mallorca",
-    "BCN": "Barcelona",
-    "MAD": "Madrid",
-    "FCO": "Rom Fiumicino",
-    "MUC": "München",
-    "FRA": "Frankfurt",
-    "BER": "Berlin",
-    "HAM": "Hamburg",
-    "CAI": "Kairo",
-    "JFK": "New York JFK",
-    "EWR": "New York Newark",
-    "MIA": "Miami",
-    "ATH": "Athen",
-    "WAW": "Warschau",
-    "CPH": "Kopenhagen",
-    "OPO": "Porto",
-    "LIS": "Lissabon"
-}
-
-
-# ============================================================
 # HILFSFUNKTIONEN
 # ============================================================
 
@@ -123,26 +83,34 @@ def parse_airlabs_time(time_string):
     return None
 
 
-def get_readable_city(flight_data):
-    # 1. Versuche den Stadtnamen direkt aus der API zu holen
+def get_dynamic_city_name(flight_data):
+    """
+    Holt den Namen des Abflughafens voll dynamisch direkt aus den API-Daten.
+    Bevorzugt den Stadtnamen, bereinigt den Flughafen-Namen oder nutzt den Langtext.
+    """
+    # 1. Prüfen, ob die API einen direkten Stadtnamen liefert (z.B. "Dubai", "Istanbul")
     city = flight_data.get("dep_city")
     if city and len(str(city).strip()) > 1:
         return str(city).strip()
 
-    # 2. Falls nicht da, versuche den Airport-Namen
+    # 2. Wenn kein Stadtname da ist, den Flughafen-Namen nehmen und Zusätze bereinigen
     name = flight_data.get("dep_name")
     if name and len(str(name).strip()) > 1:
-        # Oft steht da "Dubai International Airport", wir kürzen es ggf. oder nutzen es
-        cleaned = str(name).replace(" Airport", "").replace(" International", "").strip()
+        cleaned = (
+            str(name)
+            .replace(" Airport", "")
+            .replace(" International", "")
+            .replace(" Airport", "")
+            .strip()
+        )
         return cleaned
 
-    # 3. Fallback über das IATA-Kürzel im Dictionary
-    iata = str(flight_data.get("dep_iata") or "").upper()
-    if iata in AIRPORT_NAMES:
-        return AIRPORT_NAMES[iata]
+    # 3. Falls gar nichts da ist, als letzten Ausweg das IATA-Kürzel
+    iata = flight_data.get("dep_iata")
+    if iata:
+        return str(iata).strip()
 
-    # 4. Letzter Notnagel: Das Kürzel selbst
-    return iata if iata else "Unbekannt"
+    return "Unbekannt"
 
 
 # ============================================================
@@ -261,8 +229,8 @@ def update_html():
         ):
             continue
 
-        # Hier holen wir jetzt den sauberen Stadtnamen
-        departure_city = get_readable_city(flight)
+        # Dynamischer Abflugort direkt aus den API-Daten
+        departure_city = get_dynamic_city_name(flight)
 
         terminal_raw = flight.get("arr_terminal") or flight.get("terminal")
         if terminal_raw:
