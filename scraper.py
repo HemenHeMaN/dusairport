@@ -36,6 +36,46 @@ CHARTER_CODES = [
 
 
 # ============================================================
+# FLUGHAFEN-NAMEN MAPPING (Falls API nur den Code liefert)
+# ============================================================
+
+AIRPORT_NAMES = {
+    "DXB": "Dubai",
+    "DOH": "Doha",
+    "IST": "Istanbul",
+    "SAW": "Istanbul - Sabiha Gökçen",
+    "AYT": "Antalya",
+    "ESB": "Ankara",
+    "ADB": "Izmir",
+    "LHR": "London Heathrow",
+    "LGW": "London Gatwick",
+    "STN": "London Stansted",
+    "CDG": "Paris Charles de Gaulle",
+    "ORY": "Paris Orly",
+    "AMS": "Amsterdam",
+    "VIE": "Wien",
+    "ZRH": "Zürich",
+    "PMI": "Palma de Mallorca",
+    "BCN": "Barcelona",
+    "MAD": "Madrid",
+    "FCO": "Rom Fiumicino",
+    "MUC": "München",
+    "FRA": "Frankfurt",
+    "BER": "Berlin",
+    "HAM": "Hamburg",
+    "CAI": "Kairo",
+    "JFK": "New York JFK",
+    "EWR": "New York Newark",
+    "MIA": "Miami",
+    "ATH": "Athen",
+    "WAW": "Warschau",
+    "CPH": "Kopenhagen",
+    "OPO": "Porto",
+    "LIS": "Lissabon"
+}
+
+
+# ============================================================
 # HILFSFUNKTIONEN
 # ============================================================
 
@@ -81,6 +121,28 @@ def parse_airlabs_time(time_string):
         except ValueError:
             pass
     return None
+
+
+def get_readable_city(flight_data):
+    # 1. Versuche den Stadtnamen direkt aus der API zu holen
+    city = flight_data.get("dep_city")
+    if city and len(str(city).strip()) > 1:
+        return str(city).strip()
+
+    # 2. Falls nicht da, versuche den Airport-Namen
+    name = flight_data.get("dep_name")
+    if name and len(str(name).strip()) > 1:
+        # Oft steht da "Dubai International Airport", wir kürzen es ggf. oder nutzen es
+        cleaned = str(name).replace(" Airport", "").replace(" International", "").strip()
+        return cleaned
+
+    # 3. Fallback über das IATA-Kürzel im Dictionary
+    iata = str(flight_data.get("dep_iata") or "").upper()
+    if iata in AIRPORT_NAMES:
+        return AIRPORT_NAMES[iata]
+
+    # 4. Letzter Notnagel: Das Kürzel selbst
+    return iata if iata else "Unbekannt"
 
 
 # ============================================================
@@ -199,12 +261,8 @@ def update_html():
         ):
             continue
 
-        departure_city = (
-            flight.get("dep_city")
-            or flight.get("dep_name")
-            or flight.get("dep_iata")
-            or "Unbekannt"
-        )
+        # Hier holen wir jetzt den sauberen Stadtnamen
+        departure_city = get_readable_city(flight)
 
         terminal_raw = flight.get("arr_terminal") or flight.get("terminal")
         if terminal_raw:
@@ -369,7 +427,7 @@ h1 {{ color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }}
     display: inline-block; margin-top: 3px; padding: 2px 5px; border-radius: 4px; background: #ffebee; color: #c62828; font-size: 0.7rem; font-weight: bold;
 }}
 .card-details {{
-    margin-top: 10px; font-size: 0.85rem; color: --444; display: block;
+    margin-top: 10px; font-size: 0.85rem; color: #444; display: block;
 }}
 .detail-divider {{ border: none; border-top: 1px solid #eee; margin: 8px 0; }}
 .detail-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }}
