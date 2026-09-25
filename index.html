@@ -39,7 +39,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
     display: inline-block; margin-top: 3px; padding: 2px 5px; border-radius: 4px; background: #ffebee; color: #c62828; font-size: 0.7rem; font-weight: bold;
 }
 .card-details {
-    margin-top: 10px; font-size: 0.85rem; color: #444; display: block;
+    margin-top: 10px; font-size: 0.85rem; color: --444; display: block;
 }
 .detail-divider { border: none; border-top: 1px solid #eee; margin: 8px 0; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -49,9 +49,9 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
 <body>
 <h1>DUS Ankünfte</h1>
 <div class="update-info">
-        Aktuelle Zeit: <b>25.09.2026 13:38 Uhr</b> ⚡ Cache<br>
-        Zeitfenster: 13:08 bis 18:38 Uhr<br>
-        98 Ankünfte
+        Aktuelle Zeit: <b>25.09.2026 13:48 Uhr</b> ⚡ Cache<br>
+        Zeitfenster: 13:18 bis 18:48 Uhr<br>
+        93 Ankünfte
     </div>
 <div class="filter-container">
     <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
@@ -59,136 +59,6 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
     <button class="filter-btn btn-charter" onclick="filterFlights('Charter', event)">Charter</button>
 </div>
 <div id="flightList">
-        <div class="flight-card" data-category="Linie">
-            <div class="card-header">
-                <div class="time-col">
-                    <span class="flight-time">13:17</span>
-                    
-                </div>
-                <div class="main-info">
-                    <div class="city-name">DOH</div>
-                    <div class="gate-info">
-                        <span class="badge-linie">Ausgang 1 (Linie)</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-details">
-                <hr class="detail-divider">
-                <div class="detail-grid">
-                    <div><strong>Flug-Nr.:</strong> QR85</div>
-                    <div><strong>Airline:</strong> QR</div>
-                    <div><strong>Von:</strong> DOH</div>
-                    <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> Gelandet</div>
-                    <div><strong>Typ:</strong> Linie</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="flight-card" data-category="Linie">
-            <div class="card-header">
-                <div class="time-col">
-                    <span class="flight-time">13:17</span>
-                    
-                </div>
-                <div class="main-info">
-                    <div class="city-name">DOH</div>
-                    <div class="gate-info">
-                        <span class="badge-linie">Ausgang 1 (Linie)</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-details">
-                <hr class="detail-divider">
-                <div class="detail-grid">
-                    <div><strong>Flug-Nr.:</strong> JL4584</div>
-                    <div><strong>Airline:</strong> JL</div>
-                    <div><strong>Von:</strong> DOH</div>
-                    <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> Gelandet</div>
-                    <div><strong>Typ:</strong> Linie</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="flight-card" data-category="Linie">
-            <div class="card-header">
-                <div class="time-col">
-                    <span class="flight-time">13:17</span>
-                    
-                </div>
-                <div class="main-info">
-                    <div class="city-name">DOH</div>
-                    <div class="gate-info">
-                        <span class="badge-linie">Ausgang 1 (Linie)</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-details">
-                <hr class="detail-divider">
-                <div class="detail-grid">
-                    <div><strong>Flug-Nr.:</strong> MH4166</div>
-                    <div><strong>Airline:</strong> MH</div>
-                    <div><strong>Von:</strong> DOH</div>
-                    <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> Gelandet</div>
-                    <div><strong>Typ:</strong> Linie</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="flight-card" data-category="Linie">
-            <div class="card-header">
-                <div class="time-col">
-                    <span class="flight-time">13:17</span>
-                    
-                </div>
-                <div class="main-info">
-                    <div class="city-name">DOH</div>
-                    <div class="gate-info">
-                        <span class="badge-linie">Ausgang 1 (Linie)</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-details">
-                <hr class="detail-divider">
-                <div class="detail-grid">
-                    <div><strong>Flug-Nr.:</strong> IB6157</div>
-                    <div><strong>Airline:</strong> IB</div>
-                    <div><strong>Von:</strong> DOH</div>
-                    <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> Gelandet</div>
-                    <div><strong>Typ:</strong> Linie</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="flight-card" data-category="Linie">
-            <div class="card-header">
-                <div class="time-col">
-                    <span class="flight-time">13:17</span>
-                    
-                </div>
-                <div class="main-info">
-                    <div class="city-name">DOH</div>
-                    <div class="gate-info">
-                        <span class="badge-linie">Ausgang 1 (Linie)</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-details">
-                <hr class="detail-divider">
-                <div class="detail-grid">
-                    <div><strong>Flug-Nr.:</strong> VA6194</div>
-                    <div><strong>Airline:</strong> VA</div>
-                    <div><strong>Von:</strong> DOH</div>
-                    <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> Gelandet</div>
-                    <div><strong>Typ:</strong> Linie</div>
-                </div>
-            </div>
-        </div>
-        
         <div class="flight-card" data-category="Linie">
             <div class="card-header">
                 <div class="time-col">
@@ -1821,7 +1691,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> EW</div>
                     <div><strong>Von:</strong> BHX</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -1899,7 +1769,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> DE</div>
                     <div><strong>Von:</strong> ACE</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Charter</div>
                 </div>
             </div>
@@ -1925,7 +1795,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> SM</div>
                     <div><strong>Von:</strong> HRG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -1951,7 +1821,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> X3</div>
                     <div><strong>Von:</strong> FUE</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Charter</div>
                 </div>
             </div>
@@ -1977,7 +1847,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> MS</div>
                     <div><strong>Von:</strong> HRG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2003,7 +1873,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> DE</div>
                     <div><strong>Von:</strong> OLB</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Charter</div>
                 </div>
             </div>
@@ -2029,7 +1899,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> U2</div>
                     <div><strong>Von:</strong> LGW</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2055,7 +1925,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> 4X</div>
                     <div><strong>Von:</strong> PMI</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2081,7 +1951,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> PC</div>
                     <div><strong>Von:</strong> SAW</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2107,7 +1977,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> EW</div>
                     <div><strong>Von:</strong> PMI</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2133,7 +2003,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> AF</div>
                     <div><strong>Von:</strong> CDG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2159,7 +2029,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> MK</div>
                     <div><strong>Von:</strong> CDG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2185,7 +2055,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> WS</div>
                     <div><strong>Von:</strong> CDG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2211,7 +2081,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> DL</div>
                     <div><strong>Von:</strong> CDG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2237,7 +2107,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> UU</div>
                     <div><strong>Von:</strong> CDG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2263,7 +2133,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> A5</div>
                     <div><strong>Von:</strong> CDG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2289,7 +2159,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> AM</div>
                     <div><strong>Von:</strong> CDG</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2315,7 +2185,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> EW</div>
                     <div><strong>Von:</strong> MXP</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2367,7 +2237,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> EW</div>
                     <div><strong>Von:</strong> FCO</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2419,7 +2289,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> E6</div>
                     <div><strong>Von:</strong> BCN</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2445,7 +2315,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> EW</div>
                     <div><strong>Von:</strong> BCN</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2549,7 +2419,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> EW</div>
                     <div><strong>Von:</strong> OLB</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
@@ -2601,7 +2471,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
                     <div><strong>Airline:</strong> EW</div>
                     <div><strong>Von:</strong> BIO</div>
                     <div><strong>Terminal:</strong> Terminal A/B</div>
-                    <div><strong>Status:</strong> active</div>
+                    <div><strong>Status:</strong> Im Anflug</div>
                     <div><strong>Typ:</strong> Linie</div>
                 </div>
             </div>
