@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DUS Ankünfte - Live Fenster</title>
+
+    <style>
+
+        body {
+            font-family:
+                Arial,
+                sans-serif;
+
+            margin: 10px;
+
+            background: #f4f4f9;
+
+            color: #333;
+        }
+
+
+        h1 {
+            color: #003366;
+
+            font-size: 1.5rem;
+
+            margin-bottom: 5px;
+        }
+
+
+        .update-info {
+            font-size: 0.85rem;
+
+            color: #666;
+
+            margin-bottom: 15px;
+        }
+
+
+        /* ==========================================
+           FILTER
+        ========================================== */
+
+        .filter-container {
+            margin-bottom: 15px;
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+        }
+
+
+        .filter-btn {
+
+            flex: 1;
+
+            min-width: 110px;
+
+            padding: 10px 12px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            font-size: 0.9em;
+
+            text-align: center;
+
+            transition:
+                background 0.2s;
+        }
+
+
+        .btn-all {
+            background: #003366;
+
+            color: white;
+        }
+
+
+        .btn-linie {
+            background: #e3f2fd;
+
+            color: #0d47a1;
+
+            border:
+                1px solid #90caf9;
+        }
+
+
+        .btn-charter {
+            background: #fff3e0;
+
+            color: #e65100;
+
+            border:
+                1px solid #ffb74d;
+        }
+
+
+        .filter-btn:hover {
+            opacity: 0.85;
+        }
+
+
+        .filter-btn.active {
+            box-shadow:
+                inset 0 3px 5px
+                rgba(0,0,0,0.2);
+        }
+
+
+        /* ==========================================
+           TABELLE
+        ========================================== */
+
+        .table-container {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+            background: #fff;
+
+            box-shadow:
+                0 2px 5px
+                rgba(0,0,0,0.1);
+
+            border-radius: 5px;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 700px;
+        }
+
+
+        th,
+        td {
+
+            padding: 10px 12px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid #ddd;
+
+            font-size: 0.9rem;
+        }
+
+
+        th {
+
+            background-color: #003366;
+
+            color: white;
+
+            white-space: nowrap;
+        }
+
+
+        tr:hover {
+
+            background-color: #f1f1f1;
+        }
+
+
+        /* ==========================================
+           BADGES
+        ========================================== */
+
+        .badge-linie {
+
+            background: #e3f2fd;
+
+            color: #0d47a1;
+
+            padding: 4px 8px;
+
+            border-radius: 4px;
+
+            font-weight: bold;
+
+            display: inline-block;
+        }
+
+
+        .badge-charter {
+
+            background: #fff3e0;
+
+            color: #e65100;
+
+            padding: 4px 8px;
+
+            border-radius: 4px;
+
+            font-weight: bold;
+
+            display: inline-block;
+        }
+
+
+        /* ==========================================
+           VERSPÄTUNG
+        ========================================== */
+
+        .delay {
+
+            color: #c62828;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+
+        /* ==========================================
+           STATUS
+        ========================================== */
+
+        .status {
+
+            font-size: 0.75rem;
+
+            color: #666;
+        }
+
+
+        /* ==========================================
+           KEINE FLÜGE
+        ========================================== */
+
+        .no-flights {
+
+            text-align: center;
+
+            padding: 20px;
+
+            color: #666;
+        }
+
+
+        /* ==========================================
+           MOBILE
+        ========================================== */
+
+        @media (max-width: 600px) {
+
+            body {
+                margin: 8px;
+            }
+
+
+            h1 {
+                font-size: 1.2rem;
+            }
+
+
+            .filter-btn {
+
+                font-size: 0.8rem;
+
+                padding: 8px;
+            }
+
+
+            th,
+            td {
+
+                padding: 8px;
+
+                font-size: 0.8rem;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <h1>
+        Flughafen Düsseldorf (DUS) - Ankünfte
+    </h1>
+
+
+    <div
+        class="update-info"
+        id="updateInfo"
+    >
+        Lade Daten...
+    </div>
+
+
+    <div class="filter-container">
+
+        <button
+            class="filter-btn btn-all active"
+            onclick="filterFlights('all', event)"
+        >
+            Alle
+        </button>
+
+
+        <button
+            class="filter-btn btn-linie"
+            onclick="filterFlights('Linie', event)"
+        >
+            Linie
+        </button>
+
+
+        <button
+            class="filter-btn btn-charter"
+            onclick="filterFlights('Charter', event)"
+        >
+            Charter
+        </button>
+
+    </div>
+
+
+    <div class="table-container">
+
+        <table id="flightTable">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Uhrzeit
+                    </th>
+
+                    <th>
+                        Flug-Nr.
+                    </th>
+
+                    <th>
+                        Herkunftsland
+                    </th>
+
+                    <th>
+                        Flughafen / Herkunft
+                    </th>
+
+                    <th>
+                        Terminal
+                    </th>
+
+                    <th>
+                        Airline
+                    </th>
+
+                    <th>
+                        Ausgang
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        style="text-align:center;"
+                    >
+                        Warte auf Datenaktualisierung...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <script>
+
+        function filterFlights(category, event) {
+
+            const rows =
+                document.querySelectorAll(
+                    '#flightTable tbody tr'
+                );
+
+
+            const buttons =
+                document.querySelectorAll(
+                    '.filter-btn'
+                );
+
+
+            buttons.forEach(function(btn) {
+
+                btn.classList.remove('active');
+
+            });
+
+
+            if (
+                event &&
+                event.target
+            ) {
+
+                event.target.classList.add('active');
+
+            }
+
+
+            rows.forEach(function(row) {
+
+                const rowCategory =
+                    row.getAttribute(
+                        'data-category'
+                    );
+
+
+                if (!rowCategory) {
+                    return;
+                }
+
+
+                if (
+                    category === 'all' ||
+                    rowCategory === category
+                ) {
+
+                    row.style.display = '';
+
+                } else {
+
+                    row.style.display = 'none';
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+</body>
+
+</html>
