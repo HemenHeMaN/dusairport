@@ -1,0 +1,81 @@
+name: DUS Ankuenfte Clean Table
+
+on:
+  schedule:
+    # Alle 30 Minuten
+    # 04:15, 04:45 ... 21:15, 21:45 UTC
+    #
+    # Entspricht:
+    # Winterzeit: 05:15–22:45 MEZ
+    # Sommerzeit: 06:15–23:45 MESZ
+    - cron: '15,45 4-21 * * *'
+
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+
+      # --------------------------------------------------
+      # Repository auschecken
+      # --------------------------------------------------
+
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+
+      # --------------------------------------------------
+      # Python einrichten
+      # --------------------------------------------------
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+
+      # --------------------------------------------------
+      # Abhängigkeiten installieren
+      # --------------------------------------------------
+
+      - name: Abhängigkeiten installieren
+        run: |
+          python -m pip install --upgrade pip
+
+
+      # --------------------------------------------------
+      # Scraper ausführen
+      # --------------------------------------------------
+
+      - name: Scraper ausführen
+        env:
+          AIRLABS_API_KEY: ${{ secrets.AIRLABS_API_KEY }}
+        run: |
+          python scraper.py
+
+
+      # --------------------------------------------------
+      # Änderungen committen und pushen
+      # --------------------------------------------------
+
+      - name: Änderungen committen und pushen
+        run: |
+
+          git config --global user.name "github-actions[bot]"
+
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add index.html cache.json
+
+          git diff --quiet && \
+          git diff --staged --quiet || \
+          (
+            git commit -m "Update DUS Ankünfte (AirLabs)" &&
+            git push
+          )
