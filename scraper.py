@@ -11,9 +11,7 @@ import html
 # ============================================================
 
 API_KEY = os.environ.get("AIRLABS_API_KEY")
-
 AIRPORT = "DUS"
-
 CACHE_FILE = "cache.json"
 CACHE_DURATION = 300  # 5 Minuten
 
@@ -23,19 +21,17 @@ HOURS_FUTURE = 5
 
 
 # ============================================================
-# CHARTER-ZUORDNUNG
+# CHARTER-ERKENNUNG (Airline-Namen und IATA-Codes)
 # ============================================================
 
 CHARTER_AIRLINES = [
-    "condor",
-    "tuifly",
-    "corendon",
-    "freebird",
-    "smartlynx",
-    "eurowings discover",
+    "condor", "tuifly", "corendon", "freebird", "smartlynx", 
+    "eurowings discover", "discover airlines", "sunexpress", "enter air",
+    "Tailwind", "Sundair", "Marabu", "Mavi Gök"
 ]
 
-CHARTER_FLIGHTS = [
+CHARTER_CODES = [
+    "DE", "X3", "XC", "FHY", "6Y", "4Y", "XQ", "ENT", "TWI", "SRD", "MBU"
 ]
 
 
@@ -52,14 +48,15 @@ def clean_text(value, fallback="Unbekannt"):
     return html.escape(value)
 
 
-def get_flight_type(airline_name, flight_iata):
+def get_flight_type(airline_name, airline_iata, flight_iata):
     airline_lower = str(airline_name or "").lower()
-    flight_upper = str(flight_iata or "").upper().replace(" ", "")
+    iata_upper = str(airline_iata or "").upper()
+    
+    # Prüfe IATA Codes
+    if iata_upper in CHARTER_CODES:
+        return "Charter"
 
-    for charter_flight in CHARTER_FLIGHTS:
-        if flight_upper == charter_flight.upper().replace(" ", ""):
-            return "Charter"
-
+    # Prüfe Airline-Namen
     for keyword in CHARTER_AIRLINES:
         if keyword in airline_lower:
             return "Charter"
@@ -106,7 +103,7 @@ def fetch_live_flights():
     params = {
         "api_key": API_KEY,
         "arr_iata": AIRPORT,
-        "limit": 50
+        "limit": 80
     }
 
     query_string = urllib.parse.urlencode(params)
@@ -115,9 +112,7 @@ def fetch_live_flights():
     try:
         request = urllib.request.Request(
             api_url,
-            headers={
-                "User-Agent": "DUS-Flight-Scraper/1.0"
-            }
+            headers={"User-Agent": "DUS-Flight-Scraper/1.0"}
         )
         with urllib.request.urlopen(request, timeout=10) as response:
             raw_data = response.read().decode("utf-8")
@@ -181,6 +176,8 @@ def update_html():
             or flight.get("airline_iata")
             or "Unbekannt"
         )
+        
+        airline_iata = flight.get("airline_iata") or ""
 
         arrival_time = (
             flight.get("arr_estimated")
@@ -216,7 +213,7 @@ def update_html():
         if terminal_raw:
             terminal = f"Terminal {terminal_raw}"
         else:
-            terminal = "Terminal A/B"
+            terminal = f"Terminal A/B"
 
         status = flight.get("status") or "scheduled"
 
@@ -227,7 +224,7 @@ def update_html():
         except Exception:
             delay = None
 
-        flight_type = get_flight_type(airline_name, flight_iata)
+        flight_type = get_flight_type(airline_name, airline_iata, flight_iata)
         gate = get_exit_gate(flight_type)
 
         valid_list.append({
@@ -246,12 +243,15 @@ def update_html():
 
     valid_list = sorted(valid_list, key=lambda x: x["dt"])
 
+    # Duplikate bei exakt gleicher Uhrzeit, Herkunft und Airline/Flugnummer bereinigen
     unique_flights = []
     seen = set()
     for flight in valid_list:
+        # Gruppierungsschlüssel gegen identische Mehrfacheinträge
         unique_key = (
-            flight["flight_no"],
-            flight["dt"].strftime("%Y-%m-%d %H:%M")
+            flight["city"],
+            flight["time_formatted"],
+            flight["airline"]
         )
         if unique_key in seen:
             continue
@@ -288,59 +288,28 @@ def update_html():
         )
 
         cards_html += f"""
-        <div
-            class="flight-card"
-            data-category="{f['type']}"
-            onclick="toggleCard(this)"
-        >
+        <div class="flight-card" data-category="{f['type']}">
             <div class="card-header">
                 <div class="time-col">
-                    <span class="flight-time">
-                        {f['time_formatted']}
-                    </span>
+                    <span class="flight-time">{f['time_formatted']}</span>
                     {delay_html}
                 </div>
                 <div class="main-info">
-                    <div class="city-name">
-                        {clean_text(f['city'])}
-                    </div>
+                    <div class="city-name">{clean_text(f['city'])}</div>
                     <div class="gate-info">
-                        <span class="{badge_class}">
-                            {clean_text(f['gate'])}
-                        </span>
+                        <span class="{badge_class}">{clean_text(f['gate'])}</span>
                     </div>
-                </div>
-                <div class="toggle-icon">
-                    ▼
                 </div>
             </div>
             <div class="card-details">
                 <hr class="detail-divider">
                 <div class="detail-grid">
-                    <div>
-                        <strong>Flug-Nr.:</strong>
-                        {clean_text(f['flight_no'])}
-                    </div>
-                    <div>
-                        <strong>Airline:</strong>
-                        {clean_text(f['airline'])}
-                    </div>
-                    <div>
-                        <strong>Von:</strong>
-                        {clean_text(f['dep_iata'])}
-                    </div>
-                    <div>
-                        <strong>Terminal:</strong>
-                        {clean_text(f['terminal'])}
-                    </div>
-                    <div>
-                        <strong>Status:</strong>
-                        {clean_text(status_text)}
-                    </div>
-                    <div>
-                        <strong>Typ:</strong>
-                        {clean_text(f['type'])}
-                    </div>
+                    <div><strong>Flug-Nr.:</strong> {clean_text(f['flight_no'])}</div>
+                    <div><strong>Airline:</strong> {clean_text(f['airline'])}</div>
+                    <div><strong>Von:</strong> {clean_text(f['dep_iata'])}</div>
+                    <div><strong>Terminal:</strong> {clean_text(f['terminal'])}</div>
+                    <div><strong>Status:</strong> {clean_text(status_text)}</div>
+                    <div><strong>Typ:</strong> {clean_text(f['type'])}</div>
                 </div>
             </div>
         </div>
@@ -359,15 +328,8 @@ def update_html():
         cache_status_text = "🌐 Live"
 
     update_info_text = f"""
-        Aktuelle Zeit:
-        <b>{now.strftime('%d.%m.%Y %H:%M')} Uhr</b>
-        {cache_status_text}
-        <br>
-        Zeitfenster:
-        {time_min.strftime('%H:%M')} Uhr
-        bis
-        {time_max.strftime('%H:%M')} Uhr
-        <br>
+        Aktuelle Zeit: <b>{now.strftime('%d.%m.%Y %H:%M')} Uhr</b> {cache_status_text}<br>
+        Zeitfenster: {time_min.strftime('%H:%M')} bis {time_max.strftime('%H:%M')} Uhr<br>
         {len(valid_list)} Ankünfte
     """
 
@@ -395,9 +357,8 @@ h1 {{ color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }}
 .btn-charter.active {{ background: #e65100; color: white; }}
 .flight-card {{
     background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; transition: background 0.1s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }}
-.flight-card:active {{ background: #fafafa; }}
 .card-header {{ display: flex; align-items: center; justify-content: space-between; }}
 .time-col {{ font-size: 1.2rem; font-weight: bold; color: #003366; min-width: 72px; }}
 .flight-time {{ display: block; }}
@@ -412,10 +373,9 @@ h1 {{ color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }}
 .delay-badge {{
     display: inline-block; margin-top: 3px; padding: 2px 5px; border-radius: 4px; background: #ffebee; color: #c62828; font-size: 0.7rem; font-weight: bold;
 }}
-.toggle-icon {{ font-size: 0.8rem; color: #888; transition: transform 0.3s; }}
-.flight-card.open .toggle-icon {{ transform: rotate(180deg); }}
-.card-details {{ display: none; margin-top: 10px; font-size: 0.85rem; color: #444; }}
-.flight-card.open .card-details {{ display: block; }}
+.card-details {{
+    margin-top: 10px; font-size: 0.85rem; color: #444; display: block;
+}}
 .detail-divider {{ border: none; border-top: 1px solid #eee; margin: 8px 0; }}
 .detail-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }}
 .no-flights {{ text-align: center; padding: 20px; color: #666; background: #fff; border-radius: 8px; }}
@@ -431,9 +391,6 @@ h1 {{ color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }}
 </div>
 <div id="flightList">{cards_html}</div>
 <script>
-function toggleCard(cardElement) {{
-    cardElement.classList.toggle("open");
-}}
 function filterFlights(category, event) {{
     const cards = document.querySelectorAll(".flight-card");
     const buttons = document.querySelectorAll(".filter-btn");
