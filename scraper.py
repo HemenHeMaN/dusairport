@@ -15,8 +15,8 @@ AIRPORT = "DUS"
 CACHE_FILE = "cache.json"
 CACHE_DURATION = 300  # 5 Minuten
 
-# Zeitfenster
-MINUTES_PAST = 30
+# Zeitfenster: 1 Stunde in der Vergangenheit, 5 Stunden in der Zukunft (gesamt 6 Stunden)
+MINUTES_PAST = 60
 HOURS_FUTURE = 5
 
 
@@ -456,7 +456,7 @@ function filterFlights(category, event) {{
     with open("index.html", "w", encoding="utf-8") as file:
         file.write(full_html)
 
-    print(f"HTML aktualisiert: {len(valid_list)} Flüge (Duplikate entfernt)")
+    print(f"HTML aktualisiert: {len(valid_list)} Flüge im neuen Zeitfenster (-1h bis +5h)")
 
 
 if __name__ == "__main__":
