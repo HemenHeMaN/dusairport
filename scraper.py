@@ -312,7 +312,12 @@ def update_html():
 
     cards_html = ""
     for f in valid_list:
-        badge_class = "badge-charter" if f["type"] == "Charter" else "badge-linie"
+        if f["type"] == "Linie":
+            badge_class = "badge-linie"
+            card_class = "flight-card card-linie"
+        else:
+            badge_class = "badge-charter"
+            card_class = "flight-card card-charter"
 
         delay_html = ""
         if f["delay"] > 0:
@@ -335,7 +340,7 @@ def update_html():
             status_text = status_translation.get(str(f["status"]).lower(), f["status"])
 
         cards_html += f"""
-        <div class="flight-card" data-category="{f['type']}">
+        <div class="{card_class}" data-category="{f['type']}">
             <div class="card-header">
                 <div class="time-col">
                     <span class="flight-time">{f['time_scheduled']}</span>
@@ -397,10 +402,26 @@ h1 {{ color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }}
 .btn-all.active {{ background: #003366; color: white; }}
 .btn-linie.active {{ background: #0d47a1; color: white; }}
 .btn-charter.active {{ background: #e65100; color: white; }}
+
+/* Flugkarten Grunddesign */
 .flight-card {{
-    background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 10px;
+    border-radius: 8px; padding: 12px; margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-left: 5px solid #ccc;
 }}
+
+/* Hellblau für Linie */
+.flight-card.card-linie {{
+    background: #f0f7ff;
+    border-left-color: #0d47a1;
+}}
+
+/* Hellorange für Charter */
+.flight-card.card-charter {{
+    background: #fff8f0;
+    border-left-color: #e65100;
+}}
+
 .card-header {{ display: flex; align-items: center; justify-content: space-between; }}
 .time-col {{ font-size: 1.2rem; font-weight: bold; color: #003366; min-width: 72px; }}
 .flight-time {{ display: block; }}
@@ -418,7 +439,7 @@ h1 {{ color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }}
 .card-details {{
     margin-top: 10px; font-size: 0.85rem; color: #444; display: block;
 }}
-.detail-divider {{ border: none; border-top: 1px solid #eee; margin: 8px 0; }}
+.detail-divider {{ border: none; border-top: 1px solid rgba(0,0,0,0.08); margin: 8px 0; }}
 .detail-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }}
 .no-flights {{ text-align: center; padding: 20px; color: #666; background: #fff; border-radius: 8px; }}
 </style>
@@ -456,7 +477,7 @@ function filterFlights(category, event) {{
     with open("index.html", "w", encoding="utf-8") as file:
         file.write(full_html)
 
-    print(f"HTML aktualisiert: {len(valid_list)} Flüge im neuen Zeitfenster (-1h bis +5h)")
+    print(f"HTML aktualisiert: {len(valid_list)} Flüge")
 
 
 if __name__ == "__main__":
