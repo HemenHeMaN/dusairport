@@ -48,9 +48,10 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
 </head>
 <body>
 <h1>DUS Ankünfte</h1>
-<div class="update-info" id="updateInfo">
-        Aktuelle Zeit: <b id="currentTime">--:--</b> 🌐 Live<br>
-        Lade Flüge aus Cache...
+<div class="update-info">
+        Aktuelle Zeit: <b>05.10.2026 22:18 Uhr</b> 🌐 Live<br>
+        Zeitfenster: 21:48 bis 03:18 Uhr<br>
+        54 Ankünfte
     </div>
 <div class="filter-container">
     <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
@@ -58,172 +59,1372 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
     <button class="filter-btn btn-charter" onclick="filterFlights('Charter', event)">Charter</button>
 </div>
 <div id="flightList">
-    <div class="no-flights">Daten werden geladen...</div>
-</div>
-
-<script>
-// Flughafen-Mapping für sprechende Namen
-const airportNames = {
-    'MUC': 'München',
-    'LHR': 'London-Heathrow',
-    'SMI': 'Samos',
-    'FCO': 'Rom-Fiumicino',
-    'IBZ': 'Ibiza',
-    'WAW': 'Warschau',
-    'CDG': 'Paris-Charles-de-Gaulle',
-    'CPH': 'Kopenhagen',
-    'CFU': 'Korfu',
-    'MAN': 'Manchester',
-    'RHO': 'Rhodos',
-    'BUD': 'Budapest',
-    'PMI': 'Palma de Mallorca',
-    'HAM': 'Hamburg',
-    'OTP': 'Bukarest',
-    'LIN': 'Mailand-Linate',
-    'ALC': 'Alicante',
-    'BHX': 'Birmingham',
-    'FNC': 'Madeira',
-    'FRA': 'Frankfurt',
-    'HER': 'Iraklion',
-    'MAD': 'Madrid',
-    'DLM': 'Dalaman',
-    'AMS': 'Amsterdam',
-    'FAO': 'Faro',
-    'AGP': 'Malaga',
-    'HRG': 'Hurghada',
-    'KGS': 'Kos',
-    'PRG': 'Prag',
-    'AGA': 'Agadir',
-    'BIO': 'Bilbao',
-    'LPA': 'Gran Canaria',
-    'BCN': 'Barcelona',
-    'TFS': 'Teneriffa Süd',
-    'LCA': 'Larnaka',
-    'FUE': 'Fuerteventura'
-};
-
-function getAirportName(code) {
-    return airportNames[code] || code;
-}
-
-// Funktion zum Berechnen der neuen Uhrzeit bei Verspätung
-function calculateNewTime(timeStr, delayStr) {
-    if (!delayStr) {
-        return { time: timeStr, statusText: 'Gelandet' };
-    }
-
-    const match = delayStr.match(/\d+/);
-    const delayMinutes = match ? parseInt(match[0], 10) : 0;
-
-    if (delayMinutes <= 0 || !timeStr) {
-        return { time: timeStr, statusText: 'Gelandet' };
-    }
-
-    const parts = timeStr.split(':');
-    if (parts.length !== 2) {
-        return { time: timeStr, statusText: 'Verspätet (' + delayStr + ')' };
-    }
-
-    let hours = parseInt(parts[0], 10);
-    let minutes = parseInt(parts[1], 10);
-
-    let totalMinutes = (hours * 60) + minutes + delayMinutes;
-    let newHours = Math.floor(totalMinutes / 60) % 24;
-    let newMinutes = totalMinutes % 60;
-
-    const formattedTime = String(newHours).padStart(2, '0') + ':' + String(newMinutes).padStart(2, '0');
-
-    return {
-        time: formattedTime,
-        statusText: 'Verspätet (ca. ' + formattedTime + ' Uhr)'
-    };
-}
-
-// Aktuelle Uhrzeit im Header anzeigen
-function updateClock() {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('de-DE');
-    const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('currentTime').innerText = dateStr + ' ' + timeStr + ' Uhr';
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// cache.json laden und rendern
-fetch('cache.json')
-    .then(response => {
-        if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
-        return response.json();
-    })
-    .then(flights => {
-        const container = document.getElementById('flightList');
-        const updateInfo = document.getElementById('updateInfo');
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:00</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Manchester</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> 4X9345</div>
+                    <div><strong>Airline:</strong> 4X</div>
+                    <div><strong>Von:</strong> Manchester</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
         
-        container.innerHTML = '';
-        updateInfo.innerHTML = `Aktuelle Zeit: <b id="currentTime">${new Date().toLocaleString('de-DE')}</b> 🌐 Live<br>${flights.length} Ankünfte aus Cache geladen`;
-
-        if (!flights || flights.length === 0) {
-            container.innerHTML = '<div class="no-flights">Keine Flüge im Cache gefunden.</div>';
-            return;
-        }
-
-        flights.forEach(flight => {
-            const category = flight.type || flight.category || 'Linie';
-            const rawTime = flight.time || '';
-            const rawCity = flight.city || flight.from || '';
-            const cityName = getAirportName(rawCity);
-            const flightNo = flight.flight_no || flight.flug_nr || '';
-            const airline = flight.airline || '';
-            const delay = flight.delay || '';
-            const gate = flight.gate || '';
-
-            const calc = calculateNewTime(rawTime, delay);
-            const displayTime = calc.time;
-            const status = delay ? calc.statusText : (flight.status || 'Gelandet');
-
-            const badgeClass = (category === 'Charter') ? 'badge-charter' : 'badge-linie';
-
-            const card = document.createElement('div');
-            card.className = 'flight-card';
-            card.setAttribute('data-category', category);
-
-            card.innerHTML = `
-                <div class="card-header">
-                    <div class="time-col">
-                        <span class="flight-time">${displayTime}</span>
-                        ${delay ? `<span class="delay-badge">${delay}</span>` : ''}
-                    </div>
-                    <div class="main-info">
-                        <div class="city-name">${cityName}</div>
-                        <div class="gate-info">
-                            <span class="${badgeClass}">${gate} (${category})</span>
-                        </div>
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:00</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Manchester</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
                     </div>
                 </div>
-                <div class="card-details">
-                    <hr class="detail-divider">
-                    <div class="detail-grid">
-                        <div><strong>Flug-Nr.:</strong> ${flightNo}</div>
-                        <div><strong>Airline:</strong> ${airline}</div>
-                        <div><strong>Von:</strong> ${cityName}</div>
-                        <div><strong>Typ:</strong> ${category}</div>
-                        <div><strong>Status:</strong> ${status}</div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9345</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Manchester</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:08</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Bukarest</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
                     </div>
                 </div>
-            `;
-            container.appendChild(card);
-        });
-    })
-    .catch(error => {
-        console.error('Fehler beim Laden der cache.json:', error);
-        document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json (Datei evtl. nicht im selben Ordner oder CORS-Blockade).</div>';
-    });
-
-// Filter-Funktion für die Buttons
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9793</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Bukarest</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:16</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Birmingham</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9335</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Birmingham</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:18</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Palma de Mallorca</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> DI1517</div>
+                    <div><strong>Airline:</strong> DI</div>
+                    <div><strong>Von:</strong> Palma de Mallorca</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:18</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">München</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> BT6451</div>
+                    <div><strong>Airline:</strong> BT</div>
+                    <div><strong>Von:</strong> München</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:18</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Palma de Mallorca</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> DE1517</div>
+                    <div><strong>Airline:</strong> DE</div>
+                    <div><strong>Von:</strong> Palma de Mallorca</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:18</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">München</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> CA6143</div>
+                    <div><strong>Airline:</strong> CA</div>
+                    <div><strong>Von:</strong> München</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:18</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">München</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> OU5422</div>
+                    <div><strong>Airline:</strong> OU</div>
+                    <div><strong>Von:</strong> München</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:18</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">München</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> LH2034</div>
+                    <div><strong>Airline:</strong> LH</div>
+                    <div><strong>Von:</strong> München</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:56</span>
+                    <span class="delay-badge">+33 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Madeira</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9601</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Madeira</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:56 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> OU5412</div>
+                    <div><strong>Airline:</strong> OU</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> SQ2080</div>
+                    <div><strong>Airline:</strong> SQ</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> LA8672</div>
+                    <div><strong>Airline:</strong> LA</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> NH6065</div>
+                    <div><strong>Airline:</strong> NH</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> TG7634</div>
+                    <div><strong>Airline:</strong> TG</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> CA6035</div>
+                    <div><strong>Airline:</strong> CA</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> LH78</div>
+                    <div><strong>Airline:</strong> LH</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> AI8851</div>
+                    <div><strong>Airline:</strong> AI</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:59</span>
+                    <span class="delay-badge">+32 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Frankfurt</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> AZ4724</div>
+                    <div><strong>Airline:</strong> AZ</div>
+                    <div><strong>Von:</strong> Frankfurt</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:59 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:42</span>
+                    <span class="delay-badge">+11 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Madrid</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> VY5337</div>
+                    <div><strong>Airline:</strong> VY</div>
+                    <div><strong>Von:</strong> Madrid</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:42 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:07</span>
+                    <span class="delay-badge">+36 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Iraklion</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9671</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Iraklion</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:07 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:42</span>
+                    <span class="delay-badge">+11 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Madrid</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> LA1529</div>
+                    <div><strong>Airline:</strong> LA</div>
+                    <div><strong>Von:</strong> Madrid</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:42 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:42</span>
+                    <span class="delay-badge">+11 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Madrid</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> IB1325</div>
+                    <div><strong>Airline:</strong> IB</div>
+                    <div><strong>Von:</strong> Madrid</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:42 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:07</span>
+                    <span class="delay-badge">+36 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Iraklion</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> A33886</div>
+                    <div><strong>Airline:</strong> A3</div>
+                    <div><strong>Von:</strong> Iraklion</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:07 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:42</span>
+                    <span class="delay-badge">+11 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Madrid</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> YW1325</div>
+                    <div><strong>Airline:</strong> YW</div>
+                    <div><strong>Von:</strong> Madrid</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:42 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:36</span>
+                    <span class="delay-badge">+3 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Dalaman</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> X3117</div>
+                    <div><strong>Airline:</strong> X3</div>
+                    <div><strong>Von:</strong> Dalaman</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:36 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:45</span>
+                    <span class="delay-badge">+10 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Amsterdam</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> KQ1863</div>
+                    <div><strong>Airline:</strong> KQ</div>
+                    <div><strong>Von:</strong> Amsterdam</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:45 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:45</span>
+                    <span class="delay-badge">+10 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Amsterdam</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> KL1805</div>
+                    <div><strong>Airline:</strong> KL</div>
+                    <div><strong>Von:</strong> Amsterdam</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:45 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:45</span>
+                    <span class="delay-badge">+10 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Amsterdam</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> ZQ1805</div>
+                    <div><strong>Airline:</strong> ZQ</div>
+                    <div><strong>Von:</strong> Amsterdam</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:45 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:45</span>
+                    <span class="delay-badge">+10 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Amsterdam</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> 6E3233</div>
+                    <div><strong>Airline:</strong> 6E</div>
+                    <div><strong>Von:</strong> Amsterdam</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:45 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:45</span>
+                    <span class="delay-badge">+10 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Amsterdam</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> MF9393</div>
+                    <div><strong>Airline:</strong> MF</div>
+                    <div><strong>Von:</strong> Amsterdam</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:45 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:45</span>
+                    <span class="delay-badge">+10 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Amsterdam</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> MU1829</div>
+                    <div><strong>Airline:</strong> MU</div>
+                    <div><strong>Von:</strong> Amsterdam</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:45 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:45</span>
+                    <span class="delay-badge">+10 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Amsterdam</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> AM6456</div>
+                    <div><strong>Airline:</strong> AM</div>
+                    <div><strong>Von:</strong> Amsterdam</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:45 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:49</span>
+                    <span class="delay-badge">+12 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Faro</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9645</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Faro</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:49 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:43</span>
+                    <span class="delay-badge">+4 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Malaga</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9537</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Malaga</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:43 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:43</span>
+                    <span class="delay-badge">+4 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Malaga</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> 4X9537</div>
+                    <div><strong>Airline:</strong> 4X</div>
+                    <div><strong>Von:</strong> Malaga</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:43 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:47</span>
+                    <span class="delay-badge">+6 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Hurghada</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> DE69</div>
+                    <div><strong>Airline:</strong> DE</div>
+                    <div><strong>Von:</strong> Hurghada</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:47 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:41</span>
+                    
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Kos</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> X34573</div>
+                    <div><strong>Airline:</strong> X3</div>
+                    <div><strong>Von:</strong> Kos</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Gelandet</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:20</span>
+                    <span class="delay-badge">+35 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Kos</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9637</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Kos</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:20 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:20</span>
+                    <span class="delay-badge">+35 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Kos</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> 4X9637</div>
+                    <div><strong>Airline:</strong> 4X</div>
+                    <div><strong>Von:</strong> Kos</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:20 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:44</span>
+                    <span class="delay-badge">+57 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Prag</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> E69775</div>
+                    <div><strong>Airline:</strong> E6</div>
+                    <div><strong>Von:</strong> Prag</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:44 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:44</span>
+                    <span class="delay-badge">+57 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Prag</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9775</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Prag</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:44 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:44</span>
+                    <span class="delay-badge">+57 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Prag</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> QS8044</div>
+                    <div><strong>Airline:</strong> QS</div>
+                    <div><strong>Von:</strong> Prag</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:44 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">22:51</span>
+                    <span class="delay-badge">+3 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Agadir</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> DE139</div>
+                    <div><strong>Airline:</strong> DE</div>
+                    <div><strong>Von:</strong> Agadir</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 22:51 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:18</span>
+                    <span class="delay-badge">+29 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Bilbao</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9519</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Bilbao</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:18 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:32</span>
+                    <span class="delay-badge">+41 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Barcelona</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> 4X9445</div>
+                    <div><strong>Airline:</strong> 4X</div>
+                    <div><strong>Von:</strong> Barcelona</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:32 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Linie">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:32</span>
+                    <span class="delay-badge">+41 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Barcelona</div>
+                    <div class="gate-info">
+                        <span class="badge-linie">Ausgang 1 (Linie)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> EW9445</div>
+                    <div><strong>Airline:</strong> EW</div>
+                    <div><strong>Von:</strong> Barcelona</div>
+                    <div><strong>Typ:</strong> Linie</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:32 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:18</span>
+                    <span class="delay-badge">+19 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Iraklion</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> DE1617</div>
+                    <div><strong>Airline:</strong> DE</div>
+                    <div><strong>Von:</strong> Iraklion</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:18 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:29</span>
+                    <span class="delay-badge">+27 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Iraklion</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> X34105</div>
+                    <div><strong>Airline:</strong> X3</div>
+                    <div><strong>Von:</strong> Iraklion</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:29 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:35</span>
+                    <span class="delay-badge">+30 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Teneriffa Süd</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> DE1429</div>
+                    <div><strong>Airline:</strong> DE</div>
+                    <div><strong>Von:</strong> Teneriffa Süd</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:35 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">00:08</span>
+                    <span class="delay-badge">+54 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Larnaka</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> DE1685</div>
+                    <div><strong>Airline:</strong> DE</div>
+                    <div><strong>Von:</strong> Larnaka</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 00:08 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">23:58</span>
+                    <span class="delay-badge">+39 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Fuerteventura</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> X32117</div>
+                    <div><strong>Airline:</strong> X3</div>
+                    <div><strong>Von:</strong> Fuerteventura</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 23:58 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flight-card" data-category="Charter">
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">00:10</span>
+                    <span class="delay-badge">+40 Min.</span>
+                </div>
+                <div class="main-info">
+                    <div class="city-name">Gran Canaria</div>
+                    <div class="gate-info">
+                        <span class="badge-charter">Ausgang 4 (Charter)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> X32115</div>
+                    <div><strong>Airline:</strong> X3</div>
+                    <div><strong>Von:</strong> Gran Canaria</div>
+                    <div><strong>Typ:</strong> Charter</div>
+                    <div><strong>Status:</strong> Verspätet (ca. 00:10 Uhr)</div>
+                </div>
+            </div>
+        </div>
+        </div>
+<script>
 function filterFlights(category, event) {
     const cards = document.querySelectorAll(".flight-card");
     const buttons = document.querySelectorAll(".filter-btn");
-    buttons.forEach(btn => btn.classList.remove("active"));
+    buttons.forEach(function(btn) { btn.classList.remove("active"); });
     if (event && event.target) { event.target.classList.add("active"); }
-    cards.forEach(card => {
-        const cardCategory = card.getAttribute("data-
+    cards.forEach(function(card) {
+        const cardCategory = card.getAttribute("data-category");
+        if (!cardCategory) { return; }
+        if (category === "all" || cardCategory === category) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+}
+</script>
+</body>
+</html>
