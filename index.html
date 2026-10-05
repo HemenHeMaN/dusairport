@@ -20,10 +20,26 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
 .btn-all.active { background: #003366; color: white; }
 .btn-linie.active { background: #0d47a1; color: white; }
 .btn-charter.active { background: #e65100; color: white; }
+
+/* Flugkarten Grunddesign */
 .flight-card {
-    background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 10px;
+    border-radius: 8px; padding: 12px; margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-left: 5px solid #ccc;
 }
+
+/* Hellblau für Linie */
+.flight-card.card-linie {
+    background: #f0f7ff;
+    border-left-color: #0d47a1;
+}
+
+/* Hellorange für Charter */
+.flight-card.card-charter {
+    background: #fff8f0;
+    border-left-color: #e65100;
+}
+
 .card-header { display: flex; align-items: center; justify-content: space-between; }
 .time-col { font-size: 1.2rem; font-weight: bold; color: #003366; min-width: 72px; }
 .flight-time { display: block; }
@@ -41,43 +57,109 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
 .card-details {
     margin-top: 10px; font-size: 0.85rem; color: #444; display: block;
 }
-.detail-divider { border: none; border-top: 1px solid #eee; margin: 8px 0; }
+.detail-divider { border: none; border-top: 1px solid rgba(0,0,0,0.08); margin: 8px 0; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .no-flights { text-align: center; padding: 20px; color: #666; background: #fff; border-radius: 8px; }
 </style>
 </head>
 <body>
 <h1>DUS Ankünfte</h1>
-<div class="update-info">
-        Aktuelle Zeit: <b>05.10.2026 22:29 Uhr</b> 🌐 Live<br>
-        Zeitfenster: 21:59 bis 03:29 Uhr<br>
-        0 Ankünfte
-    </div>
+<div class="update-info" id="updateInfo">Lade Daten...</div>
 <div class="filter-container">
     <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
     <button class="filter-btn btn-linie" onclick="filterFlights('Linie', event)">Linie</button>
     <button class="filter-btn btn-charter" onclick="filterFlights('Charter', event)">Charter</button>
 </div>
 <div id="flightList">
-        <div class="no-flights">
-            Keine Flüge im aktuellen Zeitfenster gefunden.
-        </div>
-        </div>
+    <div class="no-flights">Flüge werden geladen...</div>
+</div>
+
 <script>
-function filterFlights(category, event) {
-    const cards = document.querySelectorAll(".flight-card");
-    const buttons = document.querySelectorAll(".filter-btn");
-    buttons.forEach(function(btn) { btn.classList.remove("active"); });
-    if (event && event.target) { event.target.classList.add("active"); }
-    cards.forEach(function(card) {
-        const cardCategory = card.getAttribute("data-category");
-        if (!cardCategory) { return; }
-        if (category === "all" || cardCategory === category) {
-            card.style.display = "block";
-        } else {
-            card.style.display = "none";
-        }
+let allFlights = [];
+
+fetch('flights.json')
+    .then(response => response.json())
+    .then(data => {
+        const updateInfo = document.getElementById('updateInfo');
+        updateInfo.innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Ankünfte`;
+        
+        allFlights = data.flights;
+        renderFlights(allFlights);
+    })
+    .catch(error => {
+        document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der flights.json</div>';
     });
+
+function renderFlights(flights) {
+    const container = document.getElementById('flightList');
+    container.innerHTML = '';
+
+    if (!flights || flights.length === 0) {
+        container.innerHTML = '<div class="no-flights">Keine Flüge gefunden.</div>';
+        return;
+    }
+
+    const statusMap = {
+        "scheduled": "Geplant",
+        "en-route": "Im Anflug",
+        "active": "Im Anflug",
+        "landed": "Gelandet",
+        "cancelled": "Storniert",
+        "incident": "Störung",
+        "diverted": "Umgeleitet"
+    };
+
+    flights.forEach(f => {
+        const isCharter = f.type === "Charter";
+        const cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
+        const badgeClass = isCharter ? "badge-charter" : "badge-linie";
+
+        let delayHtml = f.delay > 0 ? `<span class="delay-badge">+${f.delay} Min.</span>` : '';
+        let statusText = f.delay > 0 ? `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)` : (statusMap[f.status.toLowerCase()] || f.status);
+
+        const card = document.createElement('div');
+        card.className = cardClass;
+        card.setAttribute('data-category', f.type);
+
+        card.innerHTML = `
+            <div class="card-header">
+                <div class="time-col">
+                    <span class="flight-time">${f.time_scheduled}</span>
+                    ${delayHtml}
+                </div>
+                <div class="main-info">
+                    <div class="city-name">${f.city}</div>
+                    <div class="gate-info">
+                        <span class="${badgeClass}">${f.gate}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-details">
+                <hr class="detail-divider">
+                <div class="detail-grid">
+                    <div><strong>Flug-Nr.:</strong> ${f.flight_no}</div>
+                    <div><strong>Airline:</strong> ${f.airline}</div>
+                    <div><strong>Von:</strong> ${f.city}</div>
+                    <div><strong>Typ:</strong> ${f.type}</div>
+                    <div><strong>Status:</strong> ${statusText}</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function filterFlights(category, event) {
+    const buttons = document.querySelectorAll(".filter-btn");
+    buttons.forEach(btn => btn.classList.remove("active"));
+    if (event && event.target) { event.target.classList.add("active"); }
+
+    if (category === "all") {
+        renderFlights(allFlights);
+    } else {
+        const filtered = allFlights.filter(f => f.type === category);
+        renderFlights(filtered);
+    }
 }
 </script>
 </body>
