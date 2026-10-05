@@ -2,10 +2,9 @@ name: DUS Ankuenfte Clean Table
 
 on:
   schedule:
-    # Alle 30 Minuten, aber NUR von 07:00 bis 23:30 Uhr (UTC beachten: Düsseldorf ist UTC+1/UTC+2)
-    # 07:00 MEZ = 06:00 UTC, 23:30 MEZ = 22:30 UTC
-    # Wir lassen ihn von 05:00 bis 21:30 UTC laufen (entspricht 06:00/07:00 bis 22:30/23:30 Uhr lokal)
-    - cron: '*/30 5-21 * * *'
+    # Läuft von 03:30 bis 21:30 UTC (entspricht 05:30 bis 23:30 Uhr in Düsseldorf)
+    # Pause von 23:30 bis 05:30 Uhr lokaler Zeit.
+    - cron: '*/30 3-21 * * *'
 
   workflow_dispatch:
 
@@ -38,10 +37,10 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html cache.json
+          git add cache.json
           git diff --quiet && \
           git diff --staged --quiet || \
           (
-            git commit -m "Update DUS Ankünfte (AirLabs)" &&
+            git commit -m "Update cache.json (AirLabs)" &&
             git push
           )
