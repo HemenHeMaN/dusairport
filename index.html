@@ -77,7 +77,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
 <script>
 let allFlights = [];
 
-fetch('flights.json')
+fetch('cache.json')
     .then(response => response.json())
     .then(data => {
         const updateInfo = document.getElementById('updateInfo');
@@ -87,7 +87,7 @@ fetch('flights.json')
         renderFlights(allFlights);
     })
     .catch(error => {
-        document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der flights.json</div>';
+        document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json</div>';
     });
 
 function renderFlights(flights) {
