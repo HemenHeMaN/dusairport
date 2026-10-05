@@ -128,17 +128,14 @@ def parse_airlabs_time(time_string):
 
 
 def get_dynamic_city_name(flight_data):
-    # 1. Zuerst prüfen, ob das IATA-Kürzel in unserem Mapping steht (für saubere Namen wie London-Heathrow)
     iata = flight_data.get("dep_iata")
     if iata and str(iata).upper() in AIRPORT_NAMES:
         return AIRPORT_NAMES[str(iata).upper()]
 
-    # 2. Prüfen, ob die API einen direkten Stadtnamen liefert
     city = flight_data.get("dep_city")
     if city and len(str(city).strip()) > 1:
         return str(city).strip()
 
-    # 3. Flughafen-Namen nehmen und Zusätze bereinigen
     name = flight_data.get("dep_name")
     if name and len(str(name).strip()) > 1:
         cleaned = (
@@ -149,7 +146,6 @@ def get_dynamic_city_name(flight_data):
         )
         return cleaned
 
-    # 4. Fallback IATA
     if iata:
         return str(iata).strip()
 
@@ -247,21 +243,15 @@ def update_html():
             or flight.get("airline_iata")
             or "Unbekannt"
         )
-        
         airline_iata = flight.get("airline_iata") or ""
 
-        arrival_time = (
-            flight.get("arr_estimated")
-            or flight.get("arr_time")
-            or flight.get("arr_scheduled")
-            or flight.get("arr_actual")
-        )
-
-        flight_dt = parse_airlabs_time(arrival_time)
-        if not flight_dt:
+        # Geplante Zeit (Basis)
+        scheduled_time = flight.get("arr_scheduled")
+        scheduled_dt = parse_airlabs_time(scheduled_time)
+        if not scheduled_dt:
             continue
 
-        if not (time_min <= flight_dt <= time_max):
+        if not (time_min <= scheduled_dt <= time_max):
             continue
 
         airline_lower = str(airline_name).lower()
@@ -273,29 +263,28 @@ def update_html():
             continue
 
         departure_city = get_dynamic_city_name(flight)
-
         status = flight.get("status") or "scheduled"
 
+        # Verspätung und erwartete Zeit ermitteln
         delay = flight.get("arr_delayed")
         try:
-            if delay is not None:
-                delay = int(delay)
-            else:
-                delay = 0
+            delay = int(delay) if delay is not None else 0
         except Exception:
             delay = 0
+
+        estimated_time = flight.get("arr_estimated") or flight.get("arr_time")
+        estimated_dt = parse_airlabs_time(estimated_time)
+        
+        if not estimated_dt:
+            estimated_dt = scheduled_dt + timedelta(minutes=delay)
 
         flight_type = get_flight_type(airline_name, airline_iata, flight_iata)
         gate = get_exit_gate(flight_type)
 
-        # Uhrzeit anpassen bei Verspätung (+ Minuten aufrechnen)
-        display_dt = flight_dt
-        if delay > 0:
-            display_dt = flight_dt + timedelta(minutes=delay)
-
         valid_list.append({
-            "dt": flight_dt,
-            "time_formatted": display_dt.strftime("%H:%M"),
+            "dt": scheduled_dt,
+            "time_scheduled": scheduled_dt.strftime("%H:%M"),
+            "time_estimated": estimated_dt.strftime("%H:%M"),
             "flight_no": flight_iata,
             "airline": airline_name,
             "city": departure_city,
@@ -307,13 +296,13 @@ def update_html():
 
     valid_list = sorted(valid_list, key=lambda x: x["dt"])
 
+    # Duplikate / Codeshares herausfiltern (gleicher Flughafen + gleiche geplante Zeit)
     unique_flights = []
     seen = set()
     for flight in valid_list:
         unique_key = (
             flight["city"],
-            flight["time_formatted"],
-            flight["airline"]
+            flight["time_scheduled"]
         )
         if unique_key in seen:
             continue
@@ -323,10 +312,7 @@ def update_html():
 
     cards_html = ""
     for f in valid_list:
-        if f["type"] == "Linie":
-            badge_class = "badge-linie"
-        else:
-            badge_class = "badge-charter"
+        badge_class = "badge-charter" if f["type"] == "Charter" else "badge-linie"
 
         delay_html = ""
         if f["delay"] > 0:
@@ -342,9 +328,9 @@ def update_html():
             "diverted": "Umgeleitet"
         }
         
-        # Wenn Verspätung vorliegt, Status entsprechend anpassen
+        # Status-Anzeige (Geplant vs. Erwartet)
         if f["delay"] > 0:
-            status_text = f"Verspätet (ca. {f['time_formatted']} Uhr)"
+            status_text = f"Erwartet: {f['time_estimated']} Uhr (+{f['delay']} Min.)"
         else:
             status_text = status_translation.get(str(f["status"]).lower(), f["status"])
 
@@ -352,7 +338,7 @@ def update_html():
         <div class="flight-card" data-category="{f['type']}">
             <div class="card-header">
                 <div class="time-col">
-                    <span class="flight-time">{f['time_formatted']}</span>
+                    <span class="flight-time">{f['time_scheduled']}</span>
                     {delay_html}
                 </div>
                 <div class="main-info">
@@ -382,11 +368,7 @@ def update_html():
         </div>
         """
 
-    if from_cache:
-        cache_status_text = "⚡ Cache"
-    else:
-        cache_status_text = "🌐 Live"
-
+    cache_status_text = "⚡ Cache" if from_cache else "🌐 Live"
     update_info_text = f"""
         Aktuelle Zeit: <b>{now.strftime('%d.%m.%Y %H:%M')} Uhr</b> {cache_status_text}<br>
         Zeitfenster: {time_min.strftime('%H:%M')} bis {time_max.strftime('%H:%M')} Uhr<br>
@@ -474,7 +456,7 @@ function filterFlights(category, event) {{
     with open("index.html", "w", encoding="utf-8") as file:
         file.write(full_html)
 
-    print(f"HTML aktualisiert: {len(valid_list)} Flüge")
+    print(f"HTML aktualisiert: {len(valid_list)} Flüge (Duplikate entfernt)")
 
 
 if __name__ == "__main__":
