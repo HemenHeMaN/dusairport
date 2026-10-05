@@ -21,6 +21,50 @@ HOURS_FUTURE = 5
 
 
 # ============================================================
+# FLUGHAFEN-MAPPING (IATA zu sprechendem Namen)
+# ============================================================
+
+AIRPORT_NAMES = {
+    "MUC": "München",
+    "LHR": "London-Heathrow",
+    "SMI": "Samos",
+    "FCO": "Rom-Fiumicino",
+    "IBZ": "Ibiza",
+    "WAW": "Warschau",
+    "CDG": "Paris-Charles-de-Gaulle",
+    "CPH": "Kopenhagen",
+    "CFU": "Korfu",
+    "MAN": "Manchester",
+    "RHO": "Rhodos",
+    "BUD": "Budapest",
+    "PMI": "Palma de Mallorca",
+    "HAM": "Hamburg",
+    "OTP": "Bukarest",
+    "LIN": "Mailand-Linate",
+    "ALC": "Alicante",
+    "BHX": "Birmingham",
+    "FNC": "Madeira",
+    "FRA": "Frankfurt",
+    "HER": "Iraklion",
+    "MAD": "Madrid",
+    "DLM": "Dalaman",
+    "AMS": "Amsterdam",
+    "FAO": "Faro",
+    "AGP": "Malaga",
+    "HRG": "Hurghada",
+    "KGS": "Kos",
+    "PRG": "Prag",
+    "AGA": "Agadir",
+    "BIO": "Bilbao",
+    "LPA": "Gran Canaria",
+    "BCN": "Barcelona",
+    "TFS": "Teneriffa Süd",
+    "LCA": "Larnaka",
+    "FUE": "Fuerteventura"
+}
+
+
+# ============================================================
 # CHARTER-ERKENNUNG (Airline-Namen und IATA-Codes)
 # ============================================================
 
@@ -84,29 +128,28 @@ def parse_airlabs_time(time_string):
 
 
 def get_dynamic_city_name(flight_data):
-    """
-    Holt den Namen des Abflughafens voll dynamisch direkt aus den API-Daten.
-    Bevorzugt den Stadtnamen, bereinigt den Flughafen-Namen oder nutzt den Langtext.
-    """
-    # 1. Prüfen, ob die API einen direkten Stadtnamen liefert (z.B. "Dubai", "Istanbul")
+    # 1. Zuerst prüfen, ob das IATA-Kürzel in unserem Mapping steht (für saubere Namen wie London-Heathrow)
+    iata = flight_data.get("dep_iata")
+    if iata and str(iata).upper() in AIRPORT_NAMES:
+        return AIRPORT_NAMES[str(iata).upper()]
+
+    # 2. Prüfen, ob die API einen direkten Stadtnamen liefert
     city = flight_data.get("dep_city")
     if city and len(str(city).strip()) > 1:
         return str(city).strip()
 
-    # 2. Wenn kein Stadtname da ist, den Flughafen-Namen nehmen und Zusätze bereinigen
+    # 3. Flughafen-Namen nehmen und Zusätze bereinigen
     name = flight_data.get("dep_name")
     if name and len(str(name).strip()) > 1:
         cleaned = (
             str(name)
             .replace(" Airport", "")
             .replace(" International", "")
-            .replace(" Airport", "")
             .strip()
         )
         return cleaned
 
-    # 3. Falls gar nichts da ist, als letzten Ausweg das IATA-Kürzel
-    iata = flight_data.get("dep_iata")
+    # 4. Fallback IATA
     if iata:
         return str(iata).strip()
 
@@ -229,14 +272,7 @@ def update_html():
         ):
             continue
 
-        # Dynamischer Abflugort direkt aus den API-Daten
         departure_city = get_dynamic_city_name(flight)
-
-        terminal_raw = flight.get("arr_terminal") or flight.get("terminal")
-        if terminal_raw:
-            terminal = f"Terminal {terminal_raw}"
-        else:
-            terminal = "Terminal A/B"
 
         status = flight.get("status") or "scheduled"
 
@@ -244,19 +280,25 @@ def update_html():
         try:
             if delay is not None:
                 delay = int(delay)
+            else:
+                delay = 0
         except Exception:
-            delay = None
+            delay = 0
 
         flight_type = get_flight_type(airline_name, airline_iata, flight_iata)
         gate = get_exit_gate(flight_type)
 
+        # Uhrzeit anpassen bei Verspätung (+ Minuten aufrechnen)
+        display_dt = flight_dt
+        if delay > 0:
+            display_dt = flight_dt + timedelta(minutes=delay)
+
         valid_list.append({
             "dt": flight_dt,
-            "time_formatted": flight_dt.strftime("%H:%M"),
+            "time_formatted": display_dt.strftime("%H:%M"),
             "flight_no": flight_iata,
             "airline": airline_name,
             "city": departure_city,
-            "terminal": terminal,
             "type": flight_type,
             "gate": gate,
             "status": status,
@@ -287,12 +329,8 @@ def update_html():
             badge_class = "badge-charter"
 
         delay_html = ""
-        if f["delay"] is not None and f["delay"] > 0:
-            delay_html = (
-                f'<span class="delay-badge">'
-                f'+{f["delay"]} Min.'
-                f'</span>'
-            )
+        if f["delay"] > 0:
+            delay_html = f'<span class="delay-badge">+{f["delay"]} Min.</span>'
 
         status_translation = {
             "scheduled": "Geplant",
@@ -303,10 +341,12 @@ def update_html():
             "incident": "Störung",
             "diverted": "Umgeleitet"
         }
-        status_text = status_translation.get(
-            str(f["status"]).lower(),
-            f["status"]
-        )
+        
+        # Wenn Verspätung vorliegt, Status entsprechend anpassen
+        if f["delay"] > 0:
+            status_text = f"Verspätet (ca. {f['time_formatted']} Uhr)"
+        else:
+            status_text = status_translation.get(str(f["status"]).lower(), f["status"])
 
         cards_html += f"""
         <div class="flight-card" data-category="{f['type']}">
@@ -328,9 +368,8 @@ def update_html():
                     <div><strong>Flug-Nr.:</strong> {clean_text(f['flight_no'])}</div>
                     <div><strong>Airline:</strong> {clean_text(f['airline'])}</div>
                     <div><strong>Von:</strong> {clean_text(f['city'])}</div>
-                    <div><strong>Terminal:</strong> {clean_text(f['terminal'])}</div>
-                    <div><strong>Status:</strong> {clean_text(status_text)}</div>
                     <div><strong>Typ:</strong> {clean_text(f['type'])}</div>
+                    <div><strong>Status:</strong> {clean_text(status_text)}</div>
                 </div>
             </div>
         </div>
