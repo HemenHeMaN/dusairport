@@ -2,9 +2,7 @@ name: DUS Ankuenfte Clean Table
 
 on:
   schedule:
-    # Alle 30 Minuten, aber NUR von 07:00 bis 23:30 Uhr (UTC beachten: Düsseldorf ist UTC+1/UTC+2)
-    # 07:00 MEZ = 06:00 UTC, 23:30 MEZ = 22:30 UTC
-    # Wir lassen ihn von 05:00 bis 21:30 UTC laufen (entspricht 06:00/07:00 bis 22:30/23:30 Uhr lokal)
+    # Alle 30 Minuten von 07:00 bis 23:30 Uhr (05:00 bis 21:30 UTC)
     - cron: '*/30 5-21 * * *'
 
   workflow_dispatch:
