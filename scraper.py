@@ -8,7 +8,6 @@ import time
 API_KEY = os.environ.get("AIRLABS_API_KEY")
 AIRPORT = "DUS"
 CACHE_FILE = "cache.json"
-OUTPUT_JSON = "flights.json"
 CACHE_DURATION = 300  # 5 Minuten
 
 MINUTES_PAST = 60
@@ -103,7 +102,10 @@ def fetch_flights():
         if time.time() - os.path.getmtime(CACHE_FILE) < CACHE_DURATION:
             try:
                 with open(CACHE_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f), True
+                    data = json.load(f)
+                    # Wenn die Cache-Datei bereits unsere verarbeitete Struktur hat, direkt zurückgeben
+                    if isinstance(data, dict) and "flights" in data:
+                        return data, True
             except Exception:
                 pass
 
@@ -113,24 +115,27 @@ def fetch_flights():
     try:
         req = urllib.request.Request(api_url, headers={"User-Agent": "DUS-Flight-Scraper/1.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        flights = data.get("response", [])
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(flights, f, ensure_ascii=False, indent=2)
-        return flights, False
+            raw_data = json.loads(resp.read().decode("utf-8"))
+        return raw_data, False
     except Exception as e:
-        print(f"Fehler: {e}")
+        print(f"Fehler beim Abrufen: {e}")
         if os.path.exists(CACHE_FILE):
             with open(CACHE_FILE, "r", encoding="utf-8") as f:
                 return json.load(f), True
-        return [], False
+        return {"response": []}, False
 
 def main():
     now = datetime.now()
     time_min = now - timedelta(minutes=MINUTES_PAST)
     time_max = now + timedelta(hours=HOURS_FUTURE)
 
-    raw_flights, from_cache = fetch_flights()
+    raw_data, from_cache = fetch_flights()
+    
+    # Falls es rohe API-Daten sind, verarbeiten
+    raw_flights = raw_data.get("response", raw_data) if isinstance(raw_data, dict) else raw_data
+    if not isinstance(raw_flights, list):
+        raw_flights = []
+
     valid_list = []
 
     for flight in raw_flights:
@@ -188,15 +193,15 @@ def main():
         unique_flights.append(f)
 
     output_data = {
-        "updated_at": now.strftime("%d.%m.%Y %H:%M"),
+        "updated_at": now.strftime("%d.%M.%Y %H:%M"),
         "source": "Cache" if from_cache else "Live",
         "flights": unique_flights
     }
 
-    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(output_data, f, ensure_ascii=False, indent=2)
 
-    print(f"flights.json aktualisiert: {len(unique_flights)} Flüge gespeichert.")
+    print(f"cache.json aktualisiert: {len(unique_flights)} Flüge gespeichert.")
 
 if __name__ == "__main__":
     main()
