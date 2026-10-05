@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUS Ankünfte</title>
+<style>
+* { box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; padding: 12px; background: #f4f4f9; color: #333;
+}
+h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
+.update-info { font-size: 0.8rem; color: #666; margin-bottom: 12px; line-height: 1.5; }
+.filter-container { margin-bottom: 15px; display: flex; gap: 6px; }
+.filter-btn {
+    flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer;
+    font-weight: bold; font-size: 0.85rem; text-align: center; background: #e4e4ed; color: #333; transition: all 0.2s;
+}
+.btn-all.active { background: #003366; color: white; }
+.btn-linie.active { background: #0d47a1; color: white; }
+.btn-charter.active { background: #e65100; color: white; }
+.flight-card {
+    background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.card-header { display: flex; align-items: center; justify-content: space-between; }
+.time-col { font-size: 1.2rem; font-weight: bold; color: #003366; min-width: 72px; }
+.flight-time { display: block; }
+.main-info { flex-grow: 1; padding: 0 10px; }
+.city-name { font-size: 0.95rem; font-weight: bold; color: #222; margin-bottom: 3px; }
+.badge-linie {
+    background: #e3f2fd; color: #0d47a1; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;
+}
+.badge-charter {
+    background: #fff3e0; color: #e65100; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;
+}
+.delay-badge {
+    display: inline-block; margin-top: 3px; padding: 2px 5px; border-radius: 4px; background: #ffebee; color: #c62828; font-size: 0.7rem; font-weight: bold;
+}
+.card-details {
+    margin-top: 10px; font-size: 0.85rem; color: #444; display: block;
+}
+.detail-divider { border: none; border-top: 1px solid #eee; margin: 8px 0; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.no-flights { text-align: center; padding: 20px; color: #666; background: #fff; border-radius: 8px; }
+</style>
+</head>
+<body>
+<h1>DUS Ankünfte</h1>
+<div class="update-info" id="updateInfo">
+        Aktuelle Zeit: <b id="currentTime">--:--</b> 🌐 Live<br>
+        Lade Flüge aus Cache...
+    </div>
+<div class="filter-container">
+    <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
+    <button class="filter-btn btn-linie" onclick="filterFlights('Linie', event)">Linie</button>
+    <button class="filter-btn btn-charter" onclick="filterFlights('Charter', event)">Charter</button>
+</div>
+<div id="flightList">
+    <div class="no-flights">Daten werden geladen...</div>
+</div>
+
+<script>
+// Flughafen-Mapping für sprechende Namen
+const airportNames = {
+    'MUC': 'München',
+    'LHR': 'London-Heathrow',
+    'SMI': 'Samos',
+    'FCO': 'Rom-Fiumicino',
+    'IBZ': 'Ibiza',
+    'WAW': 'Warschau',
+    'CDG': 'Paris-Charles-de-Gaulle',
+    'CPH': 'Kopenhagen',
+    'CFU': 'Korfu',
+    'MAN': 'Manchester',
+    'RHO': 'Rhodos',
+    'BUD': 'Budapest',
+    'PMI': 'Palma de Mallorca',
+    'HAM': 'Hamburg',
+    'OTP': 'Bukarest',
+    'LIN': 'Mailand-Linate',
+    'ALC': 'Alicante',
+    'BHX': 'Birmingham',
+    'FNC': 'Madeira',
+    'FRA': 'Frankfurt',
+    'HER': 'Iraklion',
+    'MAD': 'Madrid',
+    'DLM': 'Dalaman',
+    'AMS': 'Amsterdam',
+    'FAO': 'Faro',
+    'AGP': 'Malaga',
+    'HRG': 'Hurghada',
+    'KGS': 'Kos',
+    'PRG': 'Prag',
+    'AGA': 'Agadir',
+    'BIO': 'Bilbao',
+    'LPA': 'Gran Canaria',
+    'BCN': 'Barcelona',
+    'TFS': 'Teneriffa Süd',
+    'LCA': 'Larnaka',
+    'FUE': 'Fuerteventura'
+};
+
+function getAirportName(code) {
+    return airportNames[code] || code;
+}
+
+// Funktion zum Berechnen der neuen Uhrzeit bei Verspätung
+function calculateNewTime(timeStr, delayStr) {
+    if (!delayStr) {
+        return { time: timeStr, statusText: 'Gelandet' };
+    }
+
+    const match = delayStr.match(/\d+/);
+    const delayMinutes = match ? parseInt(match[0], 10) : 0;
+
+    if (delayMinutes <= 0 || !timeStr) {
+        return { time: timeStr, statusText: 'Gelandet' };
+    }
+
+    const parts = timeStr.split(':');
+    if (parts.length !== 2) {
+        return { time: timeStr, statusText: 'Verspätet (' + delayStr + ')' };
+    }
+
+    let hours = parseInt(parts[0], 10);
+    let minutes = parseInt(parts[1], 10);
+
+    let totalMinutes = (hours * 60) + minutes + delayMinutes;
+    let newHours = Math.floor(totalMinutes / 60) % 24;
+    let newMinutes = totalMinutes % 60;
+
+    const formattedTime = String(newHours).padStart(2, '0') + ':' + String(newMinutes).padStart(2, '0');
+
+    return {
+        time: formattedTime,
+        statusText: 'Verspätet (ca. ' + formattedTime + ' Uhr)'
+    };
+}
+
+// Aktuelle Uhrzeit im Header anzeigen
+function updateClock() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('de-DE');
+    const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('currentTime').innerText = dateStr + ' ' + timeStr + ' Uhr';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// cache.json laden und rendern
+fetch('cache.json')
+    .then(response => {
+        if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
+        return response.json();
+    })
+    .then(flights => {
+        const container = document.getElementById('flightList');
+        const updateInfo = document.getElementById('updateInfo');
+        
+        container.innerHTML = '';
+        updateInfo.innerHTML = `Aktuelle Zeit: <b id="currentTime">${new Date().toLocaleString('de-DE')}</b> 🌐 Live<br>${flights.length} Ankünfte aus Cache geladen`;
+
+        if (!flights || flights.length === 0) {
+            container.innerHTML = '<div class="no-flights">Keine Flüge im Cache gefunden.</div>';
+            return;
+        }
+
+        flights.forEach(flight => {
+            const category = flight.type || flight.category || 'Linie';
+            const rawTime = flight.time || '';
+            const rawCity = flight.city || flight.from || '';
+            const cityName = getAirportName(rawCity);
+            const flightNo = flight.flight_no || flight.flug_nr || '';
+            const airline = flight.airline || '';
+            const delay = flight.delay || '';
+            const gate = flight.gate || '';
+
+            const calc = calculateNewTime(rawTime, delay);
+            const displayTime = calc.time;
+            const status = delay ? calc.statusText : (flight.status || 'Gelandet');
+
+            const badgeClass = (category === 'Charter') ? 'badge-charter' : 'badge-linie';
+
+            const card = document.createElement('div');
+            card.className = 'flight-card';
+            card.setAttribute('data-category', category);
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="time-col">
+                        <span class="flight-time">${displayTime}</span>
+                        ${delay ? `<span class="delay-badge">${delay}</span>` : ''}
+                    </div>
+                    <div class="main-info">
+                        <div class="city-name">${cityName}</div>
+                        <div class="gate-info">
+                            <span class="${badgeClass}">${gate} (${category})</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <hr class="detail-divider">
+                    <div class="detail-grid">
+                        <div><strong>Flug-Nr.:</strong> ${flightNo}</div>
+                        <div><strong>Airline:</strong> ${airline}</div>
+                        <div><strong>Von:</strong> ${cityName}</div>
+                        <div><strong>Typ:</strong> ${category}</div>
+                        <div><strong>Status:</strong> ${status}</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    })
+    .catch(error => {
+        console.error('Fehler beim Laden der cache.json:', error);
+        document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json (Datei evtl. nicht im selben Ordner oder CORS-Blockade).</div>';
+    });
+
+// Filter-Funktion für die Buttons
+function filterFlights(category, event) {
+    const cards = document.querySelectorAll(".flight-card");
+    const buttons = document.querySelectorAll(".filter-btn");
+    buttons.forEach(btn => btn.classList.remove("active"));
+    if (event && event.target) { event.target.classList.add("active"); }
+    cards.forEach(card => {
+        const cardCategory = card.getAttribute("data-
