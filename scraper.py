@@ -30,6 +30,9 @@ CACHE_DURATION = 25 * 60  # Sekunden; kleiner als das 30-Minuten-Intervall
 MINUTES_PAST = 60
 HOURS_FUTURE = 5
 
+PAGE_SIZE = 100
+MAX_PAGES = 5
+
 # IATA: (Name, Land)
 AIRPORTS = {
     # Deutschland
@@ -47,7 +50,7 @@ AIRPORTS = {
     "RHO": ("Rhodos", "Griechenland"), "HER": ("Iraklion", "Griechenland"),
     "KGS": ("Kos", "Griechenland"), "KOS": ("Kos", "Griechenland"),
     "ATH": ("Athen", "Griechenland"), "SKG": ("Thessaloniki", "Griechenland"),
-    "PVK": ("Preveza (Aktion)", "Griechenland"),
+    "PVK": ("Preveza-Aktion", "Griechenland"),
     # Italien
     "FCO": ("Rom-Fiumicino", "Italien"), "LIN": ("Mailand-Linate", "Italien"),
     "BRI": ("Bari", "Italien"),
@@ -84,9 +87,9 @@ AIRPORTS = {
     "AGA": ("Agadir", "Marokko"), "RAK": ("Marrakesch", "Marokko"),
     "TUN": ("Tunis", "Tunesien"), "DJE": ("Djerba", "Tunesien"),
     "DXB": ("Dubai", "Vereinigte Arabische Emirate"),
+}
 
-
-    # Fallback, falls ein Flughafen nicht in der Tabelle steht (ISO-Ländercode von AirLabs)
+# Fallback, falls ein Flughafen nicht in der Tabelle steht (ISO-Ländercode von AirLabs)
 COUNTRY_NAMES = {
     "DE": "Deutschland", "ES": "Spanien", "GR": "Griechenland", "IT": "Italien",
     "GB": "Großbritannien", "IE": "Irland", "TR": "Türkei", "PT": "Portugal",
@@ -98,24 +101,6 @@ COUNTRY_NAMES = {
     "DK": "Dänemark", "SE": "Schweden", "NO": "Norwegen", "FI": "Finnland",
     "US": "USA", "CA": "Kanada", "IL": "Israel", "JO": "Jordanien",
 }
-def get_airport_info(flight):
-    """Gibt (Stadtname, Land) zurück."""
-    iata = str(flight.get("dep_iata") or "").upper()
-    if iata in AIRPORTS:
-        return AIRPORTS[iata]
-
-    city = flight.get("dep_city")
-    name = flight.get("dep_name")
-    if city and len(str(city).strip()) > 1:
-        city_name = str(city).strip()
-    elif name and len(str(name).strip()) > 1:
-        city_name = str(name).replace(" International", "").replace(" Airport", "").strip()
-    else:
-        city_name = iata or "Unbekannt"
-
-    code = str(flight.get("dep_country") or flight.get("dep_country_code") or "").upper()
-    country = COUNTRY_NAMES.get(code, "")
-    return city_name, country
 
 # Alles klein schreiben (Vergleich erfolgt mit .lower())
 CHARTER_AIRLINES = [
@@ -181,17 +166,24 @@ def get_dt(flight, ts_key, utc_key, local_key):
     return None
 
 
-def get_city_name(flight):
+def get_airport_info(flight):
+    """Gibt (Stadtname, Land) zurück."""
     iata = str(flight.get("dep_iata") or "").upper()
-    if iata in AIRPORT_NAMES:
-        return AIRPORT_NAMES[iata]
+    if iata in AIRPORTS:
+        return AIRPORTS[iata]
+
     city = flight.get("dep_city")
-    if city and len(str(city).strip()) > 1:
-        return str(city).strip()
     name = flight.get("dep_name")
-    if name and len(str(name).strip()) > 1:
-        return str(name).replace(" International", "").replace(" Airport", "").strip()
-    return iata or "Unbekannt"
+    if city and len(str(city).strip()) > 1:
+        city_name = str(city).strip()
+    elif name and len(str(name).strip()) > 1:
+        city_name = str(name).replace(" International", "").replace(" Airport", "").strip()
+    else:
+        city_name = iata or "Unbekannt"
+
+    code = str(flight.get("dep_country") or flight.get("dep_country_code") or "").upper()
+    country = COUNTRY_NAMES.get(code, "")
+    return city_name, country
 
 
 def write_json_atomic(path, data):
@@ -211,6 +203,46 @@ def valid_response(data):
 
 
 # ---------------------------------------------------------------- Datenabruf
+def fetch_all_pages():
+    """Lädt mehrere Seiten, bis eine Seite nicht mehr voll ist."""
+    all_flights = []
+    first_of_prev_page = None
+    for page in range(MAX_PAGES):
+        params = {
+            "api_key": API_KEY,
+            "arr_iata": AIRPORT,
+            "limit": PAGE_SIZE,
+            "offset": page * PAGE_SIZE,
+        }
+        url = "https://airlabs.co/api/v9/schedules?" + urllib.parse.urlencode(params)
+        req = urllib.request.Request(url, headers={"User-Agent": "DUS-Flight-Scraper/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if not valid_response(data):
+                raise RuntimeError(f"API-Fehlerantwort: {str(data)[:200]}")
+        except Exception as e:
+            if page == 0:
+                raise
+            print(f"Seite {page + 1} fehlgeschlagen ({e}), verwende bisherige Daten.")
+            break
+
+        batch = data["response"]
+        if not batch:
+            break
+        # Schutz: API ignoriert offset und liefert immer dieselbe Seite
+        marker = (batch[0].get("flight_iata"), batch[0].get("arr_time"))
+        if page > 0 and marker == first_of_prev_page:
+            print("API ignoriert offset, Paginierung abgebrochen.")
+            break
+        first_of_prev_page = marker if page == 0 else first_of_prev_page
+
+        all_flights.extend(batch)
+        if len(batch) < PAGE_SIZE:
+            break
+    return {"response": all_flights}
+
+
 def fetch_flights():
     """Gibt (raw_data, quelle) zurück; quelle: 'Live' | 'Cache' | 'Cache (veraltet)' | None."""
     if os.path.exists(RAW_CACHE_FILE) and time.time() - os.path.getmtime(RAW_CACHE_FILE) < CACHE_DURATION:
@@ -224,16 +256,12 @@ def fetch_flights():
     if not API_KEY:
         print("Fehler: Umgebungsvariable AIRLABS_API_KEY ist nicht gesetzt.")
     else:
-        params = {"api_key": API_KEY, "arr_iata": AIRPORT, "limit": 100}
-        url = "https://airlabs.co/api/v9/schedules?" + urllib.parse.urlencode(params)
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "DUS-Flight-Scraper/1.0"})
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-            if valid_response(data):
+            data = fetch_all_pages()
+            if data["response"]:
                 write_json_atomic(RAW_CACHE_FILE, data)
                 return data, "Live"
-            print(f"API-Fehlerantwort: {str(data)[:200]}")
+            print("API lieferte keine Flüge.")
         except Exception as e:
             print(f"Fehler beim API-Abruf: {e}")
 
@@ -280,7 +308,7 @@ def main():
             continue
 
         sched = get_dt(fl, "arr_time_ts", "arr_time_utc", "arr_time")
-        if not sched or not (time_min <= sched <= time_max):
+        if not sched:
             continue
 
         try:
@@ -292,6 +320,11 @@ def main():
         if not est:
             est = sched + timedelta(minutes=delay)
 
+        # Fenster nach erwarteter Ankunft, nicht nach Plan-Zeit
+        if not (time_min <= est <= time_max):
+            continue
+
+        city, country = get_airport_info(fl)
         ftype = get_flight_type(airline_name, airline_iata)
         flights.append({
             "dt": sched.timestamp(),
@@ -299,7 +332,8 @@ def main():
             "time_estimated": est.strftime("%H:%M"),
             "flight_no": flight_no,
             "airline": airline_name,
-            "city": get_city_name(fl),
+            "city": city,
+            "country": country,
             "type": ftype,
             "gate": get_exit_gate(ftype),
             "status": fl.get("status") or "scheduled",
@@ -307,6 +341,7 @@ def main():
         })
 
     flights.sort(key=lambda x: x["dt"])
+    print(f"Rohdaten: {len(raw_data['response'])} Einträge, im Fenster: {len(flights)}")
 
     # Restliche Duplikate: gleiche Flugnummer + gleiche Zeit
     unique, seen = [], set()
