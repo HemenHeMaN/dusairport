@@ -1,24 +1,24 @@
 {
-  "updated_at": "06.10.2026 17:44",
+  "updated_at": "06.10.2026 18:15",
   "source": "Live",
   "flights": [
     {
       "dt": 1791286500.0,
       "time_scheduled": "13:35",
-      "time_estimated": "17:54",
+      "time_estimated": "18:01",
       "flight_no": "EW9641",
       "airline": "EW",
       "city": "Porto",
       "country": "Portugal",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 259
+      "status": "landed",
+      "delay": 266
     },
     {
       "dt": 1791295500.0,
       "time_scheduled": "16:05",
-      "time_estimated": "18:17",
+      "time_estimated": "18:25",
       "flight_no": "E69975",
       "airline": "E6",
       "city": "TLV",
@@ -26,20 +26,7 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 132
-    },
-    {
-      "dt": 1791296100.0,
-      "time_scheduled": "16:15",
-      "time_estimated": "16:54",
-      "flight_no": "EW9579",
-      "airline": "EW",
-      "city": "Palma de Mallorca",
-      "country": "Spanien",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 39
+      "delay": 140
     },
     {
       "dt": 1791298200.0,
@@ -57,15 +44,15 @@
     {
       "dt": 1791299100.0,
       "time_scheduled": "17:05",
-      "time_estimated": "18:00",
+      "time_estimated": "17:48",
       "flight_no": "EW9583",
       "airline": "EW",
       "city": "Palma de Mallorca",
       "country": "Spanien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 55
+      "status": "landed",
+      "delay": 43
     },
     {
       "dt": 1791299400.0,
@@ -83,54 +70,15 @@
     {
       "dt": 1791299400.0,
       "time_scheduled": "17:10",
-      "time_estimated": "17:43",
+      "time_estimated": "17:46",
       "flight_no": "EW9461",
       "airline": "EW",
       "city": "London-Heathrow",
       "country": "Großbritannien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 33
-    },
-    {
-      "dt": 1791299700.0,
-      "time_scheduled": "17:15",
-      "time_estimated": "17:09",
-      "flight_no": "EW9087",
-      "airline": "EW",
-      "city": "München",
-      "country": "Deutschland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791300000.0,
-      "time_scheduled": "17:20",
-      "time_estimated": "16:57",
-      "flight_no": "PC5011",
-      "airline": "PC",
-      "city": "Antalya",
-      "country": "Türkei",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791300000.0,
-      "time_scheduled": "17:20",
-      "time_estimated": "17:08",
-      "flight_no": "TK1527",
-      "airline": "TK",
-      "city": "Istanbul",
-      "country": "Türkei",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
+      "delay": 36
     },
     {
       "dt": 1791301200.0,
@@ -174,15 +122,15 @@
     {
       "dt": 1791301200.0,
       "time_scheduled": "17:40",
-      "time_estimated": "17:57",
+      "time_estimated": "17:52",
       "flight_no": "WA1803",
       "airline": "WA",
       "city": "Amsterdam",
       "country": "Niederlande",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 17
+      "status": "landed",
+      "delay": 12
     },
     {
       "dt": 1791301500.0,
@@ -200,14 +148,14 @@
     {
       "dt": 1791301500.0,
       "time_scheduled": "17:45",
-      "time_estimated": "17:44",
+      "time_estimated": "17:45",
       "flight_no": "EW9519",
       "airline": "EW",
       "city": "Bilbao",
       "country": "Spanien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -239,15 +187,15 @@
     {
       "dt": 1791302400.0,
       "time_scheduled": "18:00",
-      "time_estimated": "18:01",
+      "time_estimated": "17:34",
       "flight_no": "XQ182",
       "airline": "XQ",
       "city": "Antalya",
       "country": "Türkei",
       "type": "Charter",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "delay": 1
+      "status": "landed",
+      "delay": 0
     },
     {
       "dt": 1791302400.0,
@@ -259,20 +207,20 @@
       "country": "Finnland",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 17
     },
     {
       "dt": 1791302700.0,
       "time_scheduled": "18:05",
-      "time_estimated": "18:05",
+      "time_estimated": "17:57",
       "flight_no": "BA922",
       "airline": "BA",
       "city": "London-Heathrow",
       "country": "Großbritannien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -304,27 +252,27 @@
     {
       "dt": 1791303300.0,
       "time_scheduled": "18:15",
-      "time_estimated": "17:57",
+      "time_estimated": "17:51",
       "flight_no": "XQ282",
       "airline": "XQ",
       "city": "Antalya",
       "country": "Türkei",
       "type": "Charter",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791303600.0,
       "time_scheduled": "18:20",
-      "time_estimated": "18:02",
+      "time_estimated": "17:59",
       "flight_no": "XQ3180",
       "airline": "XQ",
       "city": "Bodrum",
       "country": "Türkei",
       "type": "Charter",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -354,17 +302,43 @@
       "delay": 0
     },
     {
+      "dt": 1791304500.0,
+      "time_scheduled": "18:35",
+      "time_estimated": "19:28",
+      "flight_no": "4X9669",
+      "airline": "4X",
+      "city": "KLX",
+      "country": "",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 53
+    },
+    {
       "dt": 1791304800.0,
       "time_scheduled": "18:40",
-      "time_estimated": "18:37",
+      "time_estimated": "18:41",
+      "flight_no": "A51006",
+      "airline": "A5",
+      "city": "Paris-Charles-de-Gaulle",
+      "country": "Frankreich",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 1
+    },
+    {
+      "dt": 1791304800.0,
+      "time_scheduled": "18:40",
+      "time_estimated": "18:42",
       "flight_no": "LH2022",
       "airline": "LH",
       "city": "München",
       "country": "Deutschland",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "delay": 0
+      "status": "active",
+      "delay": 2
     },
     {
       "dt": 1791304800.0,
@@ -374,19 +348,6 @@
       "airline": "Unbekannt",
       "city": "Kopenhagen",
       "country": "Dänemark",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 5
-    },
-    {
-      "dt": 1791304800.0,
-      "time_scheduled": "18:40",
-      "time_estimated": "18:45",
-      "flight_no": "A51006",
-      "airline": "A5",
-      "city": "Paris-Charles-de-Gaulle",
-      "country": "Frankreich",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
@@ -421,14 +382,14 @@
     {
       "dt": 1791305400.0,
       "time_scheduled": "18:50",
-      "time_estimated": "18:50",
+      "time_estimated": "17:50",
       "flight_no": "XC106",
       "airline": "XC",
       "city": "Antalya",
       "country": "Türkei",
       "type": "Charter",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -471,6 +432,32 @@
       "delay": 0
     },
     {
+      "dt": 1791306600.0,
+      "time_scheduled": "19:10",
+      "time_estimated": "19:10",
+      "flight_no": "2L1026",
+      "airline": "2L",
+      "city": "Zürich",
+      "country": "Schweiz",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "cancelled",
+      "delay": 0
+    },
+    {
+      "dt": 1791306600.0,
+      "time_scheduled": "19:10",
+      "time_estimated": "19:11",
+      "flight_no": "OS167",
+      "airline": "OS",
+      "city": "Wien",
+      "country": "Österreich",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 1
+    },
+    {
       "dt": 1791306900.0,
       "time_scheduled": "19:15",
       "time_estimated": "18:50",
@@ -486,11 +473,102 @@
     {
       "dt": 1791306900.0,
       "time_scheduled": "19:15",
+      "time_estimated": "18:52",
+      "flight_no": "E64204",
+      "airline": "E6",
+      "city": "Prag",
+      "country": "Tschechien",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791306900.0,
+      "time_scheduled": "19:15",
       "time_estimated": "18:58",
       "flight_no": "EK57",
       "airline": "EK",
       "city": "Dubai",
       "country": "Vereinigte Arabische Emirate",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791307200.0,
+      "time_scheduled": "19:20",
+      "time_estimated": "19:20",
+      "flight_no": "BT233",
+      "airline": "BT",
+      "city": "RIX",
+      "country": "",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791307500.0,
+      "time_scheduled": "19:25",
+      "time_estimated": "19:20",
+      "flight_no": "XQ1360",
+      "airline": "XQ",
+      "city": "DIY",
+      "country": "",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791307500.0,
+      "time_scheduled": "19:25",
+      "time_estimated": "19:25",
+      "flight_no": "PC1005",
+      "airline": "PC",
+      "city": "Istanbul-Sabiha Gökçen",
+      "country": "Türkei",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791307800.0,
+      "time_scheduled": "19:30",
+      "time_estimated": "19:25",
+      "flight_no": "XQ180",
+      "airline": "XQ",
+      "city": "Antalya",
+      "country": "Türkei",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791308400.0,
+      "time_scheduled": "19:40",
+      "time_estimated": "19:36",
+      "flight_no": "LH2026",
+      "airline": "LH",
+      "city": "München",
+      "country": "Deutschland",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "delay": 0
+    },
+    {
+      "dt": 1791308400.0,
+      "time_scheduled": "19:40",
+      "time_estimated": "19:40",
+      "flight_no": "JU362",
+      "airline": "JU",
+      "city": "Belgrad",
+      "country": "Serbien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
