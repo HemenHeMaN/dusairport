@@ -1,20 +1,7 @@
 {
-  "updated_at": "06.10.2026 18:46",
+  "updated_at": "06.10.2026 19:12",
   "source": "Live",
   "flights": [
-    {
-      "dt": 1791286500.0,
-      "time_scheduled": "13:35",
-      "time_estimated": "18:01",
-      "flight_no": "EW9641",
-      "airline": "EW",
-      "city": "Porto",
-      "country": "Portugal",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 266
-    },
     {
       "dt": 1791295500.0,
       "time_scheduled": "16:05",
@@ -27,32 +14,6 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
       "delay": 145
-    },
-    {
-      "dt": 1791299100.0,
-      "time_scheduled": "17:05",
-      "time_estimated": "17:48",
-      "flight_no": "EW9583",
-      "airline": "EW",
-      "city": "Palma de Mallorca",
-      "country": "Spanien",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 43
-    },
-    {
-      "dt": 1791301200.0,
-      "time_scheduled": "17:40",
-      "time_estimated": "17:53",
-      "flight_no": "WA1803",
-      "airline": "WA",
-      "city": "Amsterdam",
-      "country": "Niederlande",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 13
     },
     {
       "dt": 1791301500.0,
@@ -70,7 +31,7 @@
     {
       "dt": 1791302100.0,
       "time_scheduled": "17:55",
-      "time_estimated": "18:50",
+      "time_estimated": "18:42",
       "flight_no": "VL76",
       "airline": "VL",
       "city": "Frankfurt",
@@ -78,33 +39,7 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 55
-    },
-    {
-      "dt": 1791302400.0,
-      "time_scheduled": "18:00",
-      "time_estimated": "18:07",
-      "flight_no": "AY1395",
-      "airline": "AY",
-      "city": "Helsinki",
-      "country": "Finnland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 7
-    },
-    {
-      "dt": 1791302700.0,
-      "time_scheduled": "18:05",
-      "time_estimated": "17:58",
-      "flight_no": "BA922",
-      "airline": "BA",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
+      "delay": 47
     },
     {
       "dt": 1791302700.0,
@@ -131,32 +66,6 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
       "delay": 32
-    },
-    {
-      "dt": 1791303300.0,
-      "time_scheduled": "18:15",
-      "time_estimated": "17:53",
-      "flight_no": "XQ282",
-      "airline": "XQ",
-      "city": "Antalya",
-      "country": "Türkei",
-      "type": "Charter",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791303600.0,
-      "time_scheduled": "18:20",
-      "time_estimated": "17:59",
-      "flight_no": "XQ3180",
-      "airline": "XQ",
-      "city": "Bodrum",
-      "country": "Türkei",
-      "type": "Charter",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "delay": 0
     },
     {
       "dt": 1791303600.0,
@@ -226,20 +135,7 @@
     {
       "dt": 1791304800.0,
       "time_scheduled": "18:40",
-      "time_estimated": "18:45",
-      "flight_no": "SK627",
-      "airline": "SK",
-      "city": "Kopenhagen",
-      "country": "Dänemark",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 5
-    },
-    {
-      "dt": 1791304800.0,
-      "time_scheduled": "18:40",
-      "time_estimated": "18:45",
+      "time_estimated": "18:44",
       "flight_no": "627",
       "airline": "Unbekannt",
       "city": "Kopenhagen",
@@ -247,31 +143,31 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 5
+      "delay": 4
+    },
+    {
+      "dt": 1791304800.0,
+      "time_scheduled": "18:40",
+      "time_estimated": "18:44",
+      "flight_no": "SK627",
+      "airline": "SK",
+      "city": "Kopenhagen",
+      "country": "Dänemark",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
+      "delay": 4
     },
     {
       "dt": 1791305100.0,
       "time_scheduled": "18:45",
-      "time_estimated": "18:45",
+      "time_estimated": "18:41",
       "flight_no": "BM562",
       "airline": "BM",
       "city": "BEN",
       "country": "",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791305400.0,
-      "time_scheduled": "18:50",
-      "time_estimated": "17:50",
-      "flight_no": "XC106",
-      "airline": "XC",
-      "city": "Antalya",
-      "country": "Türkei",
-      "type": "Charter",
-      "gate": "Ausgang 4 (Charter)",
       "status": "landed",
       "delay": 0
     },
@@ -291,7 +187,7 @@
     {
       "dt": 1791305700.0,
       "time_scheduled": "18:55",
-      "time_estimated": "18:37",
+      "time_estimated": "18:43",
       "flight_no": "XQ794",
       "airline": "XQ",
       "city": "ESB",
@@ -311,7 +207,20 @@
       "country": "Polen",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
+      "delay": 0
+    },
+    {
+      "dt": 1791306600.0,
+      "time_scheduled": "19:10",
+      "time_estimated": "18:55",
+      "flight_no": "OS167",
+      "airline": "OS",
+      "city": "Wien",
+      "country": "Österreich",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -330,20 +239,7 @@
     {
       "dt": 1791306600.0,
       "time_scheduled": "19:10",
-      "time_estimated": "19:11",
-      "flight_no": "OS167",
-      "airline": "OS",
-      "city": "Wien",
-      "country": "Österreich",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 1
-    },
-    {
-      "dt": 1791306600.0,
-      "time_scheduled": "19:10",
-      "time_estimated": "20:00",
+      "time_estimated": "19:50",
       "flight_no": "IB755",
       "airline": "IB",
       "city": "Madrid",
@@ -351,12 +247,12 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 50
+      "delay": 40
     },
     {
       "dt": 1791306900.0,
       "time_scheduled": "19:15",
-      "time_estimated": "18:53",
+      "time_estimated": "18:50",
       "flight_no": "TK1521",
       "airline": "TK",
       "city": "Istanbul",
@@ -369,27 +265,27 @@
     {
       "dt": 1791306900.0,
       "time_scheduled": "19:15",
-      "time_estimated": "19:01",
+      "time_estimated": "18:54",
       "flight_no": "EK57",
       "airline": "EK",
       "city": "Dubai",
       "country": "Vereinigte Arabische Emirate",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791306900.0,
       "time_scheduled": "19:15",
-      "time_estimated": "19:04",
+      "time_estimated": "18:57",
       "flight_no": "E64204",
       "airline": "E6",
       "city": "Prag",
       "country": "Tschechien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -484,13 +380,39 @@
       "delay": 1
     },
     {
-      "dt": 1791309600.0,
-      "time_scheduled": "20:00",
-      "time_estimated": "20:00",
-      "flight_no": "EW9467",
+      "dt": 1791310200.0,
+      "time_scheduled": "20:10",
+      "time_estimated": "20:09",
+      "flight_no": "VY1898",
+      "airline": "VY",
+      "city": "Barcelona",
+      "country": "Spanien",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791310500.0,
+      "time_scheduled": "20:15",
+      "time_estimated": "20:15",
+      "flight_no": "XC108",
+      "airline": "XC",
+      "city": "Antalya",
+      "country": "Türkei",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "delay": 0
+    },
+    {
+      "dt": 1791311700.0,
+      "time_scheduled": "20:35",
+      "time_estimated": "20:35",
+      "flight_no": "EW9755",
       "airline": "EW",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
+      "city": "Wien",
+      "country": "Österreich",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
