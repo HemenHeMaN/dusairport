@@ -7,49 +7,23 @@ import time
 
 API_KEY = os.environ.get("AIRLABS_API_KEY")
 AIRPORT = "DUS"
-CACHE_FILE = "cache.json"
+RAW_CACHE_FILE = ".raw_cache.json"  # Interner Rohdaten-Cache gegen API-Limits
+CACHE_FILE = "cache.json"           # Die Datei für deine index.html
 CACHE_DURATION = 300  # 5 Minuten
 
 MINUTES_PAST = 60
 HOURS_FUTURE = 5
 
 AIRPORT_NAMES = {
-    "MUC": "München",
-    "LHR": "London-Heathrow",
-    "SMI": "Samos",
-    "FCO": "Rom-Fiumicino",
-    "IBZ": "Ibiza",
-    "WAW": "Warschau",
-    "CDG": "Paris-Charles-de-Gaulle",
-    "CPH": "Kopenhagen",
-    "CFU": "Korfu",
-    "MAN": "Manchester",
-    "RHO": "Rhodos",
-    "BUD": "Budapest",
-    "PMI": "Palma de Mallorca",
-    "HAM": "Hamburg",
-    "OTP": "Bukarest",
-    "LIN": "Mailand-Linate",
-    "ALC": "Alicante",
-    "BHX": "Birmingham",
-    "FNC": "Madeira",
-    "FRA": "Frankfurt",
-    "HER": "Iraklion",
-    "MAD": "Madrid",
-    "DLM": "Dalaman",
-    "AMS": "Amsterdam",
-    "FAO": "Faro",
-    "AGP": "Malaga",
-    "HRG": "Hurghada",
-    "KGS": "Kos",
-    "PRG": "Prag",
-    "AGA": "Agadir",
-    "BIO": "Bilbao",
-    "LPA": "Gran Canaria",
-    "BCN": "Barcelona",
-    "TFS": "Teneriffa Süd",
-    "LCA": "Larnaka",
-    "FUE": "Fuerteventura"
+    "MUC": "München", "LHR": "London-Heathrow", "SMI": "Samos", "FCO": "Rom-Fiumicino",
+    "IBZ": "Ibiza", "WAW": "Warschau", "CDG": "Paris-Charles-de-Gaulle", "CPH": "Kopenhagen",
+    "CFU": "Korfu", "MAN": "Manchester", "RHO": "Rhodos", "BUD": "Budapest",
+    "PMI": "Palma de Mallorca", "HAM": "Hamburg", "OTP": "Bukarest", "LIN": "Mailand-Linate",
+    "ALC": "Alicante", "BHX": "Birmingham", "FNC": "Madeira", "FRA": "Frankfurt",
+    "HER": "Iraklion", "MAD": "Madrid", "DLM": "Dalaman", "AMS": "Amsterdam",
+    "FAO": "Faro", "AGP": "Malaga", "HRG": "Hurghada", "KGS": "Kos",
+    "PRG": "Prag", "AGA": "Agadir", "BIO": "Bilbao", "LPA": "Gran Canaria",
+    "BCN": "Barcelona", "TFS": "Teneriffa Süd", "LCA": "Larnaka", "FUE": "Fuerteventura"
 }
 
 CHARTER_AIRLINES = [
@@ -98,14 +72,12 @@ def get_dynamic_city_name(flight_data):
     return str(iata).strip() if iata else "Unbekannt"
 
 def fetch_flights():
-    if os.path.exists(CACHE_FILE):
-        if time.time() - os.path.getmtime(CACHE_FILE) < CACHE_DURATION:
+    # Prüfen, ob der interne Rohdaten-Cache noch frisch ist
+    if os.path.exists(RAW_CACHE_FILE):
+        if time.time() - os.path.getmtime(RAW_CACHE_FILE) < CACHE_DURATION:
             try:
-                with open(CACHE_FILE, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    # Wenn die Cache-Datei bereits unsere verarbeitete Struktur hat, direkt zurückgeben
-                    if isinstance(data, dict) and "flights" in data:
-                        return data, True
+                with open(RAW_CACHE_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f), True
             except Exception:
                 pass
 
@@ -116,11 +88,16 @@ def fetch_flights():
         req = urllib.request.Request(api_url, headers={"User-Agent": "DUS-Flight-Scraper/1.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             raw_data = json.loads(resp.read().decode("utf-8"))
+        
+        # Rohdaten zwischenspeichern
+        with open(RAW_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(raw_data, f, ensure_ascii=False, indent=2)
+            
         return raw_data, False
     except Exception as e:
-        print(f"Fehler beim Abrufen: {e}")
-        if os.path.exists(CACHE_FILE):
-            with open(CACHE_FILE, "r", encoding="utf-8") as f:
+        print(f"Fehler beim API-Abruf: {e}")
+        if os.path.exists(RAW_CACHE_FILE):
+            with open(RAW_CACHE_FILE, "r", encoding="utf-8") as f:
                 return json.load(f), True
         return {"response": []}, False
 
@@ -130,9 +107,7 @@ def main():
     time_max = now + timedelta(hours=HOURS_FUTURE)
 
     raw_data, from_cache = fetch_flights()
-    
-    # Falls es rohe API-Daten sind, verarbeiten
-    raw_flights = raw_data.get("response", raw_data) if isinstance(raw_data, dict) else raw_data
+    raw_flights = raw_data.get("response", [])
     if not isinstance(raw_flights, list):
         raw_flights = []
 
@@ -186,22 +161,4 @@ def main():
     unique_flights = []
     seen = set()
     for f in valid_list:
-        key = (f["city"], f["time_scheduled"])
-        if key in seen:
-            continue
-        seen.add(key)
-        unique_flights.append(f)
-
-    output_data = {
-        "updated_at": now.strftime("%d.%M.%Y %H:%M"),
-        "source": "Cache" if from_cache else "Live",
-        "flights": unique_flights
-    }
-
-    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(output_data, f, ensure_ascii=False, indent=2)
-
-    print(f"cache.json aktualisiert: {len(unique_flights)} Flüge gespeichert.")
-
-if __name__ == "__main__":
-    main()
+        key
