@@ -1,55 +1,7 @@
 {
-  "updated_at": "06.10.2026 11:48",
+  "updated_at": "06.10.2026 12:18",
   "source": "Live",
   "flights": [
-    {
-      "dt": 1791276600.0,
-      "time_scheduled": "10:50",
-      "time_estimated": "10:46",
-      "flight_no": "A51606",
-      "airline": "A5",
-      "city": "Paris-Charles-de-Gaulle",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791276900.0,
-      "time_scheduled": "10:55",
-      "time_estimated": "10:38",
-      "flight_no": "EW9783",
-      "airline": "EW",
-      "city": "Budapest",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791277800.0,
-      "time_scheduled": "11:10",
-      "time_estimated": "10:50",
-      "flight_no": "TK5",
-      "airline": "TK",
-      "city": "ESB",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791277800.0,
-      "time_scheduled": "11:10",
-      "time_estimated": "11:07",
-      "flight_no": "YW1319",
-      "airline": "YW",
-      "city": "Madrid",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
     {
       "dt": 1791279000.0,
       "time_scheduled": "11:30",
@@ -113,14 +65,14 @@
     {
       "dt": 1791279600.0,
       "time_scheduled": "11:40",
-      "time_estimated": "11:39",
+      "time_estimated": "11:41",
       "flight_no": "EW9573",
       "airline": "EW",
       "city": "Palma de Mallorca",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 0
+      "delay": 1
     },
     {
       "dt": 1791279900.0,
@@ -137,31 +89,19 @@
     {
       "dt": 1791279900.0,
       "time_scheduled": "11:45",
-      "time_estimated": "12:07",
+      "time_estimated": "12:03",
       "flight_no": "EW9441",
       "airline": "EW",
       "city": "Barcelona",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 22
+      "status": "landed",
+      "delay": 18
     },
     {
       "dt": 1791280200.0,
       "time_scheduled": "11:50",
-      "time_estimated": "11:50",
-      "flight_no": "WA1799",
-      "airline": "WA",
-      "city": "Amsterdam",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791280200.0,
-      "time_scheduled": "11:50",
-      "time_estimated": "11:50",
+      "time_estimated": "11:44",
       "flight_no": "LH2012",
       "airline": "LH",
       "city": "München",
@@ -173,62 +113,98 @@
     {
       "dt": 1791280200.0,
       "time_scheduled": "11:50",
-      "time_estimated": "11:55",
+      "time_estimated": "11:51",
+      "flight_no": "WA1799",
+      "airline": "WA",
+      "city": "Amsterdam",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
+      "delay": 1
+    },
+    {
+      "dt": 1791280200.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:53",
       "flight_no": "A3840",
       "airline": "A3",
       "city": "Athen",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 5
+      "status": "landed",
+      "delay": 3
     },
     {
       "dt": 1791280500.0,
       "time_scheduled": "11:55",
-      "time_estimated": "12:25",
+      "time_estimated": "12:06",
       "flight_no": "E69577",
       "airline": "E6",
       "city": "Palma de Mallorca",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 30
+      "status": "landed",
+      "delay": 11
     },
     {
       "dt": 1791281100.0,
       "time_scheduled": "12:05",
-      "time_estimated": "12:05",
+      "time_estimated": "12:04",
       "flight_no": "X34429",
       "airline": "X3",
       "city": "Korfu",
       "type": "Charter",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791281400.0,
       "time_scheduled": "12:10",
-      "time_estimated": "12:10",
+      "time_estimated": "11:47",
       "flight_no": "VF25",
       "airline": "VF",
       "city": "Istanbul-Sabiha Gökçen",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791281400.0,
       "time_scheduled": "12:10",
-      "time_estimated": "12:36",
+      "time_estimated": "12:08",
       "flight_no": "EW9793",
       "airline": "EW",
       "city": "Bukarest",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
+      "delay": 0
+    },
+    {
+      "dt": 1791281700.0,
+      "time_scheduled": "12:15",
+      "time_estimated": "12:51",
+      "flight_no": "EW5703",
+      "airline": "EW",
+      "city": "Pristina",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 26
+      "delay": 36
+    },
+    {
+      "dt": 1791282300.0,
+      "time_scheduled": "12:25",
+      "time_estimated": "12:47",
+      "flight_no": "NI540",
+      "airline": "NI",
+      "city": "Lissabon",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 22
     },
     {
       "dt": 1791282600.0,
@@ -263,7 +239,7 @@
       "city": "Istanbul-Sabiha Gökçen",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -293,14 +269,14 @@
     {
       "dt": 1791283200.0,
       "time_scheduled": "12:40",
-      "time_estimated": "12:44",
+      "time_estimated": "12:54",
       "flight_no": "LH2014",
       "airline": "LH",
       "city": "München",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "delay": 4
+      "status": "active",
+      "delay": 14
     },
     {
       "dt": 1791283500.0,
@@ -309,6 +285,66 @@
       "flight_no": "IV8220",
       "airline": "IV",
       "city": "Pristina",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791283800.0,
+      "time_scheduled": "12:50",
+      "time_estimated": "11:47",
+      "flight_no": "XC104",
+      "airline": "XC",
+      "city": "Antalya",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "landed",
+      "delay": 0
+    },
+    {
+      "dt": 1791283800.0,
+      "time_scheduled": "12:50",
+      "time_estimated": "12:56",
+      "flight_no": "EW9535",
+      "airline": "EW",
+      "city": "Malaga",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 6
+    },
+    {
+      "dt": 1791284700.0,
+      "time_scheduled": "13:05",
+      "time_estimated": "12:54",
+      "flight_no": "E69665",
+      "airline": "E6",
+      "city": "PVK",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791285000.0,
+      "time_scheduled": "13:10",
+      "time_estimated": "12:57",
+      "flight_no": "DE1557",
+      "airline": "DE",
+      "city": "XRY",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791285000.0,
+      "time_scheduled": "13:10",
+      "time_estimated": "13:00",
+      "flight_no": "EW9883",
+      "airline": "EW",
+      "city": "Rom-Fiumicino",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
