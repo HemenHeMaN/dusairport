@@ -45,6 +45,7 @@ h1 { color: #003366; font-size: 1.3rem; margin: 0 0 5px 0; }
 .flight-time { display: block; }
 .main-info { flex-grow: 1; padding: 0 10px; }
 .city-name { font-size: 0.95rem; font-weight: bold; color: #222; margin-bottom: 3px; }
+.country { font-weight: normal; font-size: 0.8rem; color: #666; }
 .badge-linie {
     background: #e3f2fd; color: #0d47a1; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;
 }
@@ -132,8 +133,13 @@ function renderFlights(flights) {
         const cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
         const badgeClass = isCharter ? "badge-charter" : "badge-linie";
 
-        let delayHtml = f.delay > 0 ? `<span class="delay-badge">+${f.delay} Min.</span>` : '';
-        let statusText = f.delay > 0 ? `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)` : (statusMap[f.status.toLowerCase()] || f.status);
+        const delayHtml = f.delay > 0 ? `<span class="delay-badge">+${f.delay} Min.</span>` : '';
+        const statusText = f.delay > 0
+            ? `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)`
+            : (statusMap[String(f.status).toLowerCase()] || f.status);
+
+        const countryHtml = f.country ? ` <span class="country">${f.country}</span>` : '';
+        const fromText = f.country ? `${f.city}, ${f.country}` : f.city;
 
         const card = document.createElement('div');
         card.className = cardClass;
@@ -146,7 +152,7 @@ function renderFlights(flights) {
                     ${delayHtml}
                 </div>
                 <div class="main-info">
-                    <div class="city-name">${f.city}</div>
+                    <div class="city-name">${f.city}${countryHtml}</div>
                     <div class="gate-info">
                         <span class="${badgeClass}">${f.gate}</span>
                     </div>
@@ -157,7 +163,7 @@ function renderFlights(flights) {
                 <div class="detail-grid">
                     <div><strong>Flug-Nr.:</strong> ${f.flight_no}</div>
                     <div><strong>Airline:</strong> ${f.airline}</div>
-                    <div><strong>Von:</strong> ${f.city}</div>
+                    <div><strong>Von:</strong> ${fromText}</div>
                     <div><strong>Typ:</strong> ${f.type}</div>
                     <div><strong>Status:</strong> ${statusText}</div>
                 </div>
