@@ -1,15 +1,31 @@
-from datetime import datetime, timedelta
-import urllib.request
-import urllib.parse
+#!/usr/bin/env python3
+"""
+DUS-Ankünfte Scraper (AirLabs /schedules)
+Läuft alle 30 Minuten zwischen 05:30 und 23:30 (Europe/Berlin).
+Aufruf mit --force ignoriert das Zeitfenster (zum Testen).
+"""
 import json
 import os
+import sys
 import time
+import urllib.parse
+import urllib.request
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
+# ---------------------------------------------------------------- Konfiguration
 API_KEY = os.environ.get("AIRLABS_API_KEY")
 AIRPORT = "DUS"
-RAW_CACHE_FILE = ".raw_cache.json"  # Interner Rohdaten-Cache gegen API-Limits
-CACHE_FILE = "cache.json"           # Die Datei für deine index.html
-CACHE_DURATION = 300  # 5 Minuten
+RAW_CACHE_FILE = ".raw_cache.json"
+CACHE_FILE = "cache.json"
+
+TZ = ZoneInfo("Europe/Berlin")
+UTC = timezone.utc
+
+# Abruf-Zeitfenster (lokale Zeit). Etwas Toleranz für verspätete Cron-Starts.
+WINDOW_START = (5, 25)    # frühester Start (Soll: 05:30)
+WINDOW_END = (23, 40)     # spätester Start (Soll: 23:30)
+CACHE_DURATION = 25 * 60  # Sekunden; kleiner als das 30-Minuten-Intervall
 
 MINUTES_PAST = 60
 HOURS_FUTURE = 5
@@ -23,142 +39,223 @@ AIRPORT_NAMES = {
     "HER": "Iraklion", "MAD": "Madrid", "DLM": "Dalaman", "AMS": "Amsterdam",
     "FAO": "Faro", "AGP": "Malaga", "HRG": "Hurghada", "KGS": "Kos",
     "PRG": "Prag", "AGA": "Agadir", "BIO": "Bilbao", "LPA": "Gran Canaria",
-    "BCN": "Barcelona", "TFS": "Teneriffa Süd", "LCA": "Larnaka", "FUE": "Fuerteventura"
+    "BCN": "Barcelona", "TFS": "Teneriffa Süd", "LCA": "Larnaka", "FUE": "Fuerteventura",
+    "IST": "Istanbul", "SAW": "Istanbul-Sabiha Gökçen", "AYT": "Antalya", "VIE": "Wien",
+    "ZRH": "Zürich", "SPU": "Split", "DBV": "Dubrovnik", "ATH": "Athen",
+    "LIS": "Lissabon", "OPO": "Porto", "ARN": "Stockholm", "OSL": "Oslo",
+    "HEL": "Helsinki", "DUB": "Dublin", "LGW": "London-Gatwick", "STN": "London-Stansted",
+    "BJV": "Bodrum", "ADB": "Izmir", "TIA": "Tirana", "PRN": "Pristina",
+    "SKP": "Skopje", "BEG": "Belgrad", "SOF": "Sofia", "HRG": "Hurghada",
+    "RAK": "Marrakesch", "TUN": "Tunis", "DJE": "Djerba", "SSH": "Sharm el-Sheikh",
 }
 
+# Alles klein schreiben (Vergleich erfolgt mit .lower())
 CHARTER_AIRLINES = [
-    "condor", "tuifly", "corendon", "freebird", "smartlynx", 
+    "condor", "tuifly", "corendon", "freebird", "smartlynx",
     "eurowings discover", "discover airlines", "sunexpress", "enter air",
-    "Tailwind", "Sundair", "Marabu", "Mavi Gök"
+    "tailwind", "sundair", "marabu", "mavi gök", "mavi gok",
 ]
 
-CHARTER_CODES = [
-    "DE", "X3", "XC", "FHY", "6Y", "4Y", "XQ", "ENT", "TWI", "SRD", "MBU"
-]
+# IATA- und ICAO-Codes gemischt, weil AirLabs je nach Feld beides liefert
+CHARTER_CODES = {"DE", "X3", "XC", "FHY", "6Y", "4Y", "XQ", "ENT", "TWI", "SRD", "MBU"}
+
+SKIP_AIRLINE_KEYWORDS = ("flugschule", "training", "flight school")
+
+
+# ---------------------------------------------------------------- Hilfsfunktionen
+def in_run_window(now_local):
+    start = now_local.replace(hour=WINDOW_START[0], minute=WINDOW_START[1], second=0, microsecond=0)
+    end = now_local.replace(hour=WINDOW_END[0], minute=WINDOW_END[1], second=0, microsecond=0)
+    return start <= now_local <= end
+
 
 def get_flight_type(airline_name, airline_iata):
-    airline_lower = str(airline_name or "").lower()
-    iata_upper = str(airline_iata or "").upper()
-    if iata_upper in CHARTER_CODES:
+    if str(airline_iata or "").upper() in CHARTER_CODES:
         return "Charter"
-    for keyword in CHARTER_AIRLINES:
-        if keyword in airline_lower:
-            return "Charter"
+    name = str(airline_name or "").lower()
+    if any(k in name for k in CHARTER_AIRLINES):
+        return "Charter"
     return "Linie"
+
 
 def get_exit_gate(flight_type):
     return "Ausgang 4 (Charter)" if flight_type == "Charter" else "Ausgang 1 (Linie)"
 
-def parse_airlabs_time(time_string):
-    if not time_string:
-        return None
-    for fmt in ["%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S"]:
+
+def _parse_str(s):
+    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S"):
         try:
-            return datetime.strptime(str(time_string), fmt)
+            return datetime.strptime(str(s), fmt)
         except ValueError:
-            pass
+            continue
     return None
 
-def get_dynamic_city_name(flight_data):
-    iata = flight_data.get("dep_iata")
-    if iata and str(iata).upper() in AIRPORT_NAMES:
-        return AIRPORT_NAMES[str(iata).upper()]
-    city = flight_data.get("dep_city")
+
+def get_dt(flight, ts_key, utc_key, local_key):
+    """Liefert eine zeitzonenbewusste Zeit in Europe/Berlin oder None.
+    Reihenfolge: Unix-Timestamp -> UTC-String -> lokaler String."""
+    ts = flight.get(ts_key)
+    if ts:
+        try:
+            return datetime.fromtimestamp(int(ts), UTC).astimezone(TZ)
+        except (ValueError, TypeError, OSError):
+            pass
+    s = flight.get(utc_key)
+    if s:
+        dt = _parse_str(s)
+        if dt:
+            return dt.replace(tzinfo=UTC).astimezone(TZ)
+    s = flight.get(local_key)
+    if s:
+        dt = _parse_str(s)
+        if dt:
+            return dt.replace(tzinfo=TZ)
+    return None
+
+
+def get_city_name(flight):
+    iata = str(flight.get("dep_iata") or "").upper()
+    if iata in AIRPORT_NAMES:
+        return AIRPORT_NAMES[iata]
+    city = flight.get("dep_city")
     if city and len(str(city).strip()) > 1:
         return str(city).strip()
-    name = flight_data.get("dep_name")
+    name = flight.get("dep_name")
     if name and len(str(name).strip()) > 1:
-        return str(name).replace(" Airport", "").replace(" International", "").strip()
-    return str(iata).strip() if iata else "Unbekannt"
+        return str(name).replace(" International", "").replace(" Airport", "").strip()
+    return iata or "Unbekannt"
 
+
+def write_json_atomic(path, data):
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, path)
+
+
+def load_json(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def valid_response(data):
+    return isinstance(data, dict) and "error" not in data and isinstance(data.get("response"), list)
+
+
+# ---------------------------------------------------------------- Datenabruf
 def fetch_flights():
-    # Prüfen, ob der interne Rohdaten-Cache noch frisch ist
+    """Gibt (raw_data, quelle) zurück; quelle: 'Live' | 'Cache' | 'Cache (veraltet)' | None."""
+    if os.path.exists(RAW_CACHE_FILE) and time.time() - os.path.getmtime(RAW_CACHE_FILE) < CACHE_DURATION:
+        try:
+            data = load_json(RAW_CACHE_FILE)
+            if valid_response(data):
+                return data, "Cache"
+        except Exception:
+            pass
+
+    if not API_KEY:
+        print("Fehler: Umgebungsvariable AIRLABS_API_KEY ist nicht gesetzt.")
+    else:
+        params = {"api_key": API_KEY, "arr_iata": AIRPORT, "limit": 100}
+        url = "https://airlabs.co/api/v9/schedules?" + urllib.parse.urlencode(params)
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "DUS-Flight-Scraper/1.0"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if valid_response(data):
+                write_json_atomic(RAW_CACHE_FILE, data)
+                return data, "Live"
+            print(f"API-Fehlerantwort: {str(data)[:200]}")
+        except Exception as e:
+            print(f"Fehler beim API-Abruf: {e}")
+
+    # Fallback: alte Rohdaten, falls vorhanden
     if os.path.exists(RAW_CACHE_FILE):
-        if time.time() - os.path.getmtime(RAW_CACHE_FILE) < CACHE_DURATION:
-            try:
-                with open(RAW_CACHE_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f), True
-            except Exception:
-                pass
+        try:
+            data = load_json(RAW_CACHE_FILE)
+            if valid_response(data):
+                return data, "Cache (veraltet)"
+        except Exception:
+            pass
+    return None, None
 
-    params = {"api_key": API_KEY, "arr_iata": AIRPORT, "limit": 80}
-    api_url = "https://airlabs.co/api/v9/schedules?" + urllib.parse.urlencode(params)
 
-    try:
-        req = urllib.request.Request(api_url, headers={"User-Agent": "DUS-Flight-Scraper/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            raw_data = json.loads(resp.read().decode("utf-8"))
-        
-        # Rohdaten zwischenspeichern
-        with open(RAW_CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(raw_data, f, ensure_ascii=False, indent=2)
-            
-        return raw_data, False
-    except Exception as e:
-        print(f"Fehler beim API-Abruf: {e}")
-        if os.path.exists(RAW_CACHE_FILE):
-            with open(RAW_CACHE_FILE, "r", encoding="utf-8") as f:
-                return json.load(f), True
-        return {"response": []}, False
-
+# ---------------------------------------------------------------- Hauptlogik
 def main():
-    now = datetime.now()
+    now = datetime.now(TZ)
+
+    if "--force" not in sys.argv and not in_run_window(now):
+        print(f"{now:%H:%M} liegt außerhalb 05:30–23:30, kein Abruf.")
+        return
+
+    raw_data, source = fetch_flights()
+    if raw_data is None:
+        print("Keine Daten verfügbar, cache.json bleibt unverändert.")
+        sys.exit(1)
+
     time_min = now - timedelta(minutes=MINUTES_PAST)
     time_max = now + timedelta(hours=HOURS_FUTURE)
 
-    raw_data, from_cache = fetch_flights()
-    raw_flights = raw_data.get("response", [])
-    if not isinstance(raw_flights, list):
-        raw_flights = []
-
-    valid_list = []
-
-    for flight in raw_flights:
-        flight_iata = flight.get("flight_iata") or flight.get("flight_number") or ""
-        if not flight_iata:
+    flights = []
+    for fl in raw_data["response"]:
+        flight_no = fl.get("flight_iata") or fl.get("flight_number") or ""
+        if not flight_no:
             continue
 
-        airline_name = flight.get("airline_name") or flight.get("airline_iata") or "Unbekannt"
-        airline_iata = flight.get("airline_iata") or ""
-
-        scheduled_time = flight.get("arr_scheduled")
-        scheduled_dt = parse_airlabs_time(scheduled_time)
-        if not scheduled_dt or not (time_min <= scheduled_dt <= time_max):
+        # Codeshare-Partner überspringen (Betreiberflug bleibt erhalten)
+        if fl.get("cs_flight_iata"):
             continue
 
-        if any(x in airline_name.lower() for x in ["flugschule", "training", "flight school"]):
+        airline_name = fl.get("airline_name") or fl.get("airline_iata") or "Unbekannt"
+        airline_iata = fl.get("airline_iata") or ""
+        if any(k in airline_name.lower() for k in SKIP_AIRLINE_KEYWORDS):
             continue
 
-        delay = flight.get("arr_delayed")
+        sched = get_dt(fl, "arr_time_ts", "arr_time_utc", "arr_time")
+        if not sched or not (time_min <= sched <= time_max):
+            continue
+
         try:
-            delay = int(delay) if delay is not None else 0
-        except Exception:
+            delay = int(fl.get("arr_delayed") or 0)
+        except (ValueError, TypeError):
             delay = 0
 
-        estimated_time = flight.get("arr_estimated") or flight.get("arr_time")
-        estimated_dt = parse_airlabs_time(estimated_time)
-        if not estimated_dt:
-            estimated_dt = scheduled_dt + timedelta(minutes=delay)
+        est = get_dt(fl, "arr_estimated_ts", "arr_estimated_utc", "arr_estimated")
+        if not est:
+            est = sched + timedelta(minutes=delay)
 
-        flight_type = get_flight_type(airline_name, airline_iata)
-
-        valid_list.append({
-            "dt": scheduled_dt.timestamp(),
-            "time_scheduled": scheduled_dt.strftime("%H:%M"),
-            "time_estimated": estimated_dt.strftime("%H:%M"),
-            "flight_no": flight_iata,
+        ftype = get_flight_type(airline_name, airline_iata)
+        flights.append({
+            "dt": sched.timestamp(),
+            "time_scheduled": sched.strftime("%H:%M"),
+            "time_estimated": est.strftime("%H:%M"),
+            "flight_no": flight_no,
             "airline": airline_name,
-            "city": get_dynamic_city_name(flight),
-            "type": flight_type,
-            "gate": get_exit_gate(flight_type),
-            "status": flight.get("status") or "scheduled",
-            "delay": delay
+            "city": get_city_name(fl),
+            "type": ftype,
+            "gate": get_exit_gate(ftype),
+            "status": fl.get("status") or "scheduled",
+            "delay": delay,
         })
 
-    valid_list = sorted(valid_list, key=lambda x: x["dt"])
+    flights.sort(key=lambda x: x["dt"])
 
-    # Codeshare-Duplikate filtern
-    unique_flights = []
-    seen = set()
-    for f in valid_list:
-        key
+    # Restliche Duplikate: gleiche Flugnummer + gleiche Zeit
+    unique, seen = [], set()
+    for f in flights:
+        key = (f["flight_no"], f["time_scheduled"])
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(f)
+
+    write_json_atomic(CACHE_FILE, {
+        "updated_at": now.strftime("%d.%m.%Y %H:%M"),
+        "source": source,
+        "flights": unique,
+    })
+    print(f"cache.json aktualisiert ({source}): {len(unique)} Flüge.")
+
+
+if __name__ == "__main__":
+    main()
