@@ -6,6 +6,7 @@ Aufruf mit --force ignoriert das Zeitfenster (zum Testen).
 """
 import json
 import os
+import re
 import sys
 import time
 import urllib.parse
@@ -50,10 +51,11 @@ AIRPORTS = {
     "RHO": ("Rhodos", "Griechenland"), "HER": ("Iraklion", "Griechenland"),
     "KGS": ("Kos", "Griechenland"), "KOS": ("Kos", "Griechenland"),
     "ATH": ("Athen", "Griechenland"), "SKG": ("Thessaloniki", "Griechenland"),
-    "PVK": ("Preveza-Aktion", "Griechenland"),
+    "PVK": ("Preveza-Aktion", "Griechenland"), "KLX": ("Kalamata", "Griechenland"),
     # Italien
     "FCO": ("Rom-Fiumicino", "Italien"), "LIN": ("Mailand-Linate", "Italien"),
-    "BRI": ("Bari", "Italien"),
+    "BRI": ("Bari", "Italien"), "MXP": ("Mailand-Malpensa", "Italien"),
+    "NAP": ("Neapel", "Italien"),
     # Großbritannien / Irland
     "LHR": ("London-Heathrow", "Großbritannien"), "LGW": ("London-Gatwick", "Großbritannien"),
     "STN": ("London-Stansted", "Großbritannien"), "MAN": ("Manchester", "Großbritannien"),
@@ -62,6 +64,7 @@ AIRPORTS = {
     "DLM": ("Dalaman", "Türkei"), "IST": ("Istanbul", "Türkei"),
     "SAW": ("Istanbul-Sabiha Gökçen", "Türkei"), "AYT": ("Antalya", "Türkei"),
     "BJV": ("Bodrum", "Türkei"), "ADB": ("Izmir", "Türkei"),
+    "ESB": ("Ankara-Esenboğa", "Türkei"), "DIY": ("Diyarbakır", "Türkei"),
     # Portugal
     "FNC": ("Madeira", "Portugal"), "FAO": ("Faro", "Portugal"),
     "LIS": ("Lissabon", "Portugal"), "OPO": ("Porto", "Portugal"),
@@ -73,7 +76,7 @@ AIRPORTS = {
     "OSL": ("Oslo", "Norwegen"), "HEL": ("Helsinki", "Finnland"),
     "WAW": ("Warschau", "Polen"), "PRG": ("Prag", "Tschechien"),
     "BUD": ("Budapest", "Ungarn"), "OTP": ("Bukarest", "Rumänien"),
-    "SOF": ("Sofia", "Bulgarien"),
+    "SOF": ("Sofia", "Bulgarien"), "RIX": ("Riga", "Lettland"),
     # Westeuropa
     "CDG": ("Paris-Charles-de-Gaulle", "Frankreich"), "AMS": ("Amsterdam", "Niederlande"),
     # Balkan
@@ -87,6 +90,7 @@ AIRPORTS = {
     "AGA": ("Agadir", "Marokko"), "RAK": ("Marrakesch", "Marokko"),
     "TUN": ("Tunis", "Tunesien"), "DJE": ("Djerba", "Tunesien"),
     "DXB": ("Dubai", "Vereinigte Arabische Emirate"),
+    "TLV": ("Tel Aviv", "Israel"), "BEN": ("Bengasi", "Libyen"),
 }
 
 # Fallback, falls ein Flughafen nicht in der Tabelle steht (ISO-Ländercode von AirLabs)
@@ -99,7 +103,7 @@ COUNTRY_NAMES = {
     "AL": "Albanien", "XK": "Kosovo", "MK": "Nordmazedonien", "CY": "Zypern",
     "EG": "Ägypten", "MA": "Marokko", "TN": "Tunesien", "AE": "Vereinigte Arabische Emirate",
     "DK": "Dänemark", "SE": "Schweden", "NO": "Norwegen", "FI": "Finnland",
-    "US": "USA", "CA": "Kanada", "IL": "Israel", "JO": "Jordanien",
+    "LV": "Lettland", "LY": "Libyen", "US": "USA", "CA": "Kanada", "IL": "Israel", "JO": "Jordanien",
 }
 
 # Alles klein schreiben (Vergleich erfolgt mit .lower())
@@ -122,13 +126,30 @@ def in_run_window(now_local):
     return start <= now_local <= end
 
 
-def get_flight_type(airline_name, airline_iata):
+def get_flight_type(flight, airline_name, airline_iata):
+    """Gibt (Typ, Quelle) zurück.
+    Priorität: 1. Terminal (A = Linie, B/C = Charter)
+               2. Gepäckband (1-4 = Linie, 5-8 = Charter)
+               3. Airline-Heuristik (Fallback, wenn AirLabs noch nichts zugewiesen hat)"""
+    terminal = str(flight.get("arr_terminal") or "").strip().upper()
+    m = re.search(r"\b([ABC])\b", terminal)
+    if m:
+        return ("Linie" if m.group(1) == "A" else "Charter"), "Terminal"
+
+    baggage = re.search(r"\d+", str(flight.get("arr_baggage") or ""))
+    if baggage:
+        belt = int(baggage.group(0))
+        if 1 <= belt <= 4:
+            return "Linie", "Gepäckband"
+        if 5 <= belt <= 8:
+            return "Charter", "Gepäckband"
+
     if str(airline_iata or "").upper() in CHARTER_CODES:
-        return "Charter"
+        return "Charter", "Airline"
     name = str(airline_name or "").lower()
     if any(k in name for k in CHARTER_AIRLINES):
-        return "Charter"
-    return "Linie"
+        return "Charter", "Airline"
+    return "Linie", "Airline"
 
 
 def get_exit_gate(flight_type):
@@ -325,7 +346,7 @@ def main():
             continue
 
         city, country = get_airport_info(fl)
-        ftype = get_flight_type(airline_name, airline_iata)
+        ftype, type_source = get_flight_type(fl, airline_name, airline_iata)
         flights.append({
             "dt": sched.timestamp(),
             "time_scheduled": sched.strftime("%H:%M"),
@@ -335,6 +356,9 @@ def main():
             "city": city,
             "country": country,
             "type": ftype,
+            "type_source": type_source,
+            "terminal": fl.get("arr_terminal") or "",
+            "baggage": fl.get("arr_baggage") or "",
             "gate": get_exit_gate(ftype),
             "status": fl.get("status") or "scheduled",
             "delay": delay,
