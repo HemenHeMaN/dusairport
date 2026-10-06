@@ -45,7 +45,7 @@ AIRPORTS = {
     "AGP": ("Malaga", "Spanien"), "BIO": ("Bilbao", "Spanien"),
     "LPA": ("Gran Canaria", "Spanien"), "BCN": ("Barcelona", "Spanien"),
     "TFS": ("Teneriffa Süd", "Spanien"), "FUE": ("Fuerteventura", "Spanien"),
-    "XRY": ("Jerez de la Frontera", "Spanien"),
+    "XRY": ("Jerez de la Frontera", "Spanien"), "VLC": ("Valencia", "Spanien"),
     # Griechenland
     "SMI": ("Samos", "Griechenland"), "CFU": ("Korfu", "Griechenland"),
     "RHO": ("Rhodos", "Griechenland"), "HER": ("Heraklion (Kreta)", "Griechenland"),
@@ -53,11 +53,12 @@ AIRPORTS = {
     "ATH": ("Athen", "Griechenland"), "SKG": ("Thessaloniki", "Griechenland"),
     "PVK": ("Preveza-Aktion", "Griechenland"), "KLX": ("Kalamata", "Griechenland"),
     "CHQ": ("Chania (Kreta)", "Griechenland"), "GPA": ("Patras-Araxos", "Griechenland"),
+    "AOK": ("Karpathos", "Griechenland"),
     # Italien
     "FCO": ("Rom-Fiumicino", "Italien"), "LIN": ("Mailand-Linate", "Italien"),
     "BRI": ("Bari", "Italien"), "MXP": ("Mailand-Malpensa", "Italien"),
     "NAP": ("Neapel", "Italien"), "BLQ": ("Bologna", "Italien"),
-    "SUF": ("Lamezia Terme (Kalabrien)", "Italien"),
+    "SUF": ("Lamezia Terme (Kalabrien)", "Italien"), "BDS": ("Brindisi", "Italien"),
     # Großbritannien / Irland
     "LHR": ("London-Heathrow", "Großbritannien"), "LGW": ("London-Gatwick", "Großbritannien"),
     "STN": ("London-Stansted", "Großbritannien"), "MAN": ("Manchester", "Großbritannien"),
@@ -79,12 +80,15 @@ AIRPORTS = {
     "WAW": ("Warschau", "Polen"), "PRG": ("Prag", "Tschechien"),
     "BUD": ("Budapest", "Ungarn"), "OTP": ("Bukarest", "Rumänien"),
     "SOF": ("Sofia", "Bulgarien"), "RIX": ("Riga", "Lettland"),
+    "KUN": ("Kaunas", "Litauen"),
     # Westeuropa
     "CDG": ("Paris-Charles-de-Gaulle", "Frankreich"), "AMS": ("Amsterdam", "Niederlande"),
     # Balkan
     "SPU": ("Split", "Kroatien"), "DBV": ("Dubrovnik", "Kroatien"),
     "TIA": ("Tirana", "Albanien"), "PRN": ("Pristina", "Kosovo"),
     "SKP": ("Skopje", "Nordmazedonien"), "BEG": ("Belgrad", "Serbien"),
+    # Malta
+    "MLA": ("Malta", "Malta"),
     # Zypern
     "LCA": ("Larnaka", "Zypern"),
     # Afrika / Naher Osten
@@ -105,7 +109,8 @@ COUNTRY_NAMES = {
     "AL": "Albanien", "XK": "Kosovo", "MK": "Nordmazedonien", "CY": "Zypern",
     "EG": "Ägypten", "MA": "Marokko", "TN": "Tunesien", "AE": "Vereinigte Arabische Emirate",
     "DK": "Dänemark", "SE": "Schweden", "NO": "Norwegen", "FI": "Finnland",
-    "LV": "Lettland", "LY": "Libyen", "US": "USA", "CA": "Kanada", "IL": "Israel", "JO": "Jordanien",
+    "LV": "Lettland", "LT": "Litauen", "MT": "Malta", "LY": "Libyen", 
+    "US": "USA", "CA": "Kanada", "IL": "Israel", "JO": "Jordanien",
 }
 
 # Alles klein schreiben (Vergleich erfolgt mit .lower())
