@@ -115,6 +115,27 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 .update-info { font-size: 0.85rem; color: var(--update-color); margin-bottom: 12px; line-height: 1.5; }
 
+/* Suchfeld */
+.search-container { margin-bottom: 12px; }
+.search-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 1rem;
+    font-family: var(--font);
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+.search-input:focus {
+    border-color: var(--size-btn-bg);
+}
+[data-theme="dark"] .search-input:focus {
+    border-color: var(--filter-active-linie);
+}
+
 /* Filter */
 .filter-container { margin-bottom: 15px; display: flex; gap: 6px; }
 .filter-btn {
@@ -165,7 +186,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .tx-input { display: none; }
 .tx {
     display: inline-block;
-    font-size: 6.5px; /* Angepasst an Kopfzeilen-Größe */
+    font-size: 6.5px;
     line-height: 1;
     cursor: pointer;
     border-radius: 6em;
@@ -354,6 +375,11 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <div class="update-info" id="updateInfo">Lade Daten...</div>
 
+<!-- NEU: Suchfeld -->
+<div class="search-container">
+    <input type="text" id="searchInput" class="search-input" placeholder="Nach Flug, Stadt, Land oder Airline suchen..." aria-label="Flüge durchsuchen">
+</div>
+
 <div class="filter-container">
     <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
     <button class="filter-btn btn-linie" onclick="filterFlights('Linie', event)">Linie</button>
@@ -372,6 +398,7 @@ const THEME_KEY = 'dus_theme';
 
 let allFlights = [];
 let currentFilter = 'all';
+let currentSearch = '';
 
 /* ---------- Theme (Tag/Nacht) ---------- */
 const root = document.documentElement;
@@ -445,6 +472,13 @@ sizeReset.addEventListener('click', () => {
 
 loadFontSize();
 
+/* ---------- Such-Event-Listener ---------- */
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', e => {
+    currentSearch = e.target.value.toLowerCase().trim();
+    applyFilter();
+});
+
 /* ---------- Flugdaten ---------- */
 function loadData() {
     fetch('cache.json?t=' + Date.now(), { cache: 'no-store' })
@@ -466,9 +500,30 @@ function loadData() {
 }
 
 function applyFilter() {
-    const list = currentFilter === 'all'
-        ? allFlights
-        : allFlights.filter(f => f.type === currentFilter);
+    let list = allFlights;
+
+    // Nach Kategorie filtern (Alle / Linie / Charter)
+    if (currentFilter !== 'all') {
+        list = list.filter(f => f.type === currentFilter);
+    }
+
+    // Nach Suchbegriff filtern (durchsucht Stadt, Land, Airline, Flugnummer, Gate)
+    if (currentSearch) {
+        list = list.filter(f => {
+            const city = (f.city || '').toLowerCase();
+            const country = (f.country || '').toLowerCase();
+            const airline = (f.airline || '').toLowerCase();
+            const flightNo = (f.flight_no || '').toLowerCase();
+            const gate = (f.gate || '').toLowerCase();
+
+            return city.includes(currentSearch) ||
+                   country.includes(currentSearch) ||
+                   airline.includes(currentSearch) ||
+                   flightNo.includes(currentSearch) ||
+                   gate.includes(currentSearch);
+        });
+    }
+
     renderFlights(list);
 }
 
