@@ -48,14 +48,16 @@ AIRPORTS = {
     "XRY": ("Jerez de la Frontera", "Spanien"),
     # Griechenland
     "SMI": ("Samos", "Griechenland"), "CFU": ("Korfu", "Griechenland"),
-    "RHO": ("Rhodos", "Griechenland"), "HER": ("Iraklion", "Griechenland"),
+    "RHO": ("Rhodos", "Griechenland"), "HER": ("Heraklion (Kreta)", "Griechenland"),
     "KGS": ("Kos", "Griechenland"), "KOS": ("Kos", "Griechenland"),
     "ATH": ("Athen", "Griechenland"), "SKG": ("Thessaloniki", "Griechenland"),
     "PVK": ("Preveza-Aktion", "Griechenland"), "KLX": ("Kalamata", "Griechenland"),
+    "CHQ": ("Chania (Kreta)", "Griechenland"), "GPA": ("Patras-Araxos", "Griechenland"),
     # Italien
     "FCO": ("Rom-Fiumicino", "Italien"), "LIN": ("Mailand-Linate", "Italien"),
     "BRI": ("Bari", "Italien"), "MXP": ("Mailand-Malpensa", "Italien"),
-    "NAP": ("Neapel", "Italien"),
+    "NAP": ("Neapel", "Italien"), "BLQ": ("Bologna", "Italien"),
+    "SUF": ("Lamezia Terme (Kalabrien)", "Italien"),
     # Großbritannien / Irland
     "LHR": ("London-Heathrow", "Großbritannien"), "LGW": ("London-Gatwick", "Großbritannien"),
     "STN": ("London-Stansted", "Großbritannien"), "MAN": ("Manchester", "Großbritannien"),
@@ -72,7 +74,7 @@ AIRPORTS = {
     "VIE": ("Wien", "Österreich"), "GRZ": ("Graz", "Österreich"),
     "ZRH": ("Zürich", "Schweiz"),
     # Nord- und Osteuropa
-    "CPH": ("Kopenhagen", "Dänemark"), "ARN": ("Stockholm", "Schweden"),
+    "CPH": ("Kopenhagen", "Dänemark"), "ARN": ("Stockholm", "Schweden"), "GOT": ("Göteborg", "Schweden"),
     "OSL": ("Oslo", "Norwegen"), "HEL": ("Helsinki", "Finnland"),
     "WAW": ("Warschau", "Polen"), "PRG": ("Prag", "Tschechien"),
     "BUD": ("Budapest", "Ungarn"), "OTP": ("Bukarest", "Rumänien"),
@@ -86,7 +88,7 @@ AIRPORTS = {
     # Zypern
     "LCA": ("Larnaka", "Zypern"),
     # Afrika / Naher Osten
-    "HRG": ("Hurghada", "Ägypten"), "SSH": ("Sharm el-Sheikh", "Ägypten"),
+    "HRG": ("Hurghada", "Ägypten"), "SSH": ("Sharm el-Sheikh", "Ägypten"), "RMF": ("Marsa Alam", "Ägypten"),
     "AGA": ("Agadir", "Marokko"), "RAK": ("Marrakesch", "Marokko"),
     "TUN": ("Tunis", "Tunesien"), "DJE": ("Djerba", "Tunesien"),
     "DXB": ("Dubai", "Vereinigte Arabische Emirate"),
