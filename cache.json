@@ -1,5 +1,5 @@
 {
-  "updated_at": "06.10.2026 14:16",
+  "updated_at": "06.10.2026 14:49",
   "source": "Live",
   "flights": [
     {
@@ -29,82 +29,17 @@
       "delay": 62
     },
     {
-      "dt": 1791285300.0,
-      "time_scheduled": "13:15",
-      "time_estimated": "13:21",
-      "flight_no": "EW6902",
-      "airline": "EW",
-      "city": "Graz",
-      "country": "Österreich",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 6
-    },
-    {
-      "dt": 1791285600.0,
-      "time_scheduled": "13:20",
-      "time_estimated": "13:36",
-      "flight_no": "EW9643",
-      "airline": "EW",
-      "city": "Faro",
-      "country": "Portugal",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 16
-    },
-    {
       "dt": 1791286200.0,
       "time_scheduled": "13:30",
-      "time_estimated": "13:24",
-      "flight_no": "DI1621",
-      "airline": "DI",
-      "city": "Kos",
-      "country": "Griechenland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791286200.0,
-      "time_scheduled": "13:30",
-      "time_estimated": "13:30",
+      "time_estimated": "14:25",
       "flight_no": "NE728",
       "airline": "NE",
       "city": "Hurghada",
       "country": "Ägypten",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791287100.0,
-      "time_scheduled": "13:45",
-      "time_estimated": "13:41",
-      "flight_no": "EW9639",
-      "airline": "EW",
-      "city": "Samos",
-      "country": "Griechenland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791287400.0,
-      "time_scheduled": "13:50",
-      "time_estimated": "13:48",
-      "flight_no": "X34589",
-      "airline": "X3",
-      "city": "Rhodos",
-      "country": "Griechenland",
-      "type": "Charter",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "delay": 0
+      "delay": 55
     },
     {
       "dt": 1791287400.0,
@@ -168,13 +103,13 @@
       "country": "Griechenland",
       "type": "Charter",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791287700.0,
       "time_scheduled": "13:55",
-      "time_estimated": "14:39",
+      "time_estimated": "14:41",
       "flight_no": "EW9681",
       "airline": "EW",
       "city": "Athen",
@@ -182,7 +117,7 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 44
+      "delay": 46
     },
     {
       "dt": 1791288300.0,
@@ -226,24 +161,11 @@
     {
       "dt": 1791288900.0,
       "time_scheduled": "14:15",
-      "time_estimated": "13:57",
+      "time_estimated": "13:58",
       "flight_no": "MS733",
       "airline": "MS",
       "city": "CAI",
       "country": "",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791288900.0,
-      "time_scheduled": "14:15",
-      "time_estimated": "14:10",
-      "flight_no": "EW9085",
-      "airline": "EW",
-      "city": "München",
-      "country": "Deutschland",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
@@ -263,100 +185,113 @@
       "delay": 0
     },
     {
+      "dt": 1791288900.0,
+      "time_scheduled": "14:15",
+      "time_estimated": "14:12",
+      "flight_no": "EW9085",
+      "airline": "EW",
+      "city": "München",
+      "country": "Deutschland",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
+      "delay": 0
+    },
+    {
       "dt": 1791289200.0,
       "time_scheduled": "14:20",
-      "time_estimated": "14:59",
+      "time_estimated": "14:56",
       "flight_no": "E69637",
       "airline": "E6",
       "city": "Kos",
       "country": "Griechenland",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 39
+      "status": "landed",
+      "delay": 36
     },
     {
       "dt": 1791289500.0,
       "time_scheduled": "14:25",
       "time_estimated": "14:24",
-      "flight_no": "EW8044",
-      "airline": "EW",
-      "city": "Berlin",
-      "country": "Deutschland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791289500.0,
-      "time_scheduled": "14:25",
-      "time_estimated": "14:35",
       "flight_no": "VY1894",
       "airline": "VY",
       "city": "Barcelona",
       "country": "Spanien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 10
+      "status": "landed",
+      "delay": 0
+    },
+    {
+      "dt": 1791289500.0,
+      "time_scheduled": "14:25",
+      "time_estimated": "14:29",
+      "flight_no": "EW8044",
+      "airline": "EW",
+      "city": "Berlin",
+      "country": "Deutschland",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
+      "delay": 4
     },
     {
       "dt": 1791289800.0,
       "time_scheduled": "14:30",
-      "time_estimated": "14:30",
+      "time_estimated": "14:39",
       "flight_no": "LH74",
       "airline": "LH",
       "city": "Frankfurt",
       "country": "Deutschland",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 0
+      "status": "landed",
+      "delay": 9
     },
     {
       "dt": 1791290100.0,
       "time_scheduled": "14:35",
-      "time_estimated": "14:24",
-      "flight_no": "EW9465",
-      "airline": "EW",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791290100.0,
-      "time_scheduled": "14:35",
-      "time_estimated": "14:26",
+      "time_estimated": "14:18",
       "flight_no": "EW9811",
       "airline": "EW",
       "city": "VCE",
       "country": "",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
+      "delay": 0
+    },
+    {
+      "dt": 1791290100.0,
+      "time_scheduled": "14:35",
+      "time_estimated": "14:32",
+      "flight_no": "EW9465",
+      "airline": "EW",
+      "city": "London-Heathrow",
+      "country": "Großbritannien",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791290400.0,
       "time_scheduled": "14:40",
-      "time_estimated": "14:30",
+      "time_estimated": "14:34",
       "flight_no": "WX1621",
       "airline": "WX",
       "city": "Kopenhagen",
       "country": "Dänemark",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791290700.0,
       "time_scheduled": "14:45",
-      "time_estimated": "15:18",
+      "time_estimated": "15:22",
       "flight_no": "EW9421",
       "airline": "EW",
       "city": "NCE",
@@ -364,19 +299,19 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 33
+      "delay": 37
     },
     {
       "dt": 1791291300.0,
       "time_scheduled": "14:55",
-      "time_estimated": "14:55",
+      "time_estimated": "14:24",
       "flight_no": "BJ214",
       "airline": "BJ",
       "city": "MIR",
       "country": "",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -406,6 +341,19 @@
       "delay": 0
     },
     {
+      "dt": 1791292200.0,
+      "time_scheduled": "15:10",
+      "time_estimated": "15:53",
+      "flight_no": "XQ1328",
+      "airline": "XQ",
+      "city": "ONQ",
+      "country": "",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "active",
+      "delay": 43
+    },
+    {
       "dt": 1791292500.0,
       "time_scheduled": "15:15",
       "time_estimated": "15:18",
@@ -421,7 +369,7 @@
     {
       "dt": 1791293100.0,
       "time_scheduled": "15:25",
-      "time_estimated": "15:28",
+      "time_estimated": "15:58",
       "flight_no": "LH2016",
       "airline": "LH",
       "city": "München",
@@ -429,7 +377,20 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "delay": 3
+      "delay": 33
+    },
+    {
+      "dt": 1791293700.0,
+      "time_scheduled": "15:35",
+      "time_estimated": "15:55",
+      "flight_no": "E69613",
+      "airline": "E6",
+      "city": "Korfu",
+      "country": "Griechenland",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 20
     },
     {
       "dt": 1791294300.0,
@@ -442,6 +403,45 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791294300.0,
+      "time_scheduled": "15:45",
+      "time_estimated": "15:58",
+      "flight_no": "EW9365",
+      "airline": "EW",
+      "city": "EDI",
+      "country": "",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 13
+    },
+    {
+      "dt": 1791294600.0,
+      "time_scheduled": "15:50",
+      "time_estimated": "15:50",
+      "flight_no": "SM2980",
+      "airline": "SM",
+      "city": "Hurghada",
+      "country": "Ägypten",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791295200.0,
+      "time_scheduled": "16:00",
+      "time_estimated": "16:00",
+      "flight_no": "A51406",
+      "airline": "A5",
+      "city": "Paris-Charles-de-Gaulle",
+      "country": "Frankreich",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
       "delay": 0
     }
   ]
