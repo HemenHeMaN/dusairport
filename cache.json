@@ -1,67 +1,7 @@
 {
-  "updated_at": "06.10.2026 10:48",
+  "updated_at": "06.10.2026 11:19",
   "source": "Live",
   "flights": [
-    {
-      "dt": 1791273300.0,
-      "time_scheduled": "09:55",
-      "time_estimated": "10:07",
-      "flight_no": "EW9761",
-      "airline": "EW",
-      "city": "Zürich",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 12
-    },
-    {
-      "dt": 1791273300.0,
-      "time_scheduled": "09:55",
-      "time_estimated": "10:17",
-      "flight_no": "BA918",
-      "airline": "BA",
-      "city": "London-Heathrow",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 22
-    },
-    {
-      "dt": 1791273600.0,
-      "time_scheduled": "10:00",
-      "time_estimated": "10:35",
-      "flight_no": "EW9083",
-      "airline": "EW",
-      "city": "München",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 35
-    },
-    {
-      "dt": 1791273900.0,
-      "time_scheduled": "10:05",
-      "time_estimated": "10:11",
-      "flight_no": "EW9331",
-      "airline": "EW",
-      "city": "Birmingham",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 6
-    },
-    {
-      "dt": 1791274500.0,
-      "time_scheduled": "10:15",
-      "time_estimated": "10:05",
-      "flight_no": "ME247",
-      "airline": "ME",
-      "city": "BEY",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
     {
       "dt": 1791274800.0,
       "time_scheduled": "10:20",
@@ -78,11 +18,11 @@
       "dt": 1791275100.0,
       "time_scheduled": "10:25",
       "time_estimated": "10:18",
-      "flight_no": "4X9743",
-      "airline": "4X",
-      "city": "GVA",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
+      "flight_no": "DE1011",
+      "airline": "DE",
+      "city": "Palma de Mallorca",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
       "status": "landed",
       "delay": 0
     },
@@ -90,11 +30,11 @@
       "dt": 1791275100.0,
       "time_scheduled": "10:25",
       "time_estimated": "10:18",
-      "flight_no": "DE1011",
-      "airline": "DE",
-      "city": "Palma de Mallorca",
-      "type": "Charter",
-      "gate": "Ausgang 4 (Charter)",
+      "flight_no": "4X9743",
+      "airline": "4X",
+      "city": "GVA",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
       "status": "landed",
       "delay": 0
     },
@@ -149,7 +89,7 @@
     {
       "dt": 1791275400.0,
       "time_scheduled": "10:30",
-      "time_estimated": "10:27",
+      "time_estimated": "10:28",
       "flight_no": "AY1393",
       "airline": "AY",
       "city": "Helsinki",
@@ -185,14 +125,14 @@
     {
       "dt": 1791275700.0,
       "time_scheduled": "10:35",
-      "time_estimated": "10:38",
+      "time_estimated": "10:43",
       "flight_no": "EW6903",
       "airline": "EW",
       "city": "CGN",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 3
+      "delay": 8
     },
     {
       "dt": 1791276300.0,
@@ -209,26 +149,26 @@
     {
       "dt": 1791276300.0,
       "time_scheduled": "10:45",
-      "time_estimated": "10:58",
+      "time_estimated": "10:53",
       "flight_no": "E69751",
       "airline": "E6",
       "city": "Wien",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 13
+      "status": "landed",
+      "delay": 8
     },
     {
       "dt": 1791276600.0,
       "time_scheduled": "10:50",
-      "time_estimated": "10:52",
+      "time_estimated": "10:46",
       "flight_no": "A51606",
       "airline": "A5",
       "city": "Paris-Charles-de-Gaulle",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 2
+      "status": "landed",
+      "delay": 0
     },
     {
       "dt": 1791276900.0,
@@ -245,13 +185,13 @@
     {
       "dt": 1791277800.0,
       "time_scheduled": "11:10",
-      "time_estimated": "11:10",
+      "time_estimated": "10:50",
       "flight_no": "TK5",
       "airline": "TK",
       "city": "ESB",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -263,7 +203,7 @@
       "city": "Madrid",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 15
     },
     {
@@ -277,6 +217,18 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "delay": 0
+    },
+    {
+      "dt": 1791279000.0,
+      "time_scheduled": "11:30",
+      "time_estimated": "11:45",
+      "flight_no": "DE1775",
+      "airline": "DE",
+      "city": "Palma de Mallorca",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "active",
+      "delay": 15
     },
     {
       "dt": 1791279600.0,
@@ -297,6 +249,66 @@
       "flight_no": "EW9573",
       "airline": "EW",
       "city": "Palma de Mallorca",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791279600.0,
+      "time_scheduled": "11:40",
+      "time_estimated": "11:40",
+      "flight_no": "X32313",
+      "airline": "X3",
+      "city": "Palma de Mallorca",
+      "type": "Charter",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791279600.0,
+      "time_scheduled": "11:40",
+      "time_estimated": "11:45",
+      "flight_no": "DI1515",
+      "airline": "DI",
+      "city": "Palma de Mallorca",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 5
+    },
+    {
+      "dt": 1791279900.0,
+      "time_scheduled": "11:45",
+      "time_estimated": "11:45",
+      "flight_no": "EW9441",
+      "airline": "EW",
+      "city": "Barcelona",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791279900.0,
+      "time_scheduled": "11:45",
+      "time_estimated": "11:45",
+      "flight_no": "BQ1952",
+      "airline": "BQ",
+      "city": "BZO",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "delay": 0
+    },
+    {
+      "dt": 1791280200.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:43",
+      "flight_no": "LH2012",
+      "airline": "LH",
+      "city": "München",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
