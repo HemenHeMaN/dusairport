@@ -1,39 +1,7 @@
 {
-  "updated_at": "06.10.2026 21:43",
+  "updated_at": "06.10.2026 21:52",
   "source": "Live",
   "flights": [
-    {
-      "dt": 1791308400.0,
-      "time_scheduled": "19:40",
-      "time_estimated": "20:50",
-      "flight_no": "DE4803",
-      "airline": "DE",
-      "city": "KUN",
-      "country": "",
-      "type": "Charter",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "delay": 70
-    },
-    {
-      "dt": 1791309600.0,
-      "time_scheduled": "20:00",
-      "time_estimated": "20:47",
-      "flight_no": "EW9467",
-      "airline": "EW",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "cancelled",
-      "delay": 47
-    },
     {
       "dt": 1791311700.0,
       "time_scheduled": "20:35",
@@ -86,22 +54,6 @@
       "dt": 1791313200.0,
       "time_scheduled": "21:00",
       "time_estimated": "21:16",
-      "flight_no": "BA924",
-      "airline": "BA",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 16
-    },
-    {
-      "dt": 1791313200.0,
-      "time_scheduled": "21:00",
-      "time_estimated": "21:16",
       "flight_no": "EW9765",
       "airline": "EW",
       "city": "Zürich",
@@ -115,9 +67,25 @@
       "delay": 16
     },
     {
+      "dt": 1791313200.0,
+      "time_scheduled": "21:00",
+      "time_estimated": "21:17",
+      "flight_no": "BA924",
+      "airline": "BA",
+      "city": "London-Heathrow",
+      "country": "Großbritannien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
+      "delay": 17
+    },
+    {
       "dt": 1791314100.0,
       "time_scheduled": "21:15",
-      "time_estimated": "22:05",
+      "time_estimated": "21:41",
       "flight_no": "EW9039",
       "airline": "EW",
       "city": "Hamburg",
@@ -128,7 +96,7 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 50
+      "delay": 26
     },
     {
       "dt": 1791314400.0,
@@ -159,7 +127,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -170,22 +138,6 @@
       "airline": "X3",
       "city": "Palma de Mallorca",
       "country": "Spanien",
-      "type": "Charter",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791315000.0,
-      "time_scheduled": "21:30",
-      "time_estimated": "21:30",
-      "flight_no": "X36643",
-      "airline": "X3",
-      "city": "Marsa Alam",
-      "country": "Ägypten",
       "type": "Charter",
       "type_source": "Airline",
       "terminal": "",
@@ -211,9 +163,25 @@
       "delay": 5
     },
     {
+      "dt": 1791315000.0,
+      "time_scheduled": "21:30",
+      "time_estimated": "21:42",
+      "flight_no": "X36643",
+      "airline": "X3",
+      "city": "Marsa Alam",
+      "country": "Ägypten",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "landed",
+      "delay": 12
+    },
+    {
       "dt": 1791315300.0,
       "time_scheduled": "21:35",
-      "time_estimated": "21:44",
+      "time_estimated": "21:43",
       "flight_no": "E69221",
       "airline": "E6",
       "city": "Göteborg",
@@ -223,8 +191,8 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 9
+      "status": "landed",
+      "delay": 8
     },
     {
       "dt": 1791315300.0,
@@ -303,7 +271,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 7
     },
     {
@@ -325,7 +293,7 @@
     {
       "dt": 1791316200.0,
       "time_scheduled": "21:50",
-      "time_estimated": "21:44",
+      "time_estimated": "21:38",
       "flight_no": "A51106",
       "airline": "A5",
       "city": "Paris-Charles-de-Gaulle",
@@ -344,8 +312,8 @@
       "time_estimated": "22:16",
       "flight_no": "EW9691",
       "airline": "EW",
-      "city": "MLA",
-      "country": "",
+      "city": "Malta",
+      "country": "Malta",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
@@ -405,7 +373,7 @@
     {
       "dt": 1791316800.0,
       "time_scheduled": "22:00",
-      "time_estimated": "21:51",
+      "time_estimated": "21:54",
       "flight_no": "EW9835",
       "airline": "EW",
       "city": "Bologna",
@@ -431,7 +399,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -469,18 +437,34 @@
     {
       "dt": 1791317100.0,
       "time_scheduled": "22:05",
-      "time_estimated": "22:09",
+      "time_estimated": "22:15",
       "flight_no": "E69855",
       "airline": "E6",
-      "city": "BDS",
-      "country": "",
+      "city": "Brindisi",
+      "country": "Italien",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 4
+      "delay": 10
+    },
+    {
+      "dt": 1791317400.0,
+      "time_scheduled": "22:10",
+      "time_estimated": "22:20",
+      "flight_no": "WX629",
+      "airline": "WX",
+      "city": "Kopenhagen",
+      "country": "Dänemark",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 10
     },
     {
       "dt": 1791317700.0,
@@ -552,8 +536,8 @@
       "time_estimated": "22:14",
       "flight_no": "EW9539",
       "airline": "EW",
-      "city": "VLC",
-      "country": "",
+      "city": "Valencia",
+      "country": "Spanien",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
@@ -563,13 +547,29 @@
       "delay": 0
     },
     {
+      "dt": 1791318300.0,
+      "time_scheduled": "22:25",
+      "time_estimated": "22:25",
+      "flight_no": "ZQ1805",
+      "airline": "ZQ",
+      "city": "Amsterdam",
+      "country": "Niederlande",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "delay": 0
+    },
+    {
       "dt": 1791318600.0,
       "time_scheduled": "22:30",
       "time_estimated": "22:07",
       "flight_no": "E69679",
       "airline": "E6",
-      "city": "AOK",
-      "country": "",
+      "city": "Karpathos",
+      "country": "Griechenland",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
