@@ -1,11 +1,11 @@
 {
-  "updated_at": "06.10.2026 15:15",
+  "updated_at": "06.10.2026 15:45",
   "source": "Live",
   "flights": [
     {
       "dt": 1791279000.0,
       "time_scheduled": "11:30",
-      "time_estimated": "15:11",
+      "time_estimated": "15:12",
       "flight_no": "BA914",
       "airline": "BA",
       "city": "London-Heathrow",
@@ -13,137 +13,7 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 221
-    },
-    {
-      "dt": 1791286200.0,
-      "time_scheduled": "13:30",
-      "time_estimated": "14:25",
-      "flight_no": "NE728",
-      "airline": "NE",
-      "city": "Hurghada",
-      "country": "Ägypten",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 55
-    },
-    {
-      "dt": 1791287700.0,
-      "time_scheduled": "13:55",
-      "time_estimated": "14:40",
-      "flight_no": "X34105",
-      "airline": "X3",
-      "city": "Iraklion",
-      "country": "Griechenland",
-      "type": "Charter",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "delay": 45
-    },
-    {
-      "dt": 1791287700.0,
-      "time_scheduled": "13:55",
-      "time_estimated": "14:43",
-      "flight_no": "EW9681",
-      "airline": "EW",
-      "city": "Athen",
-      "country": "Griechenland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 48
-    },
-    {
-      "dt": 1791289200.0,
-      "time_scheduled": "14:20",
-      "time_estimated": "14:39",
-      "flight_no": "E69637",
-      "airline": "E6",
-      "city": "Kos",
-      "country": "Griechenland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 19
-    },
-    {
-      "dt": 1791289500.0,
-      "time_scheduled": "14:25",
-      "time_estimated": "14:24",
-      "flight_no": "VY1894",
-      "airline": "VY",
-      "city": "Barcelona",
-      "country": "Spanien",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791289500.0,
-      "time_scheduled": "14:25",
-      "time_estimated": "14:29",
-      "flight_no": "EW8044",
-      "airline": "EW",
-      "city": "Berlin",
-      "country": "Deutschland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 4
-    },
-    {
-      "dt": 1791289800.0,
-      "time_scheduled": "14:30",
-      "time_estimated": "14:39",
-      "flight_no": "LH74",
-      "airline": "LH",
-      "city": "Frankfurt",
-      "country": "Deutschland",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 9
-    },
-    {
-      "dt": 1791290100.0,
-      "time_scheduled": "14:35",
-      "time_estimated": "14:18",
-      "flight_no": "EW9811",
-      "airline": "EW",
-      "city": "VCE",
-      "country": "",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791290100.0,
-      "time_scheduled": "14:35",
-      "time_estimated": "14:32",
-      "flight_no": "EW9465",
-      "airline": "EW",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791290400.0,
-      "time_scheduled": "14:40",
-      "time_estimated": "14:34",
-      "flight_no": "WX1621",
-      "airline": "WX",
-      "city": "Kopenhagen",
-      "country": "Dänemark",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
+      "delay": 222
     },
     {
       "dt": 1791290700.0,
@@ -157,19 +27,6 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
       "delay": 16
-    },
-    {
-      "dt": 1791291300.0,
-      "time_scheduled": "14:55",
-      "time_estimated": "14:24",
-      "flight_no": "BJ214",
-      "airline": "BJ",
-      "city": "MIR",
-      "country": "",
-      "type": "Linie",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
     },
     {
       "dt": 1791291600.0,
@@ -200,15 +57,15 @@
     {
       "dt": 1791292200.0,
       "time_scheduled": "15:10",
-      "time_estimated": "15:53",
+      "time_estimated": "15:14",
       "flight_no": "XQ1328",
       "airline": "XQ",
       "city": "ONQ",
       "country": "",
       "type": "Charter",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "delay": 43
+      "status": "landed",
+      "delay": 4
     },
     {
       "dt": 1791292500.0,
@@ -226,7 +83,7 @@
     {
       "dt": 1791292800.0,
       "time_scheduled": "15:20",
-      "time_estimated": "16:05",
+      "time_estimated": "16:08",
       "flight_no": "U28649",
       "airline": "U2",
       "city": "London-Gatwick",
@@ -234,7 +91,7 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 45
+      "delay": 48
     },
     {
       "dt": 1791293100.0,
@@ -246,13 +103,13 @@
       "country": "Deutschland",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 23
     },
     {
       "dt": 1791293700.0,
       "time_scheduled": "15:35",
-      "time_estimated": "15:55",
+      "time_estimated": "15:57",
       "flight_no": "E69613",
       "airline": "E6",
       "city": "Korfu",
@@ -260,19 +117,19 @@
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 20
+      "delay": 22
     },
     {
       "dt": 1791294300.0,
       "time_scheduled": "15:45",
-      "time_estimated": "15:45",
+      "time_estimated": "15:22",
       "flight_no": "VF27",
       "airline": "VF",
       "city": "Istanbul-Sabiha Gökçen",
       "country": "Türkei",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -291,14 +148,14 @@
     {
       "dt": 1791294600.0,
       "time_scheduled": "15:50",
-      "time_estimated": "15:50",
+      "time_estimated": "15:18",
       "flight_no": "SM2980",
       "airline": "SM",
       "city": "Hurghada",
       "country": "Ägypten",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -354,6 +211,19 @@
       "delay": 28
     },
     {
+      "dt": 1791296100.0,
+      "time_scheduled": "16:15",
+      "time_estimated": "16:54",
+      "flight_no": "EW9579",
+      "airline": "EW",
+      "city": "Palma de Mallorca",
+      "country": "Spanien",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 39
+    },
+    {
       "dt": 1791297000.0,
       "time_scheduled": "16:30",
       "time_estimated": "16:23",
@@ -361,6 +231,32 @@
       "airline": "LH",
       "city": "München",
       "country": "Deutschland",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791297000.0,
+      "time_scheduled": "16:30",
+      "time_estimated": "16:45",
+      "flight_no": "4X9815",
+      "airline": "4X",
+      "city": "CTA",
+      "country": "",
+      "type": "Linie",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 15
+    },
+    {
+      "dt": 1791298500.0,
+      "time_scheduled": "16:55",
+      "time_estimated": "16:55",
+      "flight_no": "EW9763",
+      "airline": "EW",
+      "city": "Zürich",
+      "country": "Schweiz",
       "type": "Linie",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
