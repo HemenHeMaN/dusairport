@@ -30,24 +30,92 @@ CACHE_DURATION = 25 * 60  # Sekunden; kleiner als das 30-Minuten-Intervall
 MINUTES_PAST = 60
 HOURS_FUTURE = 5
 
-AIRPORT_NAMES = {
-    "MUC": "München", "LHR": "London-Heathrow", "SMI": "Samos", "FCO": "Rom-Fiumicino",
-    "IBZ": "Ibiza", "WAW": "Warschau", "CDG": "Paris-Charles-de-Gaulle", "CPH": "Kopenhagen",
-    "CFU": "Korfu", "MAN": "Manchester", "RHO": "Rhodos", "BUD": "Budapest",
-    "PMI": "Palma de Mallorca", "HAM": "Hamburg", "OTP": "Bukarest", "LIN": "Mailand-Linate",
-    "ALC": "Alicante", "BHX": "Birmingham", "FNC": "Madeira", "FRA": "Frankfurt",
-    "HER": "Iraklion", "MAD": "Madrid", "DLM": "Dalaman", "AMS": "Amsterdam",
-    "FAO": "Faro", "AGP": "Malaga", "HRG": "Hurghada", "KGS": "Kos",
-    "PRG": "Prag", "AGA": "Agadir", "BIO": "Bilbao", "LPA": "Gran Canaria",
-    "BCN": "Barcelona", "TFS": "Teneriffa Süd", "LCA": "Larnaka", "FUE": "Fuerteventura",
-    "IST": "Istanbul", "SAW": "Istanbul-Sabiha Gökçen", "AYT": "Antalya", "VIE": "Wien",
-    "ZRH": "Zürich", "SPU": "Split", "DBV": "Dubrovnik", "ATH": "Athen",
-    "LIS": "Lissabon", "OPO": "Porto", "ARN": "Stockholm", "OSL": "Oslo",
-    "HEL": "Helsinki", "DUB": "Dublin", "LGW": "London-Gatwick", "STN": "London-Stansted",
-    "BJV": "Bodrum", "ADB": "Izmir", "TIA": "Tirana", "PRN": "Pristina",
-    "SKP": "Skopje", "BEG": "Belgrad", "SOF": "Sofia", "HRG": "Hurghada",
-    "RAK": "Marrakesch", "TUN": "Tunis", "DJE": "Djerba", "SSH": "Sharm el-Sheikh",
+# IATA: (Name, Land)
+AIRPORTS = {
+    # Deutschland
+    "MUC": ("München", "Deutschland"), "HAM": ("Hamburg", "Deutschland"),
+    "FRA": ("Frankfurt", "Deutschland"), "BER": ("Berlin", "Deutschland"),
+    # Spanien
+    "IBZ": ("Ibiza", "Spanien"), "PMI": ("Palma de Mallorca", "Spanien"),
+    "ALC": ("Alicante", "Spanien"), "MAD": ("Madrid", "Spanien"),
+    "AGP": ("Malaga", "Spanien"), "BIO": ("Bilbao", "Spanien"),
+    "LPA": ("Gran Canaria", "Spanien"), "BCN": ("Barcelona", "Spanien"),
+    "TFS": ("Teneriffa Süd", "Spanien"), "FUE": ("Fuerteventura", "Spanien"),
+    "XRY": ("Jerez de la Frontera", "Spanien"),
+    # Griechenland
+    "SMI": ("Samos", "Griechenland"), "CFU": ("Korfu", "Griechenland"),
+    "RHO": ("Rhodos", "Griechenland"), "HER": ("Iraklion", "Griechenland"),
+    "KGS": ("Kos", "Griechenland"), "KOS": ("Kos", "Griechenland"),
+    "ATH": ("Athen", "Griechenland"), "SKG": ("Thessaloniki", "Griechenland"),
+    "PVK": ("Preveza (Aktion)", "Griechenland"),
+    # Italien
+    "FCO": ("Rom-Fiumicino", "Italien"), "LIN": ("Mailand-Linate", "Italien"),
+    "BRI": ("Bari", "Italien"),
+    # Großbritannien / Irland
+    "LHR": ("London-Heathrow", "Großbritannien"), "LGW": ("London-Gatwick", "Großbritannien"),
+    "STN": ("London-Stansted", "Großbritannien"), "MAN": ("Manchester", "Großbritannien"),
+    "BHX": ("Birmingham", "Großbritannien"), "DUB": ("Dublin", "Irland"),
+    # Türkei
+    "DLM": ("Dalaman", "Türkei"), "IST": ("Istanbul", "Türkei"),
+    "SAW": ("Istanbul-Sabiha Gökçen", "Türkei"), "AYT": ("Antalya", "Türkei"),
+    "BJV": ("Bodrum", "Türkei"), "ADB": ("Izmir", "Türkei"),
+    # Portugal
+    "FNC": ("Madeira", "Portugal"), "FAO": ("Faro", "Portugal"),
+    "LIS": ("Lissabon", "Portugal"), "OPO": ("Porto", "Portugal"),
+    # Österreich / Schweiz
+    "VIE": ("Wien", "Österreich"), "GRZ": ("Graz", "Österreich"),
+    "ZRH": ("Zürich", "Schweiz"),
+    # Nord- und Osteuropa
+    "CPH": ("Kopenhagen", "Dänemark"), "ARN": ("Stockholm", "Schweden"),
+    "OSL": ("Oslo", "Norwegen"), "HEL": ("Helsinki", "Finnland"),
+    "WAW": ("Warschau", "Polen"), "PRG": ("Prag", "Tschechien"),
+    "BUD": ("Budapest", "Ungarn"), "OTP": ("Bukarest", "Rumänien"),
+    "SOF": ("Sofia", "Bulgarien"),
+    # Westeuropa
+    "CDG": ("Paris-Charles-de-Gaulle", "Frankreich"), "AMS": ("Amsterdam", "Niederlande"),
+    # Balkan
+    "SPU": ("Split", "Kroatien"), "DBV": ("Dubrovnik", "Kroatien"),
+    "TIA": ("Tirana", "Albanien"), "PRN": ("Pristina", "Kosovo"),
+    "SKP": ("Skopje", "Nordmazedonien"), "BEG": ("Belgrad", "Serbien"),
+    # Zypern
+    "LCA": ("Larnaka", "Zypern"),
+    # Afrika / Naher Osten
+    "HRG": ("Hurghada", "Ägypten"), "SSH": ("Sharm el-Sheikh", "Ägypten"),
+    "AGA": ("Agadir", "Marokko"), "RAK": ("Marrakesch", "Marokko"),
+    "TUN": ("Tunis", "Tunesien"), "DJE": ("Djerba", "Tunesien"),
+    "DXB": ("Dubai", "Vereinigte Arabische Emirate"),
+
+
+    # Fallback, falls ein Flughafen nicht in der Tabelle steht (ISO-Ländercode von AirLabs)
+COUNTRY_NAMES = {
+    "DE": "Deutschland", "ES": "Spanien", "GR": "Griechenland", "IT": "Italien",
+    "GB": "Großbritannien", "IE": "Irland", "TR": "Türkei", "PT": "Portugal",
+    "AT": "Österreich", "CH": "Schweiz", "FR": "Frankreich", "NL": "Niederlande",
+    "BE": "Belgien", "PL": "Polen", "CZ": "Tschechien", "HU": "Ungarn",
+    "RO": "Rumänien", "BG": "Bulgarien", "HR": "Kroatien", "RS": "Serbien",
+    "AL": "Albanien", "XK": "Kosovo", "MK": "Nordmazedonien", "CY": "Zypern",
+    "EG": "Ägypten", "MA": "Marokko", "TN": "Tunesien", "AE": "Vereinigte Arabische Emirate",
+    "DK": "Dänemark", "SE": "Schweden", "NO": "Norwegen", "FI": "Finnland",
+    "US": "USA", "CA": "Kanada", "IL": "Israel", "JO": "Jordanien",
 }
+def get_airport_info(flight):
+    """Gibt (Stadtname, Land) zurück."""
+    iata = str(flight.get("dep_iata") or "").upper()
+    if iata in AIRPORTS:
+        return AIRPORTS[iata]
+
+    city = flight.get("dep_city")
+    name = flight.get("dep_name")
+    if city and len(str(city).strip()) > 1:
+        city_name = str(city).strip()
+    elif name and len(str(name).strip()) > 1:
+        city_name = str(name).replace(" International", "").replace(" Airport", "").strip()
+    else:
+        city_name = iata or "Unbekannt"
+
+    code = str(flight.get("dep_country") or flight.get("dep_country_code") or "").upper()
+    country = COUNTRY_NAMES.get(code, "")
+    return city_name, country
 
 # Alles klein schreiben (Vergleich erfolgt mit .lower())
 CHARTER_AIRLINES = [
