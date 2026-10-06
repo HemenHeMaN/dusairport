@@ -27,7 +27,7 @@ WINDOW_START = (5, 25)    # frühester Start (Soll: 05:30)
 WINDOW_END = (23, 40)     # spätester Start (Soll: 23:30)
 CACHE_DURATION = 25 * 60  # Sekunden; kleiner als das 30-Minuten-Intervall
 
-MINUTES_PAST = 30
+MINUTES_PAST = 60
 HOURS_FUTURE = 5
 
 # IATA: (Name, Land)
