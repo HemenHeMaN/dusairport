@@ -1,27 +1,11 @@
 {
-  "updated_at": "07.10.2026 13:13",
+  "updated_at": "07.10.2026 13:44",
   "source": "Live",
   "flights": [
     {
-      "dt": 1791366600.0,
-      "time_scheduled": "11:50",
-      "time_estimated": "12:25",
-      "flight_no": "E69845",
-      "airline": "E6",
-      "city": "Olbia (Sardinien)",
-      "country": "Italien",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 35
-    },
-    {
       "dt": 1791368700.0,
       "time_scheduled": "12:25",
-      "time_estimated": "13:11",
+      "time_estimated": "13:15",
       "flight_no": "NI540",
       "airline": "NI",
       "city": "Lissabon",
@@ -31,56 +15,8 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 46
-    },
-    {
-      "dt": 1791369300.0,
-      "time_scheduled": "12:35",
-      "time_estimated": "12:23",
-      "flight_no": "PC1001",
-      "airline": "PC",
-      "city": "Istanbul-Sabiha Gökçen",
-      "country": "Türkei",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791369600.0,
-      "time_scheduled": "12:40",
-      "time_estimated": "12:36",
-      "flight_no": "EW9655",
-      "airline": "EW",
-      "city": "Thessaloniki",
-      "country": "Griechenland",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791369600.0,
-      "time_scheduled": "12:40",
-      "time_estimated": "12:43",
-      "flight_no": "LH2014",
-      "airline": "LH",
-      "city": "München",
-      "country": "Deutschland",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 3
+      "delay": 50
     },
     {
       "dt": 1791370200.0,
@@ -101,7 +37,7 @@
     {
       "dt": 1791370200.0,
       "time_scheduled": "12:50",
-      "time_estimated": "13:23",
+      "time_estimated": "13:25",
       "flight_no": "EW9441",
       "airline": "EW",
       "city": "Barcelona",
@@ -111,8 +47,8 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 33
+      "status": "landed",
+      "delay": 35
     },
     {
       "dt": 1791370200.0,
@@ -159,7 +95,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 24
     },
     {
@@ -181,7 +117,7 @@
     {
       "dt": 1791371100.0,
       "time_scheduled": "13:05",
-      "time_estimated": "13:17",
+      "time_estimated": "13:13",
       "flight_no": "SK816",
       "airline": "SK",
       "city": "Oslo",
@@ -192,12 +128,12 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "landed",
-      "delay": 12
+      "delay": 8
     },
     {
       "dt": 1791371400.0,
       "time_scheduled": "13:10",
-      "time_estimated": "13:47",
+      "time_estimated": "13:19",
       "flight_no": "EW9539",
       "airline": "EW",
       "city": "Valencia",
@@ -207,13 +143,13 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 37
+      "status": "landed",
+      "delay": 9
     },
     {
       "dt": 1791371700.0,
       "time_scheduled": "13:15",
-      "time_estimated": "13:15",
+      "time_estimated": "13:09",
       "flight_no": "EW9603",
       "airline": "EW",
       "city": "Lissabon",
@@ -229,7 +165,7 @@
     {
       "dt": 1791372000.0,
       "time_scheduled": "13:20",
-      "time_estimated": "13:09",
+      "time_estimated": "13:15",
       "flight_no": "EW9571",
       "airline": "EW",
       "city": "Jerez de la Frontera",
@@ -239,13 +175,13 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791372300.0,
       "time_scheduled": "13:25",
-      "time_estimated": "13:48",
+      "time_estimated": "13:44",
       "flight_no": "EK55",
       "airline": "EK",
       "city": "Dubai",
@@ -256,12 +192,12 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 23
+      "delay": 19
     },
     {
       "dt": 1791372600.0,
       "time_scheduled": "13:30",
-      "time_estimated": "14:05",
+      "time_estimated": "13:50",
       "flight_no": "EW9681",
       "airline": "EW",
       "city": "Athen",
@@ -272,12 +208,12 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 35
+      "delay": 20
     },
     {
       "dt": 1791372900.0,
       "time_scheduled": "13:35",
-      "time_estimated": "13:35",
+      "time_estimated": "13:28",
       "flight_no": "X34105",
       "airline": "X3",
       "city": "Heraklion (Kreta)",
@@ -287,13 +223,13 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791372900.0,
       "time_scheduled": "13:35",
-      "time_estimated": "13:42",
+      "time_estimated": "13:32",
       "flight_no": "DE1615",
       "airline": "DE",
       "city": "Chania (Kreta)",
@@ -303,13 +239,13 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "delay": 7
+      "status": "landed",
+      "delay": 0
     },
     {
       "dt": 1791373200.0,
       "time_scheduled": "13:40",
-      "time_estimated": "13:35",
+      "time_estimated": "13:37",
       "flight_no": "EW9043",
       "airline": "EW",
       "city": "Berlin",
@@ -319,13 +255,13 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
       "dt": 1791373500.0,
       "time_scheduled": "13:45",
-      "time_estimated": "12:57",
+      "time_estimated": "12:58",
       "flight_no": "QR85",
       "airline": "QR",
       "city": "Doha",
@@ -373,7 +309,7 @@
     {
       "dt": 1791373800.0,
       "time_scheduled": "13:50",
-      "time_estimated": "13:32",
+      "time_estimated": "13:19",
       "flight_no": "TK1525",
       "airline": "TK",
       "city": "Istanbul",
@@ -383,7 +319,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -415,7 +351,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
+      "status": "active",
       "delay": 0
     },
     {
@@ -495,23 +431,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791375300.0,
-      "time_scheduled": "14:15",
-      "time_estimated": "14:12",
-      "flight_no": "EW9085",
-      "airline": "EW",
-      "city": "München",
-      "country": "Deutschland",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -522,6 +442,22 @@
       "airline": "OS",
       "city": "Wien",
       "country": "Österreich",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 3
+    },
+    {
+      "dt": 1791375300.0,
+      "time_scheduled": "14:15",
+      "time_estimated": "14:18",
+      "flight_no": "EW9085",
+      "airline": "EW",
+      "city": "München",
+      "country": "Deutschland",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
@@ -595,19 +531,19 @@
       "delay": 2
     },
     {
-      "dt": 1791376500.0,
-      "time_scheduled": "14:35",
-      "time_estimated": "14:35",
-      "flight_no": "EW9465",
-      "airline": "EW",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
+      "dt": 1791376800.0,
+      "time_scheduled": "14:40",
+      "time_estimated": "14:27",
+      "flight_no": "WX1621",
+      "airline": "WX",
+      "city": "Kopenhagen",
+      "country": "Dänemark",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
+      "status": "active",
       "delay": 0
     }
   ]
