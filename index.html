@@ -41,6 +41,8 @@
     --size-btn-bg: #003366;
     --size-btn-hover: #00224a;
     --reset-btn-bg: #e4e4ed;
+
+    --detail-label-color: #5a5a66;
 }
 
 [data-theme="dark"] {
@@ -71,6 +73,8 @@
     --size-btn-bg: #1565c0;
     --size-btn-hover: #0d47a1;
     --reset-btn-bg: #333;
+
+    --detail-label-color: #9a9aa6;
 }
 
 html { font-size: var(--base-font-size); }
@@ -175,10 +179,18 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 [data-theme="dark"] .delay-badge { background: #5c1d1d; color: #ff8080; }
 
+/* Details: Bezeichnung klein/grau, Wert groß/fett/farbig */
 .card-details { margin-top: 10px; font-size: 0.95rem; color: var(--text-color); }
 .detail-divider { border: none; border-top: 1px solid var(--border-color); margin: 8px 0; }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.detail-grid > div { overflow-wrap: anywhere; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
+.detail-grid > div { display: flex; flex-direction: column; gap: 1px; overflow-wrap: anywhere; }
+.detail-label {
+    font-size: 0.75rem; font-weight: 600; color: var(--detail-label-color);
+    text-transform: uppercase; letter-spacing: 0.04em;
+}
+.detail-value { font-size: 1.1rem; font-weight: 700; color: var(--heading-color); }
+.card-linie .flight-no { color: var(--card-linie-border); }
+.card-charter .flight-no { color: var(--card-charter-border); }
 
 .no-flights { text-align: center; padding: 20px; color: var(--text-color); background: var(--card-bg); border-radius: 8px; }
 
@@ -375,7 +387,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <div class="update-info" id="updateInfo">Lade Daten...</div>
 
-<!-- NEU: Suchfeld -->
+<!-- Suchfeld -->
 <div class="search-container">
     <input type="text" id="searchInput" class="search-input" placeholder="Nach Flug, Stadt, Land oder Airline suchen..." aria-label="Flüge durchsuchen">
 </div>
@@ -579,11 +591,11 @@ function renderFlights(flights) {
             <div class="card-details">
                 <hr class="detail-divider">
                 <div class="detail-grid">
-                    <div><strong>Flug-Nr.:</strong><b> ${f.flight_no}</b></div>
-                    <div><strong>Airline:</strong><b> ${f.airline}</b></div>
-                    <div><strong>Von:</strong><b> ${fromText}</b></div>
-                    <div><strong>Typ:</strong><b> ${f.type}</b></div>
-                    <div><strong>Status:</strong><b> ${statusText}</b></div>
+                    <div><span class="detail-label">Flug-Nr.</span><span class="detail-value flight-no">${f.flight_no}</span></div>
+                    <div><span class="detail-label">Airline</span><span class="detail-value">${f.airline}</span></div>
+                    <div><span class="detail-label">Von</span><span class="detail-value">${fromText}</span></div>
+                    <div><span class="detail-label">Typ</span><span class="detail-value">${f.type}</span></div>
+                    <div><span class="detail-label">Status</span><span class="detail-value">${statusText}</span></div>
                 </div>
             </div>
         `;
