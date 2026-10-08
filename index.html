@@ -565,16 +565,25 @@ function renderFlights(flights) {
         const guessTitle = isGuess ? ' title="Vorläufig, Ausgang noch nicht vergeben"' : '';
 
         const delayHtml = f.delay > 0 ? `<span class="delay-badge">+${f.delay} Min.</span>` : '';
-        const statusText = f.delay > 0
-            ? `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)`
-            : (statusMap[String(f.status).toLowerCase()] || f.status);
+        const st = String(f.status).toLowerCase();
+        let statusText;
+        if (st === 'landed') {
+            statusText = 'Gelandet'
+                + (f.time_estimated !== f.time_scheduled ? ` ${f.time_estimated} Uhr` : '')
+                + (f.delay > 0 ? ` (+${f.delay} Min.)` : '');
+        } else if ((st === 'active' || st === 'en-route') && f.delay > 0) {
+            statusText = `Im Anflug, erwartet ${f.time_estimated} Uhr (+${f.delay} Min.)`;
+        } else if (f.delay > 0) {
+            statusText = `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)`;
+        } else {
+            statusText = statusMap[st] || f.status;
+        }
 
         const countryHtml = f.country ? ` <span class="country">${f.country}</span>` : '';
         const fromText = f.country ? `${f.city}, ${f.country}` : f.city;
         const beltHtml = f.baggage ? `<div><strong>Band:</strong> ${f.baggage}</div>` : '';
 
         // Flugzeug-Symbol: blinkt im Anflug, steht still wenn gelandet
-        const st = String(f.status).toLowerCase();
         let iconHtml = '';
         if (st === 'active' || st === 'en-route') {
             iconHtml = '<span class="status-icon blink" title="Im Anflug">✈️</span>';
