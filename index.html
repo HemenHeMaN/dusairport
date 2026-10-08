@@ -116,6 +116,9 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 
 .update-info { font-size: 0.85rem; color: var(--update-color); margin-bottom: 12px; line-height: 1.5; }
+.countdown-info { margin-top: -8px; }
+.stale { color: #c62828; font-weight: bold; }
+[data-theme="dark"] .stale { color: #ff8a80; }
 
 /* Suchfeld */
 .search-container { margin-bottom: 12px; }
@@ -385,6 +388,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 </div>
 
 <div class="update-info" id="updateInfo">Lade Daten...</div>
+<div class="update-info countdown-info" id="countdownInfo"></div>
 
 <!-- NEU: Suchfeld -->
 <div class="search-container">
@@ -407,10 +411,13 @@ const REFRESH_MINUTES = 5;
 const DEFAULT_SIZE = 18;
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
+const STALE_MINUTES = 30;   // ab so vielen Minuten Datenalter erscheint die Warnung
 
 let allFlights = [];
 let currentFilter = 'all';
 let currentSearch = '';
+let nextRefreshAt = Date.now() + REFRESH_MINUTES * 60 * 1000;
+let lastUpdate = null;
 
 /* ---------- Theme (Tag/Nacht) ---------- */
 const root = document.documentElement;
@@ -492,12 +499,36 @@ searchInput.addEventListener('input', e => {
 });
 
 /* ---------- Flugdaten ---------- */
+function parseUpdated(str) {
+    const m = /^(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})$/.exec(String(str || ''));
+    return m ? new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]) : null;
+}
+
+function updateCountdown() {
+    const el = document.getElementById('countdownInfo');
+    const left = Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000));
+    const mm = Math.floor(left / 60);
+    const ss = String(left % 60).padStart(2, '0');
+    let html = `Seite lädt neu in <b>${mm}:${ss}</b>`;
+    if (lastUpdate) {
+        const age = Math.max(0, Math.round((Date.now() - lastUpdate.getTime()) / 60000));
+        html += age > STALE_MINUTES
+            ? ` · <span class="stale">⚠️ Daten veraltet (vor ${age} Min.)</span>`
+            : ` · Datenstand: vor ${age} Min.`;
+    }
+    el.innerHTML = html;
+}
+
 function loadData() {
+    nextRefreshAt = Date.now() + REFRESH_MINUTES * 60 * 1000;
     fetch('cache.json?t=' + Date.now(), { cache: 'no-store' })
         .then(response => response.json())
         .then(data => {
             const updateInfo = document.getElementById('updateInfo');
             updateInfo.innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Ankünfte`;
+
+            lastUpdate = parseUpdated(data.updated_at);
+            updateCountdown();
 
             if (JSON.stringify(data.flights) === JSON.stringify(allFlights)) return;
 
@@ -655,7 +686,10 @@ function filterFlights(category, event) {
 }
 
 loadData();
-setInterval(loadData, REFRESH_MINUTES * 60 * 1000);
+setInterval(() => {
+    if (Date.now() >= nextRefreshAt) loadData();
+    updateCountdown();
+}, 1000);
 
 // Animationen nach dem Laden aktivieren
 requestAnimationFrame(function () {
