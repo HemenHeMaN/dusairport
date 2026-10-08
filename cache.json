@@ -1,24 +1,7 @@
 {
-  "updated_at": "08.10.2026 18:29",
+  "updated_at": "08.10.2026 18:48",
   "source": "Dus.com",
   "flights": [
-    {
-      "dt": 1791471000.0,
-      "time_scheduled": "16:50",
-      "time_estimated": "17:30",
-      "flight_no": "EW9547",
-      "airline": "Eurowings",
-      "city": "Fuerteventura",
-      "country": "Spanien",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "4",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 41
-    },
     {
       "dt": 1791471300.0,
       "time_scheduled": "16:55",
@@ -37,23 +20,6 @@
       "delay": 57
     },
     {
-      "dt": 1791471300.0,
-      "time_scheduled": "16:55",
-      "time_estimated": "17:36",
-      "flight_no": "TP542",
-      "airline": "TAP Portugal",
-      "city": "Lissabon",
-      "country": "Portugal",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "A",
-      "baggage": "20",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 42
-    },
-    {
       "dt": 1791472500.0,
       "time_scheduled": "17:15",
       "time_estimated": "17:50",
@@ -69,40 +35,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 35
-    },
-    {
-      "dt": 1791473700.0,
-      "time_scheduled": "17:35",
-      "time_estimated": "17:39",
-      "flight_no": "BA922",
-      "airline": "British Airways",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "C",
-      "baggage": "18",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 4
-    },
-    {
-      "dt": 1791474000.0,
-      "time_scheduled": "17:40",
-      "time_estimated": "17:44",
-      "flight_no": "LH2020",
-      "airline": "Lufthansa",
-      "city": "München",
-      "country": "Deutschland",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "A",
-      "baggage": "1",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 5
     },
     {
       "dt": 1791474000.0,
@@ -139,40 +71,6 @@
       "delay": 20
     },
     {
-      "dt": 1791474000.0,
-      "time_scheduled": "17:40",
-      "time_estimated": "17:33",
-      "flight_no": "OS165",
-      "airline": "Austrian Airlines",
-      "city": "Wien",
-      "country": "Österreich",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "2",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 0
-    },
-    {
-      "dt": 1791474000.0,
-      "time_scheduled": "17:40",
-      "time_estimated": "17:41",
-      "flight_no": "EW9047",
-      "airline": "Eurowings",
-      "city": "Berlin-Brandenburg",
-      "country": "Deutschland",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "A",
-      "baggage": "6",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 1
-    },
-    {
       "dt": 1791474300.0,
       "time_scheduled": "17:45",
       "time_estimated": "19:28",
@@ -205,40 +103,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 3
-    },
-    {
-      "dt": 1791474300.0,
-      "time_scheduled": "17:45",
-      "time_estimated": "17:43",
-      "flight_no": "VL076",
-      "airline": "Lufthansa City Airlines",
-      "city": "Frankfurt",
-      "country": "Deutschland",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "A",
-      "baggage": "2",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 0
-    },
-    {
-      "dt": 1791475200.0,
-      "time_scheduled": "18:00",
-      "time_estimated": "17:45",
-      "flight_no": "XQ182",
-      "airline": "Sun Express",
-      "city": "Antalya",
-      "country": "Türkei",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "C",
-      "baggage": "19",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 0
     },
     {
       "dt": 1791475200.0,
@@ -277,7 +141,7 @@
     {
       "dt": 1791475500.0,
       "time_scheduled": "18:05",
-      "time_estimated": "19:06",
+      "time_estimated": "19:02",
       "flight_no": "EW9333",
       "airline": "Eurowings",
       "city": "Birmingham",
@@ -287,14 +151,14 @@
       "terminal": "A",
       "baggage": "4",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
-      "delay": 62
+      "status": "active",
+      "status_text": "im Anflug",
+      "delay": 57
     },
     {
       "dt": 1791476400.0,
       "time_scheduled": "18:20",
-      "time_estimated": "18:50",
+      "time_estimated": "18:43",
       "flight_no": "EW9583",
       "airline": "Eurowings",
       "city": "Palma de Mallorca",
@@ -304,9 +168,9 @@
       "terminal": "A",
       "baggage": "6",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "Im Anflug",
-      "delay": 30
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 24
     },
     {
       "dt": 1791476400.0,
@@ -328,7 +192,7 @@
     {
       "dt": 1791477000.0,
       "time_scheduled": "18:30",
-      "time_estimated": "19:11",
+      "time_estimated": "19:13",
       "flight_no": "XC106",
       "airline": "Corendon Airlines",
       "city": "Antalya",
@@ -340,12 +204,12 @@
       "gate": "Ausgang 5 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 42
+      "delay": 44
     },
     {
       "dt": 1791477300.0,
       "time_scheduled": "18:35",
-      "time_estimated": "18:43",
+      "time_estimated": "18:30",
       "flight_no": "EW9585",
       "airline": "Eurowings",
       "city": "Palma de Mallorca",
@@ -355,9 +219,9 @@
       "terminal": "B",
       "baggage": "5",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 9
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 0
     },
     {
       "dt": 1791477300.0,
@@ -372,14 +236,14 @@
       "terminal": "B",
       "baggage": "10",
       "gate": "Ausgang 4 (Charter)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "im Anflug",
       "delay": 18
     },
     {
       "dt": 1791477600.0,
       "time_scheduled": "18:40",
-      "time_estimated": "18:33",
+      "time_estimated": "18:29",
       "flight_no": "LH2022",
       "airline": "Lufthansa",
       "city": "München",
@@ -389,8 +253,8 @@
       "terminal": "A",
       "baggage": "1",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "im Anflug",
+      "status": "landed",
+      "status_text": "gelandet",
       "delay": 0
     },
     {
@@ -402,9 +266,9 @@
       "city": "Kopenhagen",
       "country": "Dänemark",
       "type": "Linie",
-      "type_source": "Airline",
+      "type_source": "Ausgang",
       "terminal": "A",
-      "baggage": "",
+      "baggage": "6",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
@@ -413,7 +277,7 @@
     {
       "dt": 1791477600.0,
       "time_scheduled": "18:40",
-      "time_estimated": "18:43",
+      "time_estimated": "18:38",
       "flight_no": "AF1006",
       "airline": "Air France",
       "city": "Paris-Charles de Gaulle",
@@ -423,31 +287,31 @@
       "terminal": "B",
       "baggage": "7",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 4
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 0
     },
     {
       "dt": 1791478500.0,
       "time_scheduled": "18:55",
-      "time_estimated": "19:26",
+      "time_estimated": "19:27",
       "flight_no": "EW8046",
       "airline": "Eurowings",
       "city": "Berlin-Brandenburg",
       "country": "Deutschland",
       "type": "Linie",
-      "type_source": "Airline",
+      "type_source": "Ausgang",
       "terminal": "A",
-      "baggage": "",
+      "baggage": "4",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 31
+      "status_text": "Vorhafen verlassen",
+      "delay": 32
     },
     {
       "dt": 1791478500.0,
       "time_scheduled": "18:55",
-      "time_estimated": "19:13",
+      "time_estimated": "19:14",
       "flight_no": "LO407",
       "airline": "LOT Polish Airlines",
       "city": "Warschau",
@@ -459,12 +323,12 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 19
+      "delay": 20
     },
     {
       "dt": 1791478500.0,
       "time_scheduled": "18:55",
-      "time_estimated": "18:42",
+      "time_estimated": "18:40",
       "flight_no": "XQ794",
       "airline": "Sun Express",
       "city": "Ankara-Esenboğa",
@@ -474,8 +338,8 @@
       "terminal": "C",
       "baggage": "17",
       "gate": "Ausgang 6 (Charter)",
-      "status": "active",
-      "status_text": "Im Anflug",
+      "status": "landed",
+      "status_text": "gelandet",
       "delay": 0
     },
     {
@@ -491,8 +355,8 @@
       "terminal": "A",
       "baggage": "3",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "Im Anflug",
       "delay": 2
     },
     {
@@ -508,8 +372,8 @@
       "terminal": "C",
       "baggage": "18",
       "gate": "Ausgang 6 (Charter)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "im Anflug",
       "delay": 0
     },
     {
@@ -532,24 +396,24 @@
     {
       "dt": 1791479400.0,
       "time_scheduled": "19:10",
-      "time_estimated": "19:21",
+      "time_estimated": "19:22",
       "flight_no": "LX1026",
       "airline": "Swiss",
       "city": "Zürich",
       "country": "Schweiz",
       "type": "Linie",
       "type_source": "Ausgang",
-      "terminal": "A",
+      "terminal": "B",
       "baggage": "2",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 11
+      "delay": 12
     },
     {
       "dt": 1791479400.0,
       "time_scheduled": "19:10",
-      "time_estimated": "19:11",
+      "time_estimated": "19:07",
       "flight_no": "OS167",
       "airline": "Austrian Airlines",
       "city": "Wien",
@@ -559,9 +423,9 @@
       "terminal": "A",
       "baggage": "1",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
-      "delay": 1
+      "status": "active",
+      "status_text": "Im Anflug",
+      "delay": 0
     },
     {
       "dt": 1791479700.0,
@@ -571,11 +435,11 @@
       "airline": "A Jet",
       "city": "Istanbul-Sabiha Gökçen",
       "country": "Türkei",
-      "type": "Linie",
-      "type_source": "Airline",
+      "type": "Charter",
+      "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
+      "baggage": "18",
+      "gate": "Ausgang 6 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
       "delay": 12
@@ -583,7 +447,7 @@
     {
       "dt": 1791479700.0,
       "time_scheduled": "19:15",
-      "time_estimated": "19:04",
+      "time_estimated": "19:05",
       "flight_no": "XQ1390",
       "airline": "Sun Express",
       "city": "Gaziantep",
@@ -600,7 +464,7 @@
     {
       "dt": 1791479700.0,
       "time_scheduled": "19:15",
-      "time_estimated": "19:06",
+      "time_estimated": "19:08",
       "flight_no": "EK057",
       "airline": "Emirates",
       "city": "Dubai",
@@ -634,7 +498,7 @@
     {
       "dt": 1791480000.0,
       "time_scheduled": "19:20",
-      "time_estimated": "19:16",
+      "time_estimated": "19:18",
       "flight_no": "BT233",
       "airline": "Air Baltic",
       "city": "Riga",
@@ -651,7 +515,7 @@
     {
       "dt": 1791480300.0,
       "time_scheduled": "19:25",
-      "time_estimated": "19:19",
+      "time_estimated": "19:20",
       "flight_no": "PC1005",
       "airline": "Pegasus Airlines",
       "city": "Istanbul-Sabiha Gökçen",
@@ -674,9 +538,9 @@
       "city": "Heraklion (Kreta)",
       "country": "Griechenland",
       "type": "Charter",
-      "type_source": "Flugtyp",
+      "type_source": "Ausgang",
       "terminal": "B",
-      "baggage": "",
+      "baggage": "12",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
@@ -691,10 +555,10 @@
       "city": "Antalya",
       "country": "Türkei",
       "type": "Charter",
-      "type_source": "Airline",
+      "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "",
-      "gate": "Ausgang 4 (Charter)",
+      "baggage": "17",
+      "gate": "Ausgang 6 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
       "delay": 0
@@ -719,7 +583,7 @@
     {
       "dt": 1791481200.0,
       "time_scheduled": "19:40",
-      "time_estimated": "19:46",
+      "time_estimated": "19:41",
       "flight_no": "LH2026",
       "airline": "Lufthansa",
       "city": "München",
@@ -730,8 +594,8 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 6
+      "status_text": "Vorhafen verlassen",
+      "delay": 1
     },
     {
       "dt": 1791481200.0,
@@ -753,24 +617,24 @@
     {
       "dt": 1791481500.0,
       "time_scheduled": "19:45",
-      "time_estimated": "19:49",
+      "time_estimated": "19:48",
       "flight_no": "EW4676",
       "airline": "Eurowings",
       "city": "Stockholm-Arlanda",
       "country": "Schweden",
       "type": "Linie",
       "type_source": "Airline",
-      "terminal": "A",
+      "terminal": "B",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 4
+      "delay": 3
     },
     {
       "dt": 1791481800.0,
       "time_scheduled": "19:50",
-      "time_estimated": "21:27",
+      "time_estimated": "21:21",
       "flight_no": "X36123",
       "airline": "Tuifly",
       "city": "Hurghada",
@@ -782,12 +646,12 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 97
+      "delay": 92
     },
     {
       "dt": 1791482400.0,
       "time_scheduled": "20:00",
-      "time_estimated": "20:05",
+      "time_estimated": "20:06",
       "flight_no": "EW9467",
       "airline": "Eurowings",
       "city": "London-Heathrow",
@@ -799,7 +663,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 5
+      "delay": 6
     },
     {
       "dt": 1791482400.0,
@@ -821,7 +685,7 @@
     {
       "dt": 1791483000.0,
       "time_scheduled": "20:10",
-      "time_estimated": "20:56",
+      "time_estimated": "20:51",
       "flight_no": "EW9673",
       "airline": "Eurowings",
       "city": "Heraklion (Kreta)",
@@ -833,12 +697,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 46
+      "delay": 41
     },
     {
       "dt": 1791483000.0,
       "time_scheduled": "20:10",
-      "time_estimated": "20:34",
+      "time_estimated": "20:35",
       "flight_no": "VY1898",
       "airline": "Vueling",
       "city": "Barcelona",
@@ -849,13 +713,13 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 24
+      "status_text": "Vorhafen verlassen",
+      "delay": 25
     },
     {
       "dt": 1791483600.0,
       "time_scheduled": "20:20",
-      "time_estimated": "21:03",
+      "time_estimated": "21:08",
       "flight_no": "EW9627",
       "airline": "Eurowings",
       "city": "Zakynthos",
@@ -867,7 +731,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 44
+      "delay": 49
     },
     {
       "dt": 1791483600.0,
@@ -901,7 +765,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 5
+      "delay": 4
     },
     {
       "dt": 1791484200.0,
@@ -940,7 +804,7 @@
     {
       "dt": 1791484500.0,
       "time_scheduled": "20:35",
-      "time_estimated": "20:44",
+      "time_estimated": "20:46",
       "flight_no": "EW9755",
       "airline": "Eurowings",
       "city": "Wien",
@@ -952,7 +816,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 9
+      "delay": 11
     },
     {
       "dt": 1791484800.0,
@@ -1025,7 +889,7 @@
     {
       "dt": 1791486000.0,
       "time_scheduled": "21:00",
-      "time_estimated": "21:40",
+      "time_estimated": "21:30",
       "flight_no": "EW9765",
       "airline": "Eurowings",
       "city": "Zürich",
@@ -1037,7 +901,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 40
+      "delay": 30
     },
     {
       "dt": 1791486000.0,
@@ -1059,7 +923,7 @@
     {
       "dt": 1791486600.0,
       "time_scheduled": "21:10",
-      "time_estimated": "21:55",
+      "time_estimated": "21:56",
       "flight_no": "XR402",
       "airline": "Corendon Airlines Europe",
       "city": "Heraklion (Kreta)",
@@ -1070,13 +934,13 @@
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 46
+      "status_text": "Vorhafen verlassen",
+      "delay": 47
     },
     {
       "dt": 1791486600.0,
       "time_scheduled": "21:10",
-      "time_estimated": "21:10",
+      "time_estimated": "21:36",
       "flight_no": "EW9049",
       "airline": "Eurowings",
       "city": "Berlin-Brandenburg",
@@ -1088,12 +952,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 26
     },
     {
       "dt": 1791486900.0,
       "time_scheduled": "21:15",
-      "time_estimated": "21:15",
+      "time_estimated": "21:50",
       "flight_no": "EW9811",
       "airline": "Eurowings",
       "city": "Venedig-Tessera",
@@ -1105,12 +969,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 35
     },
     {
       "dt": 1791486900.0,
       "time_scheduled": "21:15",
-      "time_estimated": "21:38",
+      "time_estimated": "21:40",
       "flight_no": "DE1779",
       "airline": "Condor",
       "city": "Palma de Mallorca",
@@ -1122,7 +986,7 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 23
+      "delay": 25
     },
     {
       "dt": 1791487800.0,
@@ -1144,7 +1008,7 @@
     {
       "dt": 1791487800.0,
       "time_scheduled": "21:30",
-      "time_estimated": "21:42",
+      "time_estimated": "21:43",
       "flight_no": "EW9835",
       "airline": "Eurowings",
       "city": "Bologna",
@@ -1156,12 +1020,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 12
+      "delay": 13
     },
     {
       "dt": 1791487800.0,
       "time_scheduled": "21:30",
-      "time_estimated": "21:30",
+      "time_estimated": "21:55",
       "flight_no": "ENT6063",
       "airline": "Enter Air",
       "city": "Pristina",
@@ -1173,7 +1037,7 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 25
     },
     {
       "dt": 1791488100.0,
@@ -1195,7 +1059,7 @@
     {
       "dt": 1791488400.0,
       "time_scheduled": "21:40",
-      "time_estimated": "21:29",
+      "time_estimated": "21:23",
       "flight_no": "TK1529",
       "airline": "Turkish Airlines",
       "city": "Istanbul",
@@ -1206,13 +1070,13 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
       "dt": 1791488700.0,
       "time_scheduled": "21:45",
-      "time_estimated": "21:45",
+      "time_estimated": "22:10",
       "flight_no": "LH078",
       "airline": "Lufthansa",
       "city": "Frankfurt",
@@ -1224,7 +1088,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 26
     },
     {
       "dt": 1791488700.0,
@@ -1246,7 +1110,7 @@
     {
       "dt": 1791488700.0,
       "time_scheduled": "21:45",
-      "time_estimated": "21:45",
+      "time_estimated": "21:48",
       "flight_no": "EW9089",
       "airline": "Eurowings",
       "city": "München",
@@ -1258,7 +1122,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 4
     },
     {
       "dt": 1791489000.0,
@@ -1280,7 +1144,7 @@
     {
       "dt": 1791489000.0,
       "time_scheduled": "21:50",
-      "time_estimated": "21:50",
+      "time_estimated": "21:54",
       "flight_no": "AF1106",
       "airline": "Air France",
       "city": "Paris-Charles de Gaulle",
@@ -1292,7 +1156,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 5
     },
     {
       "dt": 1791489000.0,
@@ -1348,7 +1212,7 @@
     {
       "dt": 1791489300.0,
       "time_scheduled": "21:55",
-      "time_estimated": "21:55",
+      "time_estimated": "22:02",
       "flight_no": "EW9223",
       "airline": "Eurowings",
       "city": "Göteborg-Landvetter",
@@ -1360,12 +1224,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 8
     },
     {
       "dt": 1791489300.0,
       "time_scheduled": "21:55",
-      "time_estimated": "21:55",
+      "time_estimated": "21:52",
       "flight_no": "EW9815",
       "airline": "Eurowings",
       "city": "Catania (Sizilien)",
@@ -1416,7 +1280,7 @@
     {
       "dt": 1791489900.0,
       "time_scheduled": "22:05",
-      "time_estimated": "22:05",
+      "time_estimated": "22:01",
       "flight_no": "DE1617",
       "airline": "Condor",
       "city": "Heraklion (Kreta)",
@@ -1467,7 +1331,7 @@
     {
       "dt": 1791490200.0,
       "time_scheduled": "22:10",
-      "time_estimated": "22:10",
+      "time_estimated": "22:48",
       "flight_no": "EW9847",
       "airline": "Eurowings",
       "city": "Mailand-Linate",
@@ -1479,7 +1343,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 38
     },
     {
       "dt": 1791490200.0,
@@ -1756,7 +1620,7 @@
     {
       "dt": 1791491700.0,
       "time_scheduled": "22:35",
-      "time_estimated": "22:35",
+      "time_estimated": "23:03",
       "flight_no": "DE1415",
       "airline": "Condor",
       "city": "Funchal (Madeira)",
@@ -1767,8 +1631,8 @@
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 0
+      "status_text": "Vorhafen verlassen",
+      "delay": 28
     },
     {
       "dt": 1791491700.0,
