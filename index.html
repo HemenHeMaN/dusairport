@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DUS Ankünfte</title>
+<title>DUS Ankünfte - Kombiniert</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,7 @@
 :root { 
     --base-font-size: 18px; 
     --font: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    
+
     /* Hellmodus (Standard) */
     --bg-color: #f4f4f9;
     --card-bg: #fff;
@@ -21,7 +21,7 @@
     --heading-color: #002244;
     --update-color: #333;
     --border-color: rgba(0,0,0,0.15);
-    
+
     --card-linie-bg: #eaf3ff;
     --card-linie-border: #0d47a1;
     --badge-linie-bg: #cfe5ff;
@@ -42,17 +42,19 @@
     --size-btn-bg: #003366;
     --size-btn-hover: #00224a;
     --reset-btn-bg: #e4e4ed;
+
+    --success-green: #22c55e;
+    --progress-blue: #3b82f6;
 }
 
 [data-theme="dark"] {
-    /* Dunkelmodus */
     --bg-color: #121212;
     --card-bg: #1e1e1e;
     --text-color: #e0e0e0;
     --heading-color: #64b5f6;
     --update-color: #aaa;
     --border-color: rgba(255,255,255,0.15);
-    
+
     --card-linie-bg: #16243b;
     --card-linie-border: #42a5f5;
     --badge-linie-bg: #0d3b66;
@@ -85,7 +87,6 @@ body {
 }
 
 .no-anim, .no-anim *, .no-anim *::before, .no-anim *::after { transition: none !important; }
-.no-anim .lit, .no-anim .glow { animation: none !important; }
 
 /* Kopfzeile */
 .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
@@ -99,7 +100,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 .size-btn:active { background: var(--size-btn-hover); }
 
-/* Schieberegler (per Button ein-/ausblendbar) */
+/* Schieberegler */
 .slider-box {
     display: none; align-items: center; gap: 10px;
     background: var(--slider-bg); padding: 10px 12px; border-radius: 8px;
@@ -117,6 +118,38 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 .update-info { font-size: 0.85rem; color: var(--update-color); margin-bottom: 12px; line-height: 1.5; }
 
+/* Reiter / Design-Switch Bar */
+.view-switcher {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    background: var(--card-bg);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.view-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.view-btn.active {
+    background: var(--size-btn-bg);
+    color: #fff;
+}
+
+/* Ansicht-Container steuerung */
+.view-section { display: none; }
+.view-section.active-view { display: block; }
+
 /* Suchfeld */
 .search-container { margin-bottom: 12px; }
 .search-input {
@@ -131,12 +164,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     outline: none;
     transition: border-color 0.3s ease;
 }
-.search-input:focus {
-    border-color: var(--size-btn-bg);
-}
-[data-theme="dark"] .search-input:focus {
-    border-color: var(--filter-active-linie);
-}
+.search-input:focus { border-color: var(--size-btn-bg); }
 
 /* Filter */
 .filter-container { margin-bottom: 15px; display: flex; gap: 6px; }
@@ -149,7 +177,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .btn-charter.active { background: var(--filter-active-charter); color: #fff; }
 .btn-landing.active { background: var(--filter-active-landing); color: #fff; }
 
-/* Flugkarten */
+/* Flugkarten (Design 1) */
 .flight-card {
     border-radius: 8px; padding: 12px; margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.15);
@@ -178,7 +206,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 [data-theme="dark"] .delay-badge { background: #5c1d1d; color: #ff8080; }
 
-/* Status-Flugzeug: blinkt im Anflug, steht still nach der Landung */
 .status-icon { font-size: 1.5rem; line-height: 1; flex-shrink: 0; margin-left: 4px; }
 .status-icon.blink { animation: plane-blink 1s ease-in-out infinite; }
 @keyframes plane-blink {
@@ -190,141 +217,93 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .detail-divider { border: none; border-top: 1px solid var(--border-color); margin: 8px 0; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .detail-grid > div { overflow-wrap: anywhere; }
-
 .no-flights { text-align: center; padding: 20px; color: var(--text-color); background: var(--card-bg); border-radius: 8px; }
+
+/* Progress-Bar Design (im selben Theme-Look) */
+.d2-header {
+    display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; padding: 0 4px;
+}
+.d2-system-time { font-size: 0.95rem; font-weight: 600; color: var(--heading-color); font-variant-numeric: tabular-nums; }
+.d2-flight-card {
+    position: relative; background-color: var(--card-bg); border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 14px 18px 18px 18px; margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15); overflow: hidden;
+}
+.d2-card-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.d2-flight-info h3 { margin: 0 0 2px 0; font-size: 1.15rem; font-weight: 700; color: var(--text-color); }
+.d2-flight-info p { margin: 0; color: var(--update-color); font-size: 0.9rem; }
+.d2-flight-right { text-align: right; }
+.d2-status-text { font-size: 0.95rem; font-weight: 600; color: var(--text-color); margin-bottom: 2px; }
+.d2-time-label { font-size: 1.15rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+.d2-flight-card.landed .d2-status-text {
+    color: var(--success-green); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;
+}
+.d2-card-footer-bar { display: flex; flex-direction: column; gap: 6px; }
+.d2-bar-info-row {
+    display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600;
+    color: var(--update-color); text-transform: uppercase; letter-spacing: 0.05em;
+}
+.d2-progress-container {
+    position: relative; width: 100%; height: 6px;
+    background-color: rgba(0, 0, 0, 0.08); border-radius: 3px; overflow: hidden;
+}
+[data-theme="dark"] .d2-progress-container { background-color: rgba(255, 255, 255, 0.08); }
+.d2-progress-bar {
+    position: absolute; top: 0; left: 0; bottom: 0; width: 0%;
+    background-color: var(--progress-blue); border-radius: 3px; transition: width 0.5s linear;
+}
+.d2-flight-card.landed .d2-progress-bar { background-color: var(--success-green); }
 
 /* --- Taxi Dachzeichen Switch CSS --- */
 .tx-input { display: none; }
 .tx {
-    display: inline-block;
-    font-size: 6.5px;
-    line-height: 1;
-    cursor: pointer;
-    border-radius: 6em;
-    -webkit-tap-highlight-color: transparent;
+    display: inline-block; font-size: 6.5px; line-height: 1; cursor: pointer; border-radius: 6em; -webkit-tap-highlight-color: transparent;
 }
 .track {
-    position: relative;
-    display: block;
-    width: 17.625em;
-    height: 5.75em;
-    border: .125em solid rgba(26, 33, 48, .18);
-    border-radius: 6em;
-    overflow: hidden;
+    position: relative; display: block; width: 17.625em; height: 5.75em; border: .125em solid rgba(26, 33, 48, .18); border-radius: 6em; overflow: hidden;
     background: linear-gradient(180deg, #cfe2f4, #f2f7fc);
     box-shadow: inset 0 .25em .6em rgba(20, 30, 50, .18), 0 .35em 1em rgba(20, 30, 50, .16);
     transition: border-color .6s ease;
 }
 [data-theme="dark"] .track { border-color: rgba(255, 255, 255, .14); }
 .track::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, #060919, #1b2250);
-    opacity: 0;
-    transition: opacity .6s ease;
+    content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #060919, #1b2250); opacity: 0; transition: opacity .6s ease;
 }
 .tx-input:checked + label .track::before { opacity: 1; }
-
 .t {
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    transform: translateY(-50%);
-    font: 600 1.15em/1 var(--font);
-    letter-spacing: .02em;
-    transition: opacity .4s ease;
+    position: absolute; z-index: 1; top: 50%; transform: translateY(-50%); font: 600 1.15em/1 var(--font); letter-spacing: .02em; transition: opacity .4s ease;
 }
 .t-night { right: 1.5em; color: #52627c; }
 .t-day   { left: 1.6em;  color: #93a3d2; opacity: 0; }
 .tx-input:checked + label .track .t-night { opacity: 0; }
 .tx-input:checked + label .track .t-day   { opacity: 1; }
-
-.stars {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity .3s ease;
-}
+.stars { position: absolute; inset: 0; z-index: 1; opacity: 0; transition: opacity .3s ease; }
 .tx-input:checked + label .track .stars { opacity: 1; transition: opacity .6s ease .25s; }
 .stars i {
-    position: absolute;
-    display: block;
-    width: var(--s);
-    height: var(--s);
-    background: #fff;
+    position: absolute; display: block; width: var(--s); height: var(--s); background: #fff;
     clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
     animation: twinkle 2.6s ease-in-out var(--d) infinite;
 }
-@keyframes twinkle {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: .35; transform: scale(.7); }
-}
-
-.knob {
-    position: absolute;
-    z-index: 2;
-    top: .75em;
-    left: .75em;
-    width: 7.5em;
-    height: 4em;
-    transition: transform .75s cubic-bezier(.6, -.15, .25, 1.15);
-}
+@keyframes twinkle { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
+.knob { position: absolute; z-index: 2; top: .75em; left: .75em; width: 7.5em; height: 4em; transition: transform .75s cubic-bezier(.6, -.15, .25, 1.15); }
 .tx-input:checked + label .track .knob { transform: translateX(8.375em); }
-
 .glow {
-    position: absolute;
-    z-index: 0;
-    inset: -2.6em -3em;
+    position: absolute; z-index: 0; inset: -2.6em -3em;
     background: radial-gradient(closest-side, rgba(255, 206, 72, .7), rgba(255, 206, 72, 0));
-    opacity: 0;
-    transform: scale(.5);
-    pointer-events: none;
-    transition: opacity .3s ease, transform .4s ease;
+    opacity: 0; transform: scale(.5); pointer-events: none; transition: opacity .3s ease, transform .4s ease;
 }
 .tx-input:checked + label .track .glow {
-    opacity: 1;
-    transform: none;
-    transition: opacity .5s ease .3s, transform .6s ease .3s;
-    animation: ignite .9s ease .55s both;
+    opacity: 1; transform: none; transition: opacity .5s ease .3s, transform .6s ease .3s; animation: ignite .9s ease .55s both;
 }
-
-.sign {
-    position: relative;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    transition: filter .3s ease;
-}
-.tx-input:checked + label .track .sign {
-    filter: drop-shadow(0 0 .45em rgba(255, 214, 90, .85));
-    transition: filter .5s ease .5s;
-}
+.sign { position: relative; z-index: 1; display: block; width: 100%; height: 100%; overflow: visible; transition: filter .3s ease; }
+.tx-input:checked + label .track .sign { filter: drop-shadow(0 0 .45em rgba(255, 214, 90, .85)); transition: filter .5s ease .5s; }
 .bar, .foot { fill: #454b5c; }
 .gloss { fill: #fff; opacity: .35; }
 .lit { opacity: 0; transition: opacity .25s ease; }
 .tx-input:checked + label .track .lit { opacity: 1; animation: ignite .9s ease .55s both; }
-.txt {
-    fill: #4b4a42;
-    font-family: var(--font);
-    font-weight: 800;
-    font-size: 26px;
-    transition: fill .3s ease;
-}
+.txt { fill: #4b4a42; font-family: var(--font); font-weight: 800; font-size: 26px; transition: fill .3s ease; }
 .tx-input:checked + label .track .txt { fill: #17130a; transition: fill .3s ease .55s; }
-
-@keyframes ignite {
-    0%   { opacity: 0; }
-    12%  { opacity: 1; }
-    20%  { opacity: .15; }
-    34%  { opacity: 1; }
-    44%  { opacity: .4; }
-    58%, 100% { opacity: 1; }
-}
-/* --- Ende Switch CSS --- */
+@keyframes ignite { 0% { opacity: 0; } 12% { opacity: 1; } 20% { opacity: .15; } 34% { opacity: 1; } 44% { opacity: .4; } 58%, 100% { opacity: 1; } }
 </style>
 </head>
 <body class="no-anim">
@@ -332,7 +311,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 <div class="top-bar">
     <h1>DUS Ankünfte</h1>
     <div class="header-controls">
-        <!-- Taxi-Switch als Theme-Toggler -->
         <input type="checkbox" id="themeSwitch" class="tx-input" role="switch" aria-label="Nachtmodus umschalten">
         <label class="tx" for="themeSwitch" title="Design umschalten">
             <span class="track">
@@ -371,11 +349,18 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
                 </span>
             </span>
         </label>
-        
+
         <button class="size-btn" id="sizeToggle" type="button" aria-expanded="false">Aa</button>
     </div>
 </div>
 
+<!-- Design-Umschalter Reiter -->
+<div class="view-switcher">
+    <button class="view-btn active" id="btnView1" onclick="switchView('view1')">Detail-Ansicht</button>
+    <button class="view-btn" id="btnView2" onclick="switchView('view2')">Progress-Ansicht</button>
+</div>
+
+<!-- Schriftgrößen-Slider -->
 <div class="slider-box" id="sliderBox">
     <span class="small-a">A</span>
     <input type="range" id="sizeSlider" min="14" max="32" step="1" value="18" aria-label="Schriftgröße">
@@ -384,13 +369,11 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     <button class="reset-btn" id="sizeReset" type="button">Reset</button>
 </div>
 
+<!-- GEMEINSAME STEUERELEMENTE (Suchfeld + Filter auf beiden Seiten aktiv) -->
 <div class="update-info" id="updateInfo">Lade Daten...</div>
-
-<!-- NEU: Suchfeld -->
 <div class="search-container">
     <input type="text" id="searchInput" class="search-input" placeholder="Nach Flug, Stadt, Land oder Airline suchen..." aria-label="Flüge durchsuchen">
 </div>
-
 <div class="filter-container">
     <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
     <button class="filter-btn btn-linie" onclick="filterFlights('Linie', event)">Linie</button>
@@ -398,8 +381,22 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     <button class="filter-btn btn-landing" onclick="filterFlights('landing', event)">✈️ Anflug</button>
 </div>
 
-<div id="flightList">
-    <div class="no-flights">Flüge werden geladen...</div>
+<!-- ANSICHT 1: Klassische Detail-Karten -->
+<div id="view1" class="view-section active-view">
+    <div id="flightList">
+        <div class="no-flights">Flüge werden geladen...</div>
+    </div>
+</div>
+
+<!-- ANSICHT 2: Progress-Bar Karten mit Filter-Unterstützung -->
+<div id="view2" class="view-section">
+    <div class="d2-header">
+        <span style="font-weight: 700; color: var(--heading-color);">AKTUELLER ANFLUG-STATUS</span>
+        <div class="d2-system-time">SYSTEMZEIT: <span id="live-clock">--:--:--</span></div>
+    </div>
+    <div id="d2CardsContainer">
+        <div class="no-flights">Flüge werden geladen...</div>
+    </div>
 </div>
 
 <script>
@@ -407,10 +404,36 @@ const REFRESH_MINUTES = 5;
 const DEFAULT_SIZE = 18;
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
+const VIEW_KEY = 'dus_active_view';
 
 let allFlights = [];
 let currentFilter = 'all';
 let currentSearch = '';
+
+/* ---------- Reiter / Design Switch ---------- */
+function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+
+    if (viewId === 'view1') {
+        document.getElementById('view1').classList.add('active-view');
+        document.getElementById('btnView1').classList.add('active');
+    } else {
+        document.getElementById('view2').classList.add('active-view');
+        document.getElementById('btnView2').classList.add('active');
+        updateProgress();
+    }
+    try { localStorage.setItem(VIEW_KEY, viewId); } catch (e) {}
+}
+
+function loadSavedView() {
+    try {
+        const saved = localStorage.getItem(VIEW_KEY);
+        if (saved === 'view2' || saved === 'view1') {
+            switchView(saved);
+        }
+    } catch (e) {}
+}
 
 /* ---------- Theme (Tag/Nacht) ---------- */
 const root = document.documentElement;
@@ -462,7 +485,7 @@ function loadFontSize() {
     try {
         const v = parseInt(localStorage.getItem(STORAGE_KEY), 10);
         if (v >= 14 && v <= 32) saved = v;
-    } catch (e) { /* Speicher nicht verfügbar */ }
+    } catch (e) {}
     applyFontSize(saved);
 }
 
@@ -474,12 +497,12 @@ sizeToggle.addEventListener('click', () => {
 sizeSlider.addEventListener('input', e => {
     const px = parseInt(e.target.value, 10);
     applyFontSize(px);
-    try { localStorage.setItem(STORAGE_KEY, px); } catch (err) { /* ignorieren */ }
+    try { localStorage.setItem(STORAGE_KEY, px); } catch (err) {}
 });
 
 sizeReset.addEventListener('click', () => {
     applyFontSize(DEFAULT_SIZE);
-    try { localStorage.removeItem(STORAGE_KEY); } catch (err) { /* ignorieren */ }
+    try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
 });
 
 loadFontSize();
@@ -491,7 +514,7 @@ searchInput.addEventListener('input', e => {
     applyFilter();
 });
 
-/* ---------- Flugdaten ---------- */
+/* ---------- Flugdaten Laden & Filtern ---------- */
 function loadData() {
     fetch('cache.json?t=' + Date.now(), { cache: 'no-store' })
         .then(response => response.json())
@@ -507,16 +530,15 @@ function loadData() {
         .catch(() => {
             if (allFlights.length === 0) {
                 document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json</div>';
+                document.getElementById('d2CardsContainer').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json</div>';
             }
         });
 }
 
-function applyFilter() {
+function getFilteredList() {
     let list = allFlights;
 
-    // Nach Kategorie filtern (Alle / Linie / Charter)
     if (currentFilter === 'landing') {
-        // Nur Flüge, die gerade im Anflug sind
         list = list.filter(f => {
             const s = String(f.status).toLowerCase();
             return s === 'active' || s === 'en-route';
@@ -525,7 +547,6 @@ function applyFilter() {
         list = list.filter(f => f.type === currentFilter);
     }
 
-    // Nach Suchbegriff filtern (durchsucht Stadt, Land, Airline, Flugnummer, Gate)
     if (currentSearch) {
         list = list.filter(f => {
             const city = (f.city || '').toLowerCase();
@@ -541,10 +562,16 @@ function applyFilter() {
                    gate.includes(currentSearch);
         });
     }
-
-    renderFlights(list);
+    return list;
 }
 
+function applyFilter() {
+    const filtered = getFilteredList();
+    renderFlights(filtered);
+    renderDesign2Cards(filtered);
+}
+
+/* ---------- Rendering Ansicht 1 (Detail-Karten) ---------- */
 function renderFlights(flights) {
     const container = document.getElementById('flightList');
     container.innerHTML = '';
@@ -566,7 +593,6 @@ function renderFlights(flights) {
         "diverted": "Umgeleitet"
     };
 
-    // Reihenfolge: gelandet, dann im Anflug, dann alle anderen; innerhalb nach Plan-Zeit
     const statusRank = f => {
         const s = String(f.status).toLowerCase();
         if (s === 'landed') return 0;
@@ -580,7 +606,6 @@ function renderFlights(flights) {
         const cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
         const badgeClass = isCharter ? "badge-charter" : "badge-linie";
 
-        // Vorläufige Zuordnung (Ausgang/Band noch nicht vergeben): Fragezeichen am Badge
         const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
         const guessMark = isGuess ? ' ?' : '';
         const guessTitle = isGuess ? ' title="Vorläufig, Ausgang noch nicht vergeben"' : '';
@@ -604,7 +629,6 @@ function renderFlights(flights) {
         const fromText = f.country ? `${f.city}, ${f.country}` : f.city;
         const beltHtml = f.baggage ? `<div><strong>Band:</strong> ${f.baggage}</div>` : '';
 
-        // Flugzeug-Symbol: blinkt im Anflug, steht still wenn gelandet
         let iconHtml = '';
         if (st === 'active' || st === 'en-route') {
             iconHtml = '<span class="status-icon blink" title="Im Anflug">✈️</span>';
@@ -614,8 +638,6 @@ function renderFlights(flights) {
 
         const card = document.createElement('div');
         card.className = cardClass;
-        card.setAttribute('data-category', f.type);
-
         card.innerHTML = `
             <div class="card-header">
                 <div class="time-col">
@@ -654,10 +676,134 @@ function filterFlights(category, event) {
     applyFilter();
 }
 
+/* ---------- Rendering Ansicht 2 (Progress Bars) ---------- */
+function timeToMinutes(timeStr) {
+    if (!timeStr) return 0;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return (hours || 0) * 60 + (minutes || 0);
+}
+
+function renderDesign2Cards(flights) {
+    const container = document.getElementById('d2CardsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!flights || flights.length === 0) {
+        container.innerHTML = currentFilter === 'landing'
+            ? '<div class="no-flights">Gerade keine Flüge im Anflug.</div>'
+            : '<div class="no-flights">Keine Flüge gefunden.</div>';
+        return;
+    }
+
+    flights.forEach((flight, index) => {
+        const card = document.createElement('div');
+        card.className = 'd2-flight-card';
+        card.id = `d2-flight-${index}`;
+
+        const arrivalTime = flight.time_estimated || flight.time_scheduled;
+        const arrivalMin = timeToMinutes(arrivalTime);
+        const startMin = arrivalMin - 30; // 30 Min vor Ankunft als Start für den Balken
+
+        card.dataset.startMin = startMin;
+        card.dataset.arrivalMin = arrivalMin;
+        card.dataset.status = flight.status || '';
+
+        const routeText = flight.country ? `${flight.city} (${flight.country})` : flight.city;
+
+        card.innerHTML = `
+            <div class="d2-card-content">
+                <div class="d2-flight-info">
+                    <h3>${flight.flight_no} (${flight.airline})</h3>
+                    <p>Von: ${routeText} — Gate: ${flight.gate}</p>
+                </div>
+                <div class="d2-flight-right">
+                    <div class="d2-status-text" id="d2-status-${index}">Im Anflug</div>
+                    <div class="d2-time-label">${arrivalTime}</div>
+                </div>
+            </div>
+            <div class="d2-card-footer-bar">
+                <div class="d2-bar-info-row">
+                    <span>${flight.type}</span>
+                    <span id="d2-percent-${index}">0%</span>
+                </div>
+                <div class="d2-progress-container">
+                    <div class="d2-progress-bar" id="d2-progress-${index}"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    updateProgress();
+}
+
+function updateProgress() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    const currentTotalSeconds = hours * 3600 + minutes * 60 + seconds;
+    const currentTotalMinutesDecimal = currentTotalSeconds / 60;
+
+    const clockEl = document.getElementById('live-clock');
+    if (clockEl) {
+        clockEl.textContent = 
+            String(hours).padStart(2, '0') + ':' + 
+            String(minutes).padStart(2, '0') + ':' + 
+            String(seconds).padStart(2, '0');
+    }
+
+    const container = document.getElementById('d2CardsContainer');
+    if (!container) return;
+    const cards = container.querySelectorAll('.d2-flight-card');
+
+    cards.forEach((cardEl, index) => {
+        const barEl = document.getElementById(`d2-progress-${index}`);
+        const statusEl = document.getElementById(`d2-status-${index}`);
+        const percentEl = document.getElementById(`d2-percent-${index}`);
+
+        if (!cardEl || !barEl || !statusEl) return;
+
+        const startMin = parseFloat(cardEl.dataset.startMin);
+        const arrivalMin = parseFloat(cardEl.dataset.arrivalMin);
+        const flightStatus = String(cardEl.dataset.status).toLowerCase();
+        
+        const totalDuration = arrivalMin - startMin;
+        if (totalDuration <= 0) return;
+
+        const elapsed = currentTotalMinutesDecimal - startMin;
+        let percentage = (elapsed / totalDuration) * 100;
+
+        if (flightStatus === 'landed') {
+            percentage = 100;
+            statusEl.textContent = "GELANDET";
+            cardEl.classList.add('landed');
+        } else if (percentage < 0) {
+            percentage = 0;
+            statusEl.textContent = "Geplant";
+            cardEl.classList.remove('landed');
+        } else if (percentage >= 100) {
+            percentage = 100;
+            statusEl.textContent = "GELANDET";
+            cardEl.classList.add('landed');
+        } else {
+            statusEl.textContent = "Im Anflug";
+            cardEl.classList.remove('landed');
+        }
+
+        barEl.style.width = percentage + '%';
+        if (percentEl) {
+            percentEl.textContent = Math.round(percentage) + '%';
+        }
+    });
+}
+
+// Initialisierung
+loadSavedView();
 loadData();
 setInterval(loadData, REFRESH_MINUTES * 60 * 1000);
+setInterval(updateProgress, 1000);
 
-// Animationen nach dem Laden aktivieren
 requestAnimationFrame(function () {
     requestAnimationFrame(function () { document.body.classList.remove('no-anim'); });
 });
