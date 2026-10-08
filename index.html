@@ -554,7 +554,16 @@ function renderFlights(flights) {
         "diverted": "Umgeleitet"
     };
 
-    flights.forEach(f => {
+    // Reihenfolge: gelandet, dann im Anflug, dann alle anderen; innerhalb nach Plan-Zeit
+    const statusRank = f => {
+        const s = String(f.status).toLowerCase();
+        if (s === 'landed') return 0;
+        if (s === 'active' || s === 'en-route') return 1;
+        return 2;
+    };
+    const sorted = [...flights].sort((a, b) => (statusRank(a) - statusRank(b)) || (a.dt - b.dt));
+
+    sorted.forEach(f => {
         const isCharter = f.type === "Charter";
         const cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
         const badgeClass = isCharter ? "badge-charter" : "badge-linie";
