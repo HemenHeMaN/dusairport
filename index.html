@@ -36,6 +36,7 @@
     --filter-active-all: #003366;
     --filter-active-linie: #0d47a1;
     --filter-active-charter: #e65100;
+    --filter-active-landing: #2e7d32;
 
     --slider-bg: #fff;
     --size-btn-bg: #003366;
@@ -66,6 +67,7 @@
     --filter-active-all: #1565c0;
     --filter-active-linie: #1976d2;
     --filter-active-charter: #f57c00;
+    --filter-active-landing: #388e3c;
 
     --slider-bg: #1e1e1e;
     --size-btn-bg: #1565c0;
@@ -145,6 +147,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .btn-all.active { background: var(--filter-active-all); color: #fff; }
 .btn-linie.active { background: var(--filter-active-linie); color: #fff; }
 .btn-charter.active { background: var(--filter-active-charter); color: #fff; }
+.btn-landing.active { background: var(--filter-active-landing); color: #fff; }
 
 /* Flugkarten */
 .flight-card {
@@ -392,6 +395,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
     <button class="filter-btn btn-linie" onclick="filterFlights('Linie', event)">Linie</button>
     <button class="filter-btn btn-charter" onclick="filterFlights('Charter', event)">Charter</button>
+    <button class="filter-btn btn-landing" onclick="filterFlights('landing', event)">✈️ Anflug</button>
 </div>
 
 <div id="flightList">
@@ -511,7 +515,13 @@ function applyFilter() {
     let list = allFlights;
 
     // Nach Kategorie filtern (Alle / Linie / Charter)
-    if (currentFilter !== 'all') {
+    if (currentFilter === 'landing') {
+        // Nur Flüge, die gerade im Anflug sind
+        list = list.filter(f => {
+            const s = String(f.status).toLowerCase();
+            return s === 'active' || s === 'en-route';
+        });
+    } else if (currentFilter !== 'all') {
         list = list.filter(f => f.type === currentFilter);
     }
 
@@ -540,7 +550,9 @@ function renderFlights(flights) {
     container.innerHTML = '';
 
     if (!flights || flights.length === 0) {
-        container.innerHTML = '<div class="no-flights">Keine Flüge gefunden.</div>';
+        container.innerHTML = currentFilter === 'landing'
+            ? '<div class="no-flights">Gerade keine Flüge im Anflug.</div>'
+            : '<div class="no-flights">Keine Flüge gefunden.</div>';
         return;
     }
 
