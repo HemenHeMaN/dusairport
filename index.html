@@ -551,6 +551,11 @@ function renderFlights(flights) {
         const cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
         const badgeClass = isCharter ? "badge-charter" : "badge-linie";
 
+        // Vorläufige Zuordnung (Ausgang/Band noch nicht vergeben): Fragezeichen am Badge
+        const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
+        const guessMark = isGuess ? ' ?' : '';
+        const guessTitle = isGuess ? ' title="Vorläufig, Ausgang noch nicht vergeben"' : '';
+
         const delayHtml = f.delay > 0 ? `<span class="delay-badge">+${f.delay} Min.</span>` : '';
         const statusText = f.delay > 0
             ? `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)`
@@ -558,6 +563,7 @@ function renderFlights(flights) {
 
         const countryHtml = f.country ? ` <span class="country">${f.country}</span>` : '';
         const fromText = f.country ? `${f.city}, ${f.country}` : f.city;
+        const beltHtml = f.baggage ? `<div><strong>Band:</strong> ${f.baggage}</div>` : '';
 
         const card = document.createElement('div');
         card.className = cardClass;
@@ -572,7 +578,7 @@ function renderFlights(flights) {
                 <div class="main-info">
                     <div class="city-name">${f.city}${countryHtml}</div>
                     <div class="gate-info">
-                        <span class="${badgeClass}">${f.gate}</span>
+                        <span class="${badgeClass}"${guessTitle}>${f.gate}${guessMark}</span>
                     </div>
                 </div>
             </div>
@@ -584,6 +590,7 @@ function renderFlights(flights) {
                     <div><strong>Von:</strong> ${fromText}</div>
                     <div><strong>Typ:</strong> ${f.type}</div>
                     <div><strong>Status:</strong> ${statusText}</div>
+                    ${beltHtml}
                 </div>
             </div>
         `;
