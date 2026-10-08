@@ -175,6 +175,14 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 [data-theme="dark"] .delay-badge { background: #5c1d1d; color: #ff8080; }
 
+/* Status-Flugzeug: blinkt im Anflug, steht still nach der Landung */
+.status-icon { font-size: 1.5rem; line-height: 1; flex-shrink: 0; margin-left: 4px; }
+.status-icon.blink { animation: plane-blink 1s ease-in-out infinite; }
+@keyframes plane-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.1; }
+}
+
 .card-details { margin-top: 10px; font-size: 0.95rem; color: var(--text-color); }
 .detail-divider { border: none; border-top: 1px solid var(--border-color); margin: 8px 0; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -565,6 +573,15 @@ function renderFlights(flights) {
         const fromText = f.country ? `${f.city}, ${f.country}` : f.city;
         const beltHtml = f.baggage ? `<div><strong>Band:</strong> ${f.baggage}</div>` : '';
 
+        // Flugzeug-Symbol: blinkt im Anflug, steht still wenn gelandet
+        const st = String(f.status).toLowerCase();
+        let iconHtml = '';
+        if (st === 'active' || st === 'en-route') {
+            iconHtml = '<span class="status-icon blink" title="Im Anflug">✈️</span>';
+        } else if (st === 'landed') {
+            iconHtml = '<span class="status-icon" title="Gelandet">✈️</span>';
+        }
+
         const card = document.createElement('div');
         card.className = cardClass;
         card.setAttribute('data-category', f.type);
@@ -581,6 +598,7 @@ function renderFlights(flights) {
                         <span class="${badgeClass}"${guessTitle}>${f.gate}${guessMark}</span>
                     </div>
                 </div>
+                ${iconHtml}
             </div>
             <div class="card-details">
                 <hr class="detail-divider">
