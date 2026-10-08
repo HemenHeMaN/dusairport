@@ -564,7 +564,6 @@ function getFilteredList() {
         });
     }
 
-    // Identische Sortierung wie in der Detail-Ansicht
     const statusRank = f => {
         const s = String(f.status).toLowerCase();
         if (s === 'landed') return 0;
@@ -704,13 +703,13 @@ function renderDesign2Cards(flights) {
         card.className = cardClass;
         card.id = `d2-flight-${index}`;
 
-        // Startzeit = planmäßige Abflugzeit (time_scheduled)
-        // Ankunftszeit = geschätzte Zeit oder planmäßige Zeit
-        const startTimeStr = flight.time_scheduled;
         const arrivalTimeStr = flight.time_estimated || flight.time_scheduled;
-
-        const startMin = timeToMinutes(startTimeStr);
         const arrivalMin = timeToMinutes(arrivalTimeStr);
+        
+        let startMin = timeToMinutes(flight.time_scheduled);
+        if (!flight.time_scheduled || startMin >= arrivalMin) {
+            startMin = arrivalMin - 30; // Fallback: 30 Minuten Flugdauer annehmen
+        }
 
         card.dataset.startMin = startMin;
         card.dataset.arrivalMin = arrivalMin;
