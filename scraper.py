@@ -350,7 +350,7 @@ def main():
 
     write_json_atomic(CACHE_FILE, {
         "updated_at": now.strftime("%d.%m.%Y %H:%M"),
-        "source": "Live",
+        "source": "Dus.com",
         "flights": unique,
     })
     print(f"cache.json aktualisiert: {len(unique)} Flüge.")
