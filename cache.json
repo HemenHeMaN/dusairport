@@ -1,71 +1,7 @@
 {
-  "updated_at": "08.10.2026 08:52",
+  "updated_at": "08.10.2026 09:16",
   "source": "Live",
   "flights": [
-    {
-      "dt": 1791439800.0,
-      "time_scheduled": "08:10",
-      "time_estimated": "08:13",
-      "flight_no": "AY1391",
-      "airline": "AY",
-      "city": "Helsinki",
-      "country": "Finnland",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 3
-    },
-    {
-      "dt": 1791441000.0,
-      "time_scheduled": "08:30",
-      "time_estimated": "08:06",
-      "flight_no": "XQ282",
-      "airline": "XQ",
-      "city": "Antalya",
-      "country": "Türkei",
-      "type": "Charter",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791441300.0,
-      "time_scheduled": "08:35",
-      "time_estimated": "08:11",
-      "flight_no": "EC3941",
-      "airline": "EC",
-      "city": "Mailand-Malpensa",
-      "country": "Italien",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
-    {
-      "dt": 1791441600.0,
-      "time_scheduled": "08:40",
-      "time_estimated": "08:06",
-      "flight_no": "EY133",
-      "airline": "EY",
-      "city": "Abu Dhabi",
-      "country": "Vereinigte Arabische Emirate",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "delay": 0
-    },
     {
       "dt": 1791441600.0,
       "time_scheduled": "08:40",
@@ -101,7 +37,7 @@
     {
       "dt": 1791442200.0,
       "time_scheduled": "08:50",
-      "time_estimated": "09:15",
+      "time_estimated": "09:04",
       "flight_no": "OS161",
       "airline": "OS",
       "city": "Wien",
@@ -111,13 +47,13 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 25
+      "status": "landed",
+      "delay": 14
     },
     {
       "dt": 1791442500.0,
       "time_scheduled": "08:55",
-      "time_estimated": "08:46",
+      "time_estimated": "08:50",
       "flight_no": "E64672",
       "airline": "E6",
       "city": "Stockholm",
@@ -127,7 +63,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
+      "status": "landed",
       "delay": 0
     },
     {
@@ -165,7 +101,7 @@
     {
       "dt": 1791443100.0,
       "time_scheduled": "09:05",
-      "time_estimated": "08:51",
+      "time_estimated": "08:46",
       "flight_no": "VY1896",
       "airline": "VY",
       "city": "Barcelona",
@@ -181,7 +117,7 @@
     {
       "dt": 1791443100.0,
       "time_scheduled": "09:05",
-      "time_estimated": "09:09",
+      "time_estimated": "09:00",
       "flight_no": "2L1016",
       "airline": "2L",
       "city": "Zürich",
@@ -191,13 +127,13 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 4
+      "status": "landed",
+      "delay": 0
     },
     {
       "dt": 1791443100.0,
       "time_scheduled": "09:05",
-      "time_estimated": "09:13",
+      "time_estimated": "09:01",
       "flight_no": "TK1523",
       "airline": "TK",
       "city": "Istanbul",
@@ -207,8 +143,8 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 13
+      "status": "landed",
+      "delay": 1
     },
     {
       "dt": 1791443400.0,
@@ -261,6 +197,38 @@
     {
       "dt": 1791444600.0,
       "time_scheduled": "09:30",
+      "time_estimated": "09:06",
+      "flight_no": "BA918",
+      "airline": "BA",
+      "city": "London-Heathrow",
+      "country": "Großbritannien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "landed",
+      "delay": 0
+    },
+    {
+      "dt": 1791444600.0,
+      "time_scheduled": "09:30",
+      "time_estimated": "09:27",
+      "flight_no": "SK1629",
+      "airline": "SK",
+      "city": "Kopenhagen",
+      "country": "Dänemark",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 0
+    },
+    {
+      "dt": 1791444600.0,
+      "time_scheduled": "09:30",
       "time_estimated": "09:27",
       "flight_no": "1629",
       "airline": "Unbekannt",
@@ -293,38 +261,6 @@
     {
       "dt": 1791444600.0,
       "time_scheduled": "09:30",
-      "time_estimated": "09:27",
-      "flight_no": "SK1629",
-      "airline": "SK",
-      "city": "Kopenhagen",
-      "country": "Dänemark",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791444600.0,
-      "time_scheduled": "09:30",
-      "time_estimated": "09:30",
-      "flight_no": "BA918",
-      "airline": "BA",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791444600.0,
-      "time_scheduled": "09:30",
       "time_estimated": "09:30",
       "flight_no": "PC1007",
       "airline": "PC",
@@ -336,22 +272,6 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 0
-    },
-    {
-      "dt": 1791444900.0,
-      "time_scheduled": "09:35",
-      "time_estimated": "09:35",
-      "flight_no": "LH72",
-      "airline": "LH",
-      "city": "Frankfurt",
-      "country": "Deutschland",
-      "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
       "delay": 0
     },
     {
@@ -371,12 +291,12 @@
       "delay": 0
     },
     {
-      "dt": 1791445500.0,
-      "time_scheduled": "09:45",
-      "time_estimated": "09:45",
-      "flight_no": "EW9041",
-      "airline": "EW",
-      "city": "Berlin",
+      "dt": 1791444900.0,
+      "time_scheduled": "09:35",
+      "time_estimated": "09:39",
+      "flight_no": "LH72",
+      "airline": "LH",
+      "city": "Frankfurt",
       "country": "Deutschland",
       "type": "Linie",
       "type_source": "Airline",
@@ -384,7 +304,7 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "active",
-      "delay": 0
+      "delay": 4
     },
     {
       "dt": 1791445500.0,
@@ -403,9 +323,25 @@
       "delay": 4
     },
     {
+      "dt": 1791445500.0,
+      "time_scheduled": "09:45",
+      "time_estimated": "09:51",
+      "flight_no": "EW9041",
+      "airline": "EW",
+      "city": "Berlin",
+      "country": "Deutschland",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "active",
+      "delay": 6
+    },
+    {
       "dt": 1791446100.0,
       "time_scheduled": "09:55",
-      "time_estimated": "10:08",
+      "time_estimated": "10:22",
       "flight_no": "EW9761",
       "airline": "EW",
       "city": "Zürich",
@@ -415,8 +351,8 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "delay": 13
+      "status": "active",
+      "delay": 27
     },
     {
       "dt": 1791446400.0,
@@ -453,7 +389,7 @@
     {
       "dt": 1791447900.0,
       "time_scheduled": "10:25",
-      "time_estimated": "10:25",
+      "time_estimated": "10:13",
       "flight_no": "EW9341",
       "airline": "EW",
       "city": "Manchester",
@@ -463,7 +399,7 @@
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
+      "status": "active",
       "delay": 0
     },
     {
@@ -499,6 +435,22 @@
       "delay": 5
     },
     {
+      "dt": 1791447900.0,
+      "time_scheduled": "10:25",
+      "time_estimated": "10:48",
+      "flight_no": "4X9243",
+      "airline": "4X",
+      "city": "Kopenhagen",
+      "country": "Dänemark",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "delay": 23
+    },
+    {
       "dt": 1791448200.0,
       "time_scheduled": "10:30",
       "time_estimated": "10:30",
@@ -518,26 +470,26 @@
       "dt": 1791448200.0,
       "time_scheduled": "10:30",
       "time_estimated": "10:30",
-      "flight_no": "EW9463",
-      "airline": "EW",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
+      "flight_no": "4M411",
+      "airline": "4M",
+      "city": "Antalya",
+      "country": "Türkei",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
+      "status": "active",
       "delay": 0
     },
     {
       "dt": 1791448200.0,
       "time_scheduled": "10:30",
       "time_estimated": "10:30",
-      "flight_no": "4M411",
-      "airline": "4M",
-      "city": "Antalya",
-      "country": "Türkei",
+      "flight_no": "EW9463",
+      "airline": "EW",
+      "city": "London-Heathrow",
+      "country": "Großbritannien",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "",
