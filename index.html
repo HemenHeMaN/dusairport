@@ -41,9 +41,6 @@
     --size-btn-bg: #003366;
     --size-btn-hover: #00224a;
     --reset-btn-bg: #e4e4ed;
-
-    --detail-label-color: #5a5a66;
-    --now-color: #d32f2f;
 }
 
 [data-theme="dark"] {
@@ -74,9 +71,6 @@
     --size-btn-bg: #1565c0;
     --size-btn-hover: #0d47a1;
     --reset-btn-bg: #333;
-
-    --detail-label-color: #9a9aa6;
-    --now-color: #ff6b6b;
 }
 
 html { font-size: var(--base-font-size); }
@@ -181,34 +175,10 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 [data-theme="dark"] .delay-badge { background: #5c1d1d; color: #ff8080; }
 
-/* Details: Bezeichnung klein/grau, Wert groß/fett/farbig */
 .card-details { margin-top: 10px; font-size: 0.95rem; color: var(--text-color); }
 .detail-divider { border: none; border-top: 1px solid var(--border-color); margin: 8px 0; }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
-.detail-grid > div { display: flex; flex-direction: column; gap: 1px; overflow-wrap: anywhere; }
-.detail-label {
-    font-size: 0.75rem; font-weight: 600; color: var(--detail-label-color);
-    text-transform: uppercase; letter-spacing: 0.04em;
-}
-.detail-value { font-size: 1.1rem; font-weight: 700; color: var(--heading-color); }
-.card-linie .flight-no { color: var(--card-linie-border); }
-.card-charter .flight-no { color: var(--card-charter-border); }
-
-/* Jetzt-Markierung */
-.flight-card.past { opacity: 0.6; }
-.flight-card.now { box-shadow: 0 0 0 2px var(--now-color), 0 2px 6px rgba(0,0,0,0.2); }
-.now-marker {
-    display: flex; align-items: center; gap: 10px; margin: 4px 0 12px;
-    font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--now-color);
-}
-.now-marker::before, .now-marker::after { content: ""; flex: 1; height: 2px; background: var(--now-color); border-radius: 2px; }
-.jump-now {
-    position: fixed; right: 14px; bottom: 14px; z-index: 50;
-    background: var(--now-color); color: #fff; border: none; border-radius: 999px;
-    padding: 10px 16px; font-size: 0.9rem; font-weight: bold; cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-}
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.detail-grid > div { overflow-wrap: anywhere; }
 
 .no-flights { text-align: center; padding: 20px; color: var(--text-color); background: var(--card-bg); border-radius: 8px; }
 
@@ -405,7 +375,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <div class="update-info" id="updateInfo">Lade Daten...</div>
 
-<!-- Suchfeld -->
+<!-- NEU: Suchfeld -->
 <div class="search-container">
     <input type="text" id="searchInput" class="search-input" placeholder="Nach Flug, Stadt, Land oder Airline suchen..." aria-label="Flüge durchsuchen">
 </div>
@@ -420,15 +390,11 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     <div class="no-flights">Flüge werden geladen...</div>
 </div>
 
-<button class="jump-now" id="jumpNow" type="button">Jetzt</button>
-
 <script>
 const REFRESH_MINUTES = 5;
 const DEFAULT_SIZE = 18;
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
-const GRACE_MINUTES = 15;        // Flüge bis so viele Minuten in der Vergangenheit zählen noch als "jetzt"
-const NOW_WINDOW_MINUTES = 30;   // Flüge bis so viele Minuten in der Zukunft werden hervorgehoben
 
 let allFlights = [];
 let currentFilter = 'all';
@@ -510,7 +476,7 @@ loadFontSize();
 const searchInput = document.getElementById('searchInput');
 searchInput.addEventListener('input', e => {
     currentSearch = e.target.value.toLowerCase().trim();
-    applyFilter(false);
+    applyFilter();
 });
 
 /* ---------- Flugdaten ---------- */
@@ -523,9 +489,8 @@ function loadData() {
 
             if (JSON.stringify(data.flights) === JSON.stringify(allFlights)) return;
 
-            const firstLoad = allFlights.length === 0;
             allFlights = data.flights;
-            applyFilter(firstLoad);
+            applyFilter();
         })
         .catch(() => {
             if (allFlights.length === 0) {
@@ -534,7 +499,7 @@ function loadData() {
         });
 }
 
-function applyFilter(scrollFlag) {
+function applyFilter() {
     let list = allFlights;
 
     // Nach Kategorie filtern (Alle / Linie / Charter)
@@ -559,21 +524,10 @@ function applyFilter(scrollFlag) {
         });
     }
 
-    renderFlights(list, scrollFlag);
+    renderFlights(list);
 }
 
-function scrollToNow(smooth) {
-    const marker = document.getElementById('nowMarker');
-    if (!marker) return;
-    window.scrollTo({
-        top: marker.getBoundingClientRect().top + window.scrollY - 8,
-        behavior: smooth ? 'smooth' : 'auto'
-    });
-}
-
-document.getElementById('jumpNow').addEventListener('click', () => scrollToNow(true));
-
-function renderFlights(flights, scrollFlag) {
+function renderFlights(flights) {
     const container = document.getElementById('flightList');
     container.innerHTML = '';
 
@@ -592,26 +546,9 @@ function renderFlights(flights, scrollFlag) {
         "diverted": "Umgeleitet"
     };
 
-    const nowSec = Date.now() / 1000;
-    const estOf = f => f.dt + Math.max(0, f.delay || 0) * 60;
-    const anchorIdx = flights.findIndex(f => estOf(f) >= nowSec - GRACE_MINUTES * 60);
-    const nowText = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
-
-    flights.forEach((f, idx) => {
-        if (idx === anchorIdx) {
-            const marker = document.createElement('div');
-            marker.className = 'now-marker';
-            marker.id = 'nowMarker';
-            marker.textContent = 'Jetzt · ' + nowText + ' Uhr';
-            container.appendChild(marker);
-        }
-
+    flights.forEach(f => {
         const isCharter = f.type === "Charter";
-        const est = estOf(f);
-        let stateClass = '';
-        if (est < nowSec - GRACE_MINUTES * 60) stateClass = ' past';
-        else if (est <= nowSec + NOW_WINDOW_MINUTES * 60) stateClass = ' now';
-        const cardClass = (isCharter ? "flight-card card-charter" : "flight-card card-linie") + stateClass;
+        const cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
         const badgeClass = isCharter ? "badge-charter" : "badge-linie";
 
         const delayHtml = f.delay > 0 ? `<span class="delay-badge">+${f.delay} Min.</span>` : '';
@@ -642,21 +579,16 @@ function renderFlights(flights, scrollFlag) {
             <div class="card-details">
                 <hr class="detail-divider">
                 <div class="detail-grid">
-                    <div><span class="detail-label">Flug-Nr.</span><span class="detail-value flight-no">${f.flight_no}</span></div>
-                    <div><span class="detail-label">Airline</span><span class="detail-value">${f.airline}</span></div>
-                    <div><span class="detail-label">Von</span><span class="detail-value">${fromText}</span></div>
-                    <div><span class="detail-label">Typ</span><span class="detail-value">${f.type}</span></div>
-                    <div><span class="detail-label">Status</span><span class="detail-value">${statusText}</span></div>
+                    <div><strong>Flug-Nr.:</strong> ${f.flight_no}</div>
+                    <div><strong>Airline:</strong> ${f.airline}</div>
+                    <div><strong>Von:</strong> ${fromText}</div>
+                    <div><strong>Typ:</strong> ${f.type}</div>
+                    <div><strong>Status:</strong> ${statusText}</div>
                 </div>
             </div>
         `;
         container.appendChild(card);
     });
-
-    // Beim Laden / Filterwechsel zu den aktuellen Flügen scrollen (ältere Flüge liegen darüber)
-    if (scrollFlag && anchorIdx > 0) {
-        requestAnimationFrame(() => scrollToNow(false));
-    }
 }
 
 function filterFlights(category, event) {
@@ -664,7 +596,7 @@ function filterFlights(category, event) {
     if (event && event.target) { event.target.classList.add("active"); }
 
     currentFilter = category;
-    applyFilter(true);
+    applyFilter();
 }
 
 loadData();
