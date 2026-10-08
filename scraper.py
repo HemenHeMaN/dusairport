@@ -1,192 +1,86 @@
 #!/usr/bin/env python3
 """
-DUS-Ankünfte Scraper (AirLabs /schedules)
-Läuft alle 30 Minuten zwischen 05:30 und 23:30 (Europe/Berlin).
+DUS-Ankünfte Scraper (dus.com Flug-API)
+Läuft zwischen 05:30 und 23:30 (Europe/Berlin), Takt über Cron/Scheduler.
 Aufruf mit --force ignoriert das Zeitfenster (zum Testen).
+
+Charter/Linie-Zuordnung (Reihenfolge):
+  1. Ausgang   : Ausgang 1-2 = Linie, Ausgang 3-6 = Charter   (verlässlich)
+  2. Gepäckband: Band 1-6 = Linie, Band 7+ = Charter           (verlässlich)
+  3. Flugtyp   : dus.com-Flugtyp 21 (Pauschalreise-Charter)    (Fallback)
+  4. Airline   : Airline-Liste                                  (Fallback)
+Ausgang und Band vergibt der Flughafen erst kurz vor der Landung, davor
+greifen die Fallbacks. type_source zeigt, woher die Zuordnung stammt.
 """
 import json
 import os
+import random
 import re
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 # ---------------------------------------------------------------- Konfiguration
-API_KEY = os.environ.get("AIRLABS_API_KEY")
-AIRPORT = "DUS"
-RAW_CACHE_FILE = ".raw_cache.json"
+API_URL = "https://www.dus.com/api/sitecore/flightapi/SearchFlightsWithOutParams"
+REFERER = "https://www.dus.com/de-de/fliegen/ankunft"
 CACHE_FILE = "cache.json"
 
 TZ = ZoneInfo("Europe/Berlin")
-UTC = timezone.utc
 
 # Abruf-Zeitfenster (lokale Zeit). Etwas Toleranz für verspätete Cron-Starts.
 WINDOW_START = (5, 25)    # frühester Start (Soll: 05:30)
 WINDOW_END = (23, 40)     # spätester Start (Soll: 23:30)
-CACHE_DURATION = 25 * 60  # Sekunden; kleiner als das 30-Minuten-Intervall
 
+# Anzeige-Fenster (nach tatsächlicher/erwarteter Ankunft)
 MINUTES_PAST = 60
 HOURS_FUTURE = 5
 
+# Abfrage-Fenster (nach Plan-Zeit), größer als das Anzeige-Fenster,
+# damit stark verspätete oder zu früh gelandete Flüge nicht fehlen
+FETCH_BACK_HOURS = 4
+FETCH_AHEAD_HOURS = HOURS_FUTURE + 1
+
 PAGE_SIZE = 100
-MAX_PAGES = 5
+MAX_PAGES = 10
 
-# IATA: (Name, Land)
-AIRPORTS = {
-    # Deutschland
-    "MUC": ("München", "Deutschland"), "HAM": ("Hamburg", "Deutschland"),
-    "FRA": ("Frankfurt", "Deutschland"), "BER": ("Berlin", "Deutschland"),
-    # Spanien
-    "IBZ": ("Ibiza", "Spanien"), "PMI": ("Palma de Mallorca", "Spanien"),
-    "ALC": ("Alicante", "Spanien"), "MAD": ("Madrid", "Spanien"),
-    "AGP": ("Malaga", "Spanien"), "BIO": ("Bilbao", "Spanien"),
-    "LPA": ("Gran Canaria", "Spanien"), "BCN": ("Barcelona", "Spanien"),
-    "TFS": ("Teneriffa Süd", "Spanien"), "FUE": ("Fuerteventura", "Spanien"),
-    "XRY": ("Jerez de la Frontera", "Spanien"),
-    # Griechenland
-    "SMI": ("Samos", "Griechenland"), "CFU": ("Korfu", "Griechenland"),
-    "RHO": ("Rhodos", "Griechenland"), "HER": ("Heraklion (Kreta)", "Griechenland"),
-    "KGS": ("Kos", "Griechenland"), "KOS": ("Kos", "Griechenland"),
-    "ATH": ("Athen", "Griechenland"), "SKG": ("Thessaloniki", "Griechenland"),
-    "PVK": ("Preveza-Aktion", "Griechenland"), "KLX": ("Kalamata", "Griechenland"),
-    "CHQ": ("Chania (Kreta)", "Griechenland"), "GPA": ("Patras-Araxos", "Griechenland"),
-    # Italien
-    "FCO": ("Rom-Fiumicino", "Italien"), "LIN": ("Mailand-Linate", "Italien"),
-    "BRI": ("Bari", "Italien"), "MXP": ("Mailand-Malpensa", "Italien"),
-    "NAP": ("Neapel", "Italien"), "BLQ": ("Bologna", "Italien"),
-    "SUF": ("Lamezia Terme (Kalabrien)", "Italien"),
-    # Großbritannien / Irland
-    "LHR": ("London-Heathrow", "Großbritannien"), "LGW": ("London-Gatwick", "Großbritannien"),
-    "STN": ("London-Stansted", "Großbritannien"), "MAN": ("Manchester", "Großbritannien"),
-    "BHX": ("Birmingham", "Großbritannien"), "DUB": ("Dublin", "Irland"),
-    # Türkei
-    "DLM": ("Dalaman", "Türkei"), "IST": ("Istanbul", "Türkei"),
-    "SAW": ("Istanbul-Sabiha Gökçen", "Türkei"), "AYT": ("Antalya", "Türkei"),
-    "BJV": ("Bodrum", "Türkei"), "ADB": ("Izmir", "Türkei"),
-    "ESB": ("Ankara-Esenboğa", "Türkei"), "DIY": ("Diyarbakır", "Türkei"),
-    # Portugal
-    "FNC": ("Madeira", "Portugal"), "FAO": ("Faro", "Portugal"),
-    "LIS": ("Lissabon", "Portugal"), "OPO": ("Porto", "Portugal"),
-    # Österreich / Schweiz
-    "VIE": ("Wien", "Österreich"), "GRZ": ("Graz", "Österreich"),
-    "ZRH": ("Zürich", "Schweiz"),
-    # Nord- und Osteuropa
-    "CPH": ("Kopenhagen", "Dänemark"), "ARN": ("Stockholm", "Schweden"), "GOT": ("Göteborg", "Schweden"),
-    "OSL": ("Oslo", "Norwegen"), "HEL": ("Helsinki", "Finnland"),
-    "WAW": ("Warschau", "Polen"), "PRG": ("Prag", "Tschechien"),
-    "BUD": ("Budapest", "Ungarn"), "OTP": ("Bukarest", "Rumänien"),
-    "SOF": ("Sofia", "Bulgarien"), "RIX": ("Riga", "Lettland"),
-    # Westeuropa
-    "CDG": ("Paris-Charles-de-Gaulle", "Frankreich"), "AMS": ("Amsterdam", "Niederlande"),
-    # Balkan
-    "SPU": ("Split", "Kroatien"), "DBV": ("Dubrovnik", "Kroatien"),
-    "TIA": ("Tirana", "Albanien"), "PRN": ("Pristina", "Kosovo"),
-    "SKP": ("Skopje", "Nordmazedonien"), "BEG": ("Belgrad", "Serbien"),
-    # Zypern
-    "LCA": ("Larnaka", "Zypern"),
-    # Afrika / Naher Osten
-    "HRG": ("Hurghada", "Ägypten"), "SSH": ("Sharm el-Sheikh", "Ägypten"), "RMF": ("Marsa Alam", "Ägypten"),
-    "AGA": ("Agadir", "Marokko"), "RAK": ("Marrakesch", "Marokko"),
-    "TUN": ("Tunis", "Tunesien"), "DJE": ("Djerba", "Tunesien"),
-    "DXB": ("Dubai", "Vereinigte Arabische Emirate"),
-    "TLV": ("Tel Aviv", "Israel"), "BEN": ("Bengasi", "Libyen"),
-    # --- ergänzt ---
-    "ACE": ("Lanzarote", "Spanien"),
-    "SVQ": ("Sevilla", "Spanien"),
-    "TFN": ("Teneriffa Nord", "Spanien"),
-    "VLC": ("Valencia", "Spanien"),
-    "MAH": ("Menorca", "Spanien"),
-    "SPC": ("La Palma", "Spanien"),
-    "LEI": ("Almería", "Spanien"),
-    "GWT": ("Sylt (Westerland)", "Deutschland"),
-    "BZO": ("Bozen", "Italien"),
-    "SZG": ("Salzburg", "Österreich"),
-    "SGZ": ("Salzburg", "Österreich"),
-    "GVA": ("Genf", "Schweiz"),
-    "ASR": ("Kayseri", "Türkei"),
-    "ADA": ("Adana", "Türkei"),
-    "GZT": ("Gaziantep", "Türkei"),
-    "GZP": ("Gazipaşa-Alanya", "Türkei"),
-    "TZX": ("Trabzon", "Türkei"),
-    "EZS": ("Elazığ", "Türkei"),
-    "ERZ": ("Erzurum", "Türkei"),
-    "ERC": ("Erzincan", "Türkei"),
-    "OGU": ("Ordu-Giresun", "Türkei"),
-    "SZF": ("Samsun", "Türkei"),
-    "ONQ": ("Zonguldak", "Türkei"),
-    "KZR": ("Kütahya", "Türkei"),
-    "EDO": ("Edremit-Balıkesir", "Türkei"),
-    "KNY": ("Konya", "Türkei"),
-    "MLX": ("Malatya", "Türkei"),
-    "COV": ("Mersin-Çukurova", "Türkei"),
-    "EDI": ("Edinburgh", "Großbritannien"),
-    "NCL": ("Newcastle", "Großbritannien"),
-    "NCE": ("Nizza", "Frankreich"),
-    "LYS": ("Lyon", "Frankreich"),
-    "MRS": ("Marseille", "Frankreich"),
-    "BIA": ("Bastia (Korsika)", "Frankreich"),
-    "BGY": ("Mailand-Bergamo", "Italien"),
-    "VCE": ("Venedig", "Italien"),
-    "FLR": ("Florenz", "Italien"),
-    "CTA": ("Catania (Sizilien)", "Italien"),
-    "OLB": ("Olbia (Sardinien)", "Italien"),
-    "CAG": ("Cagliari (Sardinien)", "Italien"),
-    "MLA": ("Malta", "Malta"),
-    "KRN": ("Kiruna", "Schweden"),
-    "KTT": ("Kittilä", "Finnland"),
-    "IVL": ("Ivalo", "Finnland"),
-    "RVN": ("Rovaniemi", "Finnland"),
-    "KRK": ("Krakau", "Polen"),
-    "KIV": ("Chișinău", "Moldau"),
-    "VNO": ("Vilnius", "Litauen"),
-    "JMK": ("Mykonos", "Griechenland"),
-    "ZTH": ("Zakynthos", "Griechenland"),
-    "EFL": ("Kefalonia", "Griechenland"),
-    "JTR": ("Santorin", "Griechenland"),
-    "CAI": ("Kairo", "Ägypten"),
-    "LXR": ("Luxor", "Ägypten"),
-    "MIR": ("Monastir", "Tunesien"),
-    "NDR": ("Nador", "Marokko"),
-    "OUD": ("Oujda", "Marokko"),
-    "AUH": ("Abu Dhabi", "Vereinigte Arabische Emirate"),
-    "DOH": ("Doha", "Katar"),
-    "BEY": ("Beirut", "Libanon"),
-    "EBL": ("Erbil", "Irak"),
-    "ISU": ("Sulaimaniyya", "Irak"),
-    "BGW": ("Bagdad", "Irak"),
-    "AMM": ("Amman", "Jordanien"),
-    "SID": ("Sal", "Kap Verde"),
-    "BVC": ("Boa Vista", "Kap Verde"),
-    "DKR": ("Dakar", "Senegal"),
-    "JFK": ("New York-JFK", "USA"),
-    "ATL": ("Atlanta", "USA"),
+HEADERS = {
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "de-DE,de;q=0.9",
+    "Referer": REFERER,
+    "X-Requested-With": "XMLHttpRequest",
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"),
 }
 
-# Fallback, falls ein Flughafen nicht in der Tabelle steht (ISO-Ländercode von AirLabs)
-COUNTRY_NAMES = {
-    "DE": "Deutschland", "ES": "Spanien", "GR": "Griechenland", "IT": "Italien",
-    "GB": "Großbritannien", "IE": "Irland", "TR": "Türkei", "PT": "Portugal",
-    "AT": "Österreich", "CH": "Schweiz", "FR": "Frankreich", "NL": "Niederlande",
-    "BE": "Belgien", "PL": "Polen", "CZ": "Tschechien", "HU": "Ungarn",
-    "RO": "Rumänien", "BG": "Bulgarien", "HR": "Kroatien", "RS": "Serbien",
-    "AL": "Albanien", "XK": "Kosovo", "MK": "Nordmazedonien", "CY": "Zypern",
-    "EG": "Ägypten", "MA": "Marokko", "TN": "Tunesien", "AE": "Vereinigte Arabische Emirate",
-    "DK": "Dänemark", "SE": "Schweden", "NO": "Norwegen", "FI": "Finnland",
-    "LV": "Lettland", "LB": "Libanon", "IQ": "Irak", "QA": "Katar", "CV": "Kap Verde", "SN": "Senegal", "MT": "Malta", "MD": "Moldau", "LT": "Litauen", "LY": "Libyen", "US": "USA", "CA": "Kanada", "IL": "Israel", "JO": "Jordanien",
+# Flughafennamen kommen direkt von dus.com (Name + Land auf Deutsch).
+# Hier nur Überschreibungen, wenn du einen anderen/genaueren Namen willst.
+AIRPORT_NAME_OVERRIDES = {
+    "HER": "Heraklion (Kreta)", "CHQ": "Chania (Kreta)",
+    "SUF": "Lamezia Terme (Kalabrien)", "GWT": "Sylt (Westerland)",
+    "BIA": "Bastia (Korsika)", "CTA": "Catania (Sizilien)",
+    "OLB": "Olbia (Sardinien)", "CAG": "Cagliari (Sardinien)",
+    "TFS": "Teneriffa Süd", "TFN": "Teneriffa Nord", "LPA": "Gran Canaria",
+    "XRY": "Jerez de la Frontera", "PVK": "Preveza-Aktion",
+    "COV": "Mersin-Çukurova", "ESB": "Ankara-Esenboğa",
+    "SAW": "Istanbul-Sabiha Gökçen", "GZP": "Gazipaşa-Alanya",
+    "HEL": "Helsinki",
 }
+# Falls dus.com ein Land anders benennt als du: {"Vereinigtes Königreich": "Großbritannien"}
+COUNTRY_RENAMES = {}
 
+# Nur Fallback, wenn weder Ausgang, Band noch Flugtyp vorhanden sind.
 # Alles klein schreiben (Vergleich erfolgt mit .lower())
 CHARTER_AIRLINES = [
     "condor", "tuifly", "corendon", "freebird", "smartlynx",
-    "eurowings discover", "discover airlines", "sunexpress", "enter air",
-    "tailwind", "sundair", "marabu", "mavi gök", "mavi gok",
+    "eurowings discover", "discover airlines", "sunexpress", "sun express",
+    "enter air", "tailwind", "sundair", "marabu", "mavi gök", "mavi gok",
 ]
-
-# IATA- und ICAO-Codes gemischt, weil AirLabs je nach Feld beides liefert
-CHARTER_CODES = {"DE", "X3", "XC", "FHY", "6Y", "4Y", "XQ", "ENT", "TWI", "SRD", "MBU"}
+CHARTER_CODES = {"DE", "X3", "XC", "XR", "FHY", "6Y", "4Y", "XQ", "ENT", "E4",
+                 "TWI", "SRD", "MBU"}
 
 SKIP_AIRLINE_KEYWORDS = ("flugschule", "training", "flight school")
 
@@ -198,23 +92,67 @@ def in_run_window(now_local):
     return start <= now_local <= end
 
 
-def get_flight_type(flight, airline_name, airline_iata):
-    """Gibt (Typ, Quelle) zurück.
-    Priorität: 1. Terminal (A = Linie, B/C = Charter)
-               2. Gepäckband (1-4 = Linie, 5-8 = Charter)
-               3. Airline-Heuristik (Fallback, wenn AirLabs noch nichts zugewiesen hat)"""
-    terminal = str(flight.get("arr_terminal") or "").strip().upper()
-    m = re.search(r"\b([ABC])\b", terminal)
-    if m:
-        return ("Linie" if m.group(1) == "A" else "Charter"), "Terminal"
+def write_json_atomic(path, data):
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, path)
 
-    baggage = re.search(r"\d+", str(flight.get("arr_baggage") or ""))
-    if baggage:
-        belt = int(baggage.group(0))
-        if 1 <= belt <= 4:
-            return "Linie", "Gepäckband"
-        if 5 <= belt <= 8:
-            return "Charter", "Gepäckband"
+
+def parse_dt(s):
+    """ISO-String mit Offset -> zeitzonenbewusste Zeit in Europe/Berlin oder None."""
+    if not s:
+        return None
+    try:
+        dt = datetime.fromisoformat(str(s))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=TZ)
+    return dt.astimezone(TZ)
+
+
+def first_int(v):
+    """Erste Zahl aus String oder Liste ('02' -> 2, ['17'] -> 17), sonst None."""
+    if isinstance(v, (list, tuple)):
+        v = v[0] if v else None
+    m = re.search(r"\d+", str(v or ""))
+    return int(m.group(0)) if m else None
+
+
+def belts_text(belts):
+    if isinstance(belts, str):
+        belts = [belts]
+    out = []
+    for b in belts or []:
+        b = str(b).strip()
+        out.append(str(int(b)) if b.isdigit() else b)
+    return "/".join(out)
+
+
+def terminal_letter(fl, airline):
+    gates = fl.get("gate") or []
+    if isinstance(gates, str):
+        gates = [gates]
+    if gates:
+        m = re.match(r"[A-Za-z]", str(gates[0]).strip())
+        if m:
+            return m.group(0).upper()
+    return str(airline.get("terminalGateArrival") or "").strip().upper()
+
+
+def classify(fl, airline_name, airline_iata):
+    """Gibt (Typ, Quelle) zurück."""
+    ex = first_int(fl.get("arrivalExit"))
+    if ex is not None:
+        return ("Linie" if ex <= 2 else "Charter"), "Ausgang"
+
+    belt = first_int(fl.get("belt"))
+    if belt is not None:
+        return ("Linie" if belt <= 6 else "Charter"), "Gepäckband"
+
+    if (fl.get("flightType") or {}).get("code") == 21:
+        return "Charter", "Flugtyp"
 
     if str(airline_iata or "").upper() in CHARTER_CODES:
         return "Charter", "Airline"
@@ -224,220 +162,154 @@ def get_flight_type(flight, airline_name, airline_iata):
     return "Linie", "Airline"
 
 
-def get_exit_gate(flight_type):
+def exit_text(fl, flight_type):
+    ex = first_int(fl.get("arrivalExit"))
+    if ex is not None:
+        return f"Ausgang {ex} ({flight_type})"
     return "Ausgang 4 (Charter)" if flight_type == "Charter" else "Ausgang 1 (Linie)"
 
 
-def _parse_str(s):
-    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S"):
-        try:
-            return datetime.strptime(str(s), fmt)
-        except ValueError:
-            continue
-    return None
+def map_status(fl):
+    """Gibt (Status im alten AirLabs-Format, Originaltext) zurück."""
+    st = fl.get("status") or {}
+    text = str((st.get("publicStatus") or {}).get("name") or st.get("description") or "").strip()
+    low = text.lower()
+    if "gelandet" in low and "nicht" not in low:
+        return "landed", text
+    if "anflug" in low:
+        return "active", text
+    if any(k in low for k in ("gestrichen", "annull", "cancel")):
+        return "cancelled", text
+    if "umgeleitet" in low or "divert" in low:
+        return "diverted", text
+    if not text and fl.get("actualTime"):
+        return "landed", text
+    return "scheduled", text
 
 
-def get_dt(flight, ts_key, utc_key, local_key):
-    """Liefert eine zeitzonenbewusste Zeit in Europe/Berlin oder None.
-    Reihenfolge: Unix-Timestamp -> UTC-String -> lokaler String."""
-    ts = flight.get(ts_key)
-    if ts:
-        try:
-            return datetime.fromtimestamp(int(ts), UTC).astimezone(TZ)
-        except (ValueError, TypeError, OSError):
-            pass
-    s = flight.get(utc_key)
-    if s:
-        dt = _parse_str(s)
-        if dt:
-            return dt.replace(tzinfo=UTC).astimezone(TZ)
-    s = flight.get(local_key)
-    if s:
-        dt = _parse_str(s)
-        if dt:
-            return dt.replace(tzinfo=TZ)
-    return None
-
-
-def get_airport_info(flight):
-    """Gibt (Stadtname, Land) zurück."""
-    iata = str(flight.get("dep_iata") or "").upper()
-    if iata in AIRPORTS:
-        return AIRPORTS[iata]
-
-    city = flight.get("dep_city")
-    name = flight.get("dep_name")
-    if city and len(str(city).strip()) > 1:
-        city_name = str(city).strip()
-    elif name and len(str(name).strip()) > 1:
-        city_name = str(name).replace(" International", "").replace(" Airport", "").strip()
-    else:
-        city_name = iata or "Unbekannt"
-
-    code = str(flight.get("dep_country") or flight.get("dep_country_code") or "").upper()
-    country = COUNTRY_NAMES.get(code, "")
-    return city_name, country
-
-
-def write_json_atomic(path, data):
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, path)
-
-
-def load_json(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def valid_response(data):
-    return isinstance(data, dict) and "error" not in data and isinstance(data.get("response"), list)
+def airport_info(fl):
+    """Gibt (Stadt/Flughafenname, Land) zurück."""
+    dest = fl.get("destination") or {}
+    iata = str(dest.get("iataCode") or "").upper()
+    city_obj = dest.get("city") or {}
+    name = (AIRPORT_NAME_OVERRIDES.get(iata)
+            or str(dest.get("name") or "").strip()
+            or str(city_obj.get("name") or "").strip()
+            or iata or "Unbekannt")
+    country = str((city_obj.get("country") or {}).get("name") or "").strip()
+    return name, COUNTRY_RENAMES.get(country, country)
 
 
 # ---------------------------------------------------------------- Datenabruf
-def fetch_all_pages():
-    """Lädt mehrere Seiten, bis eine Seite nicht mehr voll ist."""
-    all_flights = []
-    first_of_prev_page = None
+def get_json(url, retries=3):
+    last = None
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if not isinstance(data, dict) or not isinstance(data.get("data"), dict):
+                raise RuntimeError(f"Unerwartete Antwort: {str(data)[:200]}")
+            return data["data"]
+        except urllib.error.HTTPError as e:
+            if e.code in (403, 429):  # blockiert/gedrosselt: nicht weiter hämmern
+                raise
+            last = e
+        except Exception as e:
+            last = e
+        if attempt < retries - 1:
+            time.sleep(5 * (attempt + 1))
+    raise last
+
+
+def fetch_flights(now):
+    start = (now - timedelta(hours=FETCH_BACK_HOURS)).replace(microsecond=0)
+    end = (now + timedelta(hours=FETCH_AHEAD_HOURS)).replace(microsecond=0)
+    flights, offset = [], 0
     for page in range(MAX_PAGES):
         params = {
-            "api_key": API_KEY,
-            "arr_iata": AIRPORT,
-            "limit": PAGE_SIZE,
-            "offset": page * PAGE_SIZE,
+            "lang": "de",
+            "arrival": "true",
+            "offset": offset,
+            "codeshare": "true",
+            "count": PAGE_SIZE,
+            "flightStartTime": start.isoformat(),
+            "flightEndTime": end.isoformat(),
+            "showDetails": "false",
         }
-        url = "https://airlabs.co/api/v9/schedules?" + urllib.parse.urlencode(params)
-        req = urllib.request.Request(url, headers={"User-Agent": "DUS-Flight-Scraper/1.0"})
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-            if not valid_response(data):
-                raise RuntimeError(f"API-Fehlerantwort: {str(data)[:200]}")
+            data = get_json(API_URL + "?" + urllib.parse.urlencode(params))
         except Exception as e:
             if page == 0:
                 raise
             print(f"Seite {page + 1} fehlgeschlagen ({e}), verwende bisherige Daten.")
             break
-
-        batch = data["response"]
-        if not batch:
+        batch = data.get("flights") or []
+        flights.extend(batch)
+        if not data.get("more") or not batch:
             break
-        # Schutz: API ignoriert offset und liefert immer dieselbe Seite
-        marker = (batch[0].get("flight_iata"), batch[0].get("arr_time"))
-        if page > 0 and marker == first_of_prev_page:
-            print("API ignoriert offset, Paginierung abgebrochen.")
-            break
-        first_of_prev_page = marker if page == 0 else first_of_prev_page
-
-        all_flights.extend(batch)
-        if len(batch) < PAGE_SIZE:
-            break
-    return {"response": all_flights}
-
-
-def fetch_flights():
-    """Gibt (raw_data, quelle) zurück; quelle: 'Live' | 'Cache' | 'Cache (veraltet)' | None."""
-    if os.path.exists(RAW_CACHE_FILE) and time.time() - os.path.getmtime(RAW_CACHE_FILE) < CACHE_DURATION:
-        try:
-            data = load_json(RAW_CACHE_FILE)
-            if valid_response(data):
-                return data, "Cache"
-        except Exception:
-            pass
-
-    if not API_KEY:
-        print("Fehler: Umgebungsvariable AIRLABS_API_KEY ist nicht gesetzt.")
-    else:
-        try:
-            data = fetch_all_pages()
-            if data["response"]:
-                write_json_atomic(RAW_CACHE_FILE, data)
-                return data, "Live"
-            print("API lieferte keine Flüge.")
-        except Exception as e:
-            print(f"Fehler beim API-Abruf: {e}")
-
-    # Fallback: alte Rohdaten, falls vorhanden
-    if os.path.exists(RAW_CACHE_FILE):
-        try:
-            data = load_json(RAW_CACHE_FILE)
-            if valid_response(data):
-                return data, "Cache (veraltet)"
-        except Exception:
-            pass
-    return None, None
+        offset += len(batch)
+        time.sleep(random.uniform(1.0, 2.5))
+    return flights
 
 
 # ---------------------------------------------------------------- Hauptlogik
-def main():
-    now = datetime.now(TZ)
-
-    if "--force" not in sys.argv and not in_run_window(now):
-        print(f"{now:%H:%M} liegt außerhalb 05:30–23:30, kein Abruf.")
-        return
-
-    raw_data, source = fetch_flights()
-    if raw_data is None:
-        print("Keine Daten verfügbar, cache.json bleibt unverändert.")
-        sys.exit(1)
-
+def build_flights(raw, now):
     time_min = now - timedelta(minutes=MINUTES_PAST)
     time_max = now + timedelta(hours=HOURS_FUTURE)
 
-    flights = []
-    for fl in raw_data["response"]:
-        flight_no = fl.get("flight_iata") or fl.get("flight_number") or ""
+    flights, unknown_status = [], set()
+    for fl in raw:
+        flight_no = re.sub(r"\s+", "", str(fl.get("flightNumber") or ""))
         if not flight_no:
             continue
 
         # Codeshare-Partner überspringen (Betreiberflug bleibt erhalten)
-        if fl.get("cs_flight_iata"):
+        if fl.get("codeshare"):
             continue
 
-        airline_name = fl.get("airline_name") or fl.get("airline_iata") or "Unbekannt"
-        airline_iata = fl.get("airline_iata") or ""
+        airline = fl.get("airline") or {}
+        airline_name = airline.get("name") or airline.get("iataCode") or "Unbekannt"
+        airline_iata = airline.get("iataCode") or ""
         if any(k in airline_name.lower() for k in SKIP_AIRLINE_KEYWORDS):
             continue
 
-        sched = get_dt(fl, "arr_time_ts", "arr_time_utc", "arr_time")
+        sched = parse_dt(fl.get("scheduledTime"))
         if not sched:
             continue
+        # tatsächliche Zeit, sonst erwartete, sonst Plan
+        real = parse_dt(fl.get("actualTime")) or parse_dt(fl.get("estimatedTime")) or sched
 
-        try:
-            delay = int(fl.get("arr_delayed") or 0)
-        except (ValueError, TypeError):
-            delay = 0
-
-        est = get_dt(fl, "arr_estimated_ts", "arr_estimated_utc", "arr_estimated")
-        if not est:
-            est = sched + timedelta(minutes=delay)
-
-        # Fenster nach erwarteter Ankunft, nicht nach Plan-Zeit
-        if not (time_min <= est <= time_max):
+        # Fenster nach erwarteter/tatsächlicher Ankunft, nicht nach Plan-Zeit
+        if not (time_min <= real <= time_max):
             continue
 
-        city, country = get_airport_info(fl)
-        ftype, type_source = get_flight_type(fl, airline_name, airline_iata)
+        delay = max(0, int(round((real - sched).total_seconds() / 60)))
+        status, status_text = map_status(fl)
+        if status == "scheduled" and status_text:
+            unknown_status.add(status_text)
+
+        city, country = airport_info(fl)
+        ftype, type_source = classify(fl, airline_name, airline_iata)
         flights.append({
             "dt": sched.timestamp(),
             "time_scheduled": sched.strftime("%H:%M"),
-            "time_estimated": est.strftime("%H:%M"),
+            "time_estimated": real.strftime("%H:%M"),
             "flight_no": flight_no,
             "airline": airline_name,
             "city": city,
             "country": country,
             "type": ftype,
             "type_source": type_source,
-            "terminal": fl.get("arr_terminal") or "",
-            "baggage": fl.get("arr_baggage") or "",
-            "gate": get_exit_gate(ftype),
-            "status": fl.get("status") or "scheduled",
+            "terminal": terminal_letter(fl, airline),
+            "baggage": belts_text(fl.get("belt")),
+            "gate": exit_text(fl, ftype),
+            "status": status,
+            "status_text": status_text,
             "delay": delay,
         })
 
     flights.sort(key=lambda x: x["dt"])
-    print(f"Rohdaten: {len(raw_data['response'])} Einträge, im Fenster: {len(flights)}")
 
     # Restliche Duplikate: gleiche Flugnummer + gleiche Zeit
     unique, seen = [], set()
@@ -447,13 +319,41 @@ def main():
             continue
         seen.add(key)
         unique.append(f)
+    return unique, unknown_status
+
+
+def main():
+    now = datetime.now(TZ)
+
+    if "--force" not in sys.argv and not in_run_window(now):
+        print(f"{now:%H:%M} liegt außerhalb 05:30–23:30, kein Abruf.")
+        return
+
+    try:
+        raw = fetch_flights(now)
+    except Exception as e:
+        print(f"Fehler beim Abruf: {e}")
+        print("cache.json bleibt unverändert.")
+        sys.exit(1)
+    if not raw:
+        print("API lieferte keine Flüge, cache.json bleibt unverändert.")
+        sys.exit(1)
+
+    unique, unknown_status = build_flights(raw, now)
+
+    by_source = {}
+    for f in unique:
+        by_source[f["type_source"]] = by_source.get(f["type_source"], 0) + 1
+    print(f"Rohdaten: {len(raw)} Einträge, im Fenster: {len(unique)} {by_source}")
+    if unknown_status:
+        print("Unbekannte Statustexte (als 'scheduled' behandelt):", sorted(unknown_status))
 
     write_json_atomic(CACHE_FILE, {
         "updated_at": now.strftime("%d.%m.%Y %H:%M"),
-        "source": source,
+        "source": "Live",
         "flights": unique,
     })
-    print(f"cache.json aktualisiert ({source}): {len(unique)} Flüge.")
+    print(f"cache.json aktualisiert: {len(unique)} Flüge.")
 
 
 if __name__ == "__main__":
