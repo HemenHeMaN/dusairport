@@ -26,11 +26,13 @@
     --card-linie-border: #0d47a1;
     --badge-linie-bg: #cfe5ff;
     --badge-linie-color: #08306b;
+    --progress-linie: #0d47a1;
 
     --card-charter-bg: #fff3e6;
     --card-charter-border: #e65100;
     --badge-charter-bg: #ffdcb8;
     --badge-charter-color: #8a3000;
+    --progress-charter: #e65100;
 
     --filter-bg: #dcdce8;
     --filter-active-all: #003366;
@@ -44,7 +46,6 @@
     --reset-btn-bg: #e4e4ed;
 
     --success-green: #22c55e;
-    --progress-blue: #3b82f6;
 }
 
 [data-theme="dark"] {
@@ -59,11 +60,13 @@
     --card-linie-border: #42a5f5;
     --badge-linie-bg: #0d3b66;
     --badge-linie-color: #90caf9;
+    --progress-linie: #42a5f5;
 
     --card-charter-bg: #3b2316;
     --card-charter-border: #ffb74d;
     --badge-charter-bg: #5c2d0c;
     --badge-charter-color: #ffe0b2;
+    --progress-charter: #ffb74d;
 
     --filter-bg: #2a2a2a;
     --filter-active-all: #1565c0;
@@ -219,16 +222,16 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .detail-grid > div { overflow-wrap: anywhere; }
 .no-flights { text-align: center; padding: 20px; color: var(--text-color); background: var(--card-bg); border-radius: 8px; }
 
-/* Progress-Bar Design (im selben Theme-Look) */
-.d2-header {
-    display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; padding: 0 4px;
-}
-.d2-system-time { font-size: 0.95rem; font-weight: 600; color: var(--heading-color); font-variant-numeric: tabular-nums; }
+/* Progress-Bar Design */
 .d2-flight-card {
     position: relative; background-color: var(--card-bg); border: 1px solid var(--border-color);
     border-radius: 8px; padding: 14px 18px 18px 18px; margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.15); overflow: hidden;
+    border-left: 6px solid #ccc;
 }
+.d2-flight-card.card-linie { background-color: var(--card-linie-bg); border-left-color: var(--card-linie-border); }
+.d2-flight-card.card-charter { background-color: var(--card-charter-bg); border-left-color: var(--card-charter-border); }
+
 .d2-card-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .d2-flight-info h3 { margin: 0 0 2px 0; font-size: 1.15rem; font-weight: 700; color: var(--text-color); }
 .d2-flight-info p { margin: 0; color: var(--update-color); font-size: 0.9rem; }
@@ -250,8 +253,10 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 [data-theme="dark"] .d2-progress-container { background-color: rgba(255, 255, 255, 0.08); }
 .d2-progress-bar {
     position: absolute; top: 0; left: 0; bottom: 0; width: 0%;
-    background-color: var(--progress-blue); border-radius: 3px; transition: width 0.5s linear;
+    border-radius: 3px; transition: width 0.5s linear;
 }
+.d2-flight-card.card-linie .d2-progress-bar { background-color: var(--progress-linie); }
+.d2-flight-card.card-charter .d2-progress-bar { background-color: var(--progress-charter); }
 .d2-flight-card.landed .d2-progress-bar { background-color: var(--success-green); }
 
 /* --- Taxi Dachzeichen Switch CSS --- */
@@ -390,10 +395,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <!-- ANSICHT 2: Progress-Bar Karten mit Filter-Unterstützung -->
 <div id="view2" class="view-section">
-    <div class="d2-header">
-        <span style="font-weight: 700; color: var(--heading-color);">AKTUELLER ANFLUG-STATUS</span>
-        <div class="d2-system-time">SYSTEMZEIT: <span id="live-clock">--:--:--</span></div>
-    </div>
     <div id="d2CardsContainer">
         <div class="no-flights">Flüge werden geladen...</div>
     </div>
@@ -562,7 +563,15 @@ function getFilteredList() {
                    gate.includes(currentSearch);
         });
     }
-    return list;
+
+    // Identische Sortierung wie in der Detail-Ansicht
+    const statusRank = f => {
+        const s = String(f.status).toLowerCase();
+        if (s === 'landed') return 0;
+        if (s === 'active' || s === 'en-route') return 1;
+        return 2;
+    };
+    return [...list].sort((a, b) => (statusRank(a) - statusRank(b)) || (a.dt - b.dt));
 }
 
 function applyFilter() {
@@ -593,15 +602,7 @@ function renderFlights(flights) {
         "diverted": "Umgeleitet"
     };
 
-    const statusRank = f => {
-        const s = String(f.status).toLowerCase();
-        if (s === 'landed') return 0;
-        if (s === 'active' || s === 'en-route') return 1;
-        return 2;
-    };
-    const sorted = [...flights].sort((a, b) => (statusRank(a) - statusRank(b)) || (a.dt - b.dt));
-
-    sorted.forEach(f => {
+    flights.forEach(f => {
         const isCharter = f.type === "Charter";
         const cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
         const badgeClass = isCharter ? "badge-charter" : "badge-linie";
@@ -696,13 +697,20 @@ function renderDesign2Cards(flights) {
     }
 
     flights.forEach((flight, index) => {
+        const isCharter = flight.type === "Charter";
+        const cardClass = isCharter ? "d2-flight-card card-charter" : "d2-flight-card card-linie";
+
         const card = document.createElement('div');
-        card.className = 'd2-flight-card';
+        card.className = cardClass;
         card.id = `d2-flight-${index}`;
 
-        const arrivalTime = flight.time_estimated || flight.time_scheduled;
-        const arrivalMin = timeToMinutes(arrivalTime);
-        const startMin = arrivalMin - 30; // 30 Min vor Ankunft als Start für den Balken
+        // Startzeit = planmäßige Abflugzeit (time_scheduled)
+        // Ankunftszeit = geschätzte Zeit oder planmäßige Zeit
+        const startTimeStr = flight.time_scheduled;
+        const arrivalTimeStr = flight.time_estimated || flight.time_scheduled;
+
+        const startMin = timeToMinutes(startTimeStr);
+        const arrivalMin = timeToMinutes(arrivalTimeStr);
 
         card.dataset.startMin = startMin;
         card.dataset.arrivalMin = arrivalMin;
@@ -718,7 +726,7 @@ function renderDesign2Cards(flights) {
                 </div>
                 <div class="d2-flight-right">
                     <div class="d2-status-text" id="d2-status-${index}">Im Anflug</div>
-                    <div class="d2-time-label">${arrivalTime}</div>
+                    <div class="d2-time-label">${arrivalTimeStr}</div>
                 </div>
             </div>
             <div class="d2-card-footer-bar">
@@ -738,20 +746,7 @@ function renderDesign2Cards(flights) {
 
 function updateProgress() {
     const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-
-    const currentTotalSeconds = hours * 3600 + minutes * 60 + seconds;
-    const currentTotalMinutesDecimal = currentTotalSeconds / 60;
-
-    const clockEl = document.getElementById('live-clock');
-    if (clockEl) {
-        clockEl.textContent = 
-            String(hours).padStart(2, '0') + ':' + 
-            String(minutes).padStart(2, '0') + ':' + 
-            String(seconds).padStart(2, '0');
-    }
+    const currentTotalMinutesDecimal = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
 
     const container = document.getElementById('d2CardsContainer');
     if (!container) return;
@@ -769,10 +764,12 @@ function updateProgress() {
         const flightStatus = String(cardEl.dataset.status).toLowerCase();
         
         const totalDuration = arrivalMin - startMin;
-        if (totalDuration <= 0) return;
-
-        const elapsed = currentTotalMinutesDecimal - startMin;
-        let percentage = (elapsed / totalDuration) * 100;
+        
+        let percentage = 0;
+        if (totalDuration > 0) {
+            const elapsed = currentTotalMinutesDecimal - startMin;
+            percentage = (elapsed / totalDuration) * 100;
+        }
 
         if (flightStatus === 'landed') {
             percentage = 100;
@@ -791,7 +788,7 @@ function updateProgress() {
             cardEl.classList.remove('landed');
         }
 
-        barEl.style.width = percentage + '%';
+        barEl.style.width = Math.min(Math.max(percentage, 0), 100) + '%';
         if (percentEl) {
             percentEl.textContent = Math.round(percentage) + '%';
         }
