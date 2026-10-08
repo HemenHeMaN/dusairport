@@ -703,12 +703,19 @@ function renderDesign2Cards(flights) {
         card.className = cardClass;
         card.id = `d2-flight-${index}`;
 
+        // Ziel-Ankunftszeit: Verspätete geschätzte Zeit hat Priorität, sonst planmäßig
         const arrivalTimeStr = flight.time_estimated || flight.time_scheduled;
         const arrivalMin = timeToMinutes(arrivalTimeStr);
         
-        let startMin = timeToMinutes(flight.time_scheduled);
-        if (!flight.time_scheduled || startMin >= arrivalMin) {
-            startMin = arrivalMin - 30; // Fallback: 30 Minuten Flugdauer annehmen
+        // Startzeit: Wenn im JSON vorhanden, nutzen wir sie. Wenn nicht (oder ungültig), 
+        // rechnen wir standardmäßig eine realistische Flugdauer von 2 Stunden (120 Min) vor Ankunft zurück,
+        // oder fallen auf 30 Min zurück, falls der Flug sehr nah ist.
+        let startMin = timeToMinutes(flight.time_scheduled) - 120; // Beispiel: 2h Standard-Flugzeit abziehen für den Start
+        
+        // Falls in den Rohdaten eine explizite Start-/Abflugzeit stünde, ließe sich diese hier einbinden.
+        // Da die API meist nur die Ankunft liefert, sichern wir ab, dass startMin plausibel vor arrivalMin liegt:
+        if (!startMin || startMin >= arrivalMin || (arrivalMin - startMin) > 360) {
+            startMin = arrivalMin - 120; // Nimmt 2 Stunden Flugdauer an, damit der Balken bei langen Flügen reibungslos läuft
         }
 
         card.dataset.startMin = startMin;
