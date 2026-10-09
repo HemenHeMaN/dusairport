@@ -894,7 +894,7 @@ function renderBoard(flights) {
 
         // Dynamische Flaggen-URL über FlagCDN
         const cc = getFlagCode(f.country);
-        const flagUrl = `https://flagcdn.com/w320/${cc}.svg`;
+        const flagUrl = `https://flagcdn.com/${cc}.svg`;
 
         const row = document.createElement('div');
         row.className = 'tf-row ' + st.cls + (isCancelled ? ' cancelled' : '');
