@@ -1,5 +1,5 @@
 {
-  "updated_at": "09.10.2026 11:48",
+  "updated_at": "09.10.2026 11:49",
   "source": "Dus.com",
   "flights": [
     {
@@ -525,8 +525,8 @@
       "terminal": "C",
       "baggage": "18",
       "gate": "Ausgang 6 (Charter)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "Im Anflug",
       "delay": 0
     },
     {
@@ -583,7 +583,7 @@
     {
       "dt": 1791542400.0,
       "time_scheduled": "12:40",
-      "time_estimated": "12:54",
+      "time_estimated": "12:50",
       "flight_no": "LH2014",
       "airline": "Lufthansa",
       "city": "München",
@@ -594,8 +594,8 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 15
+      "status_text": "Vorhafen verlassen",
+      "delay": 11
     },
     {
       "dt": 1791542700.0,
