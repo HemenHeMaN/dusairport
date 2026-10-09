@@ -1,5 +1,5 @@
 {
-  "updated_at": "09.10.2026 06:19",
+  "updated_at": "09.10.2026 06:37",
   "source": "Dus.com",
   "flights": [
     {
@@ -49,8 +49,8 @@
       "terminal": "C",
       "baggage": "17",
       "gate": "Ausgang 6 (Charter)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "im Anflug",
       "delay": 6
     },
     {
@@ -64,8 +64,8 @@
       "type": "Charter",
       "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "19",
-      "gate": "Ausgang 6 (Charter)",
+      "baggage": "14",
+      "gate": "Ausgang 5 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
       "delay": 18
@@ -141,7 +141,7 @@
     {
       "dt": 1791527100.0,
       "time_scheduled": "08:25",
-      "time_estimated": "08:33",
+      "time_estimated": "08:32",
       "flight_no": "H7403",
       "airline": "Hi Sky",
       "city": "Chisinau",
@@ -149,11 +149,11 @@
       "type": "Charter",
       "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "9",
-      "gate": "Ausgang 4 (Charter)",
+      "baggage": "17",
+      "gate": "Ausgang 6 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 8
+      "delay": 7
     },
     {
       "dt": 1791527400.0,
@@ -166,7 +166,7 @@
       "type": "Charter",
       "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "17",
+      "baggage": "19",
       "gate": "Ausgang 6 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
@@ -243,7 +243,7 @@
     {
       "dt": 1791528300.0,
       "time_scheduled": "08:45",
-      "time_estimated": "08:47",
+      "time_estimated": "08:45",
       "flight_no": "JU360",
       "airline": "Air Serbia",
       "city": "Belgrad",
@@ -251,11 +251,11 @@
       "type": "Charter",
       "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "19",
-      "gate": "Ausgang 6 (Charter)",
+      "baggage": "9",
+      "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 2
+      "delay": 1
     },
     {
       "dt": 1791528600.0,
@@ -328,7 +328,7 @@
     {
       "dt": 1791528900.0,
       "time_scheduled": "08:55",
-      "time_estimated": "08:35",
+      "time_estimated": "08:34",
       "flight_no": "BJ214",
       "airline": "Nouvelair",
       "city": "Monastir",
@@ -345,7 +345,7 @@
     {
       "dt": 1791528900.0,
       "time_scheduled": "08:55",
-      "time_estimated": "08:47",
+      "time_estimated": "08:55",
       "flight_no": "BJ206",
       "airline": "Nouvelair",
       "city": "Tunis",
@@ -356,7 +356,7 @@
       "baggage": "10",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
@@ -396,7 +396,7 @@
     {
       "dt": 1791529500.0,
       "time_scheduled": "09:05",
-      "time_estimated": "09:04",
+      "time_estimated": "09:02",
       "flight_no": "VY1896",
       "airline": "Vueling",
       "city": "Barcelona",
@@ -430,7 +430,7 @@
     {
       "dt": 1791530100.0,
       "time_scheduled": "09:15",
-      "time_estimated": "09:04",
+      "time_estimated": "09:02",
       "flight_no": "XQ284",
       "airline": "Sun Express",
       "city": "Antalya",
@@ -498,7 +498,7 @@
     {
       "dt": 1791531300.0,
       "time_scheduled": "09:35",
-      "time_estimated": "09:35",
+      "time_estimated": "09:36",
       "flight_no": "LO403",
       "airline": "LOT Polish Airlines",
       "city": "Warschau",
@@ -510,7 +510,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 1
     },
     {
       "dt": 1791531600.0,
@@ -532,7 +532,7 @@
     {
       "dt": 1791531900.0,
       "time_scheduled": "09:45",
-      "time_estimated": "09:45",
+      "time_estimated": "09:31",
       "flight_no": "EI692",
       "airline": "Aer Lingus",
       "city": "Dublin",
@@ -945,6 +945,57 @@
       "airline": "Eurowings",
       "city": "Budapest",
       "country": "Ungarn",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791537900.0,
+      "time_scheduled": "11:25",
+      "time_estimated": "11:25",
+      "flight_no": "DE1515",
+      "airline": "Condor",
+      "city": "Palma de Mallorca",
+      "country": "Spanien",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791538200.0,
+      "time_scheduled": "11:30",
+      "time_estimated": "11:30",
+      "flight_no": "DE1775",
+      "airline": "Condor",
+      "city": "Palma de Mallorca",
+      "country": "Spanien",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791538500.0,
+      "time_scheduled": "11:35",
+      "time_estimated": "11:35",
+      "flight_no": "EW9505",
+      "airline": "Eurowings",
+      "city": "Menorca",
+      "country": "Spanien",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "A",
