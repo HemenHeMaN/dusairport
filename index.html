@@ -542,10 +542,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 <!-- ANSICHT 3: Flughafentafel -->
 <div id="view3" class="view-section">
     <div class="tf-board">
-        <div class="tf-header">
-            <h2 class="tf-title"><small>Düsseldorf · DUS</small>Ankunft</h2>
-        </div>
-        <div class="tf-head tf-row" aria-hidden="true" style="margin-top:8px">
+        <div class="tf-head tf-row" aria-hidden="true">
             <div>Flug</div><div>Von</div><div>Erwartet</div><div>Ausgang</div><div>Art</div><div>Status</div>
         </div>
         <div class="tf-body" id="tfBody">
@@ -995,6 +992,10 @@ function renderBoard(flights) {
             ? 'Gerade keine Flüge im Anflug.' : 'Keine Flüge gefunden.') + '</div>';
         return;
     }
+
+    // Tafel: alle Flüge nach erwarteter Zeit sortieren
+    flights = [...flights].sort((a, b) =>
+        timeToMinutes(a.time_estimated || a.time_scheduled) - timeToMinutes(b.time_estimated || b.time_scheduled));
 
     flights.forEach(f => {
         const st = tfStatus(f);
