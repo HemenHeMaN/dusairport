@@ -41,6 +41,7 @@
     --filter-active-linie: #0d47a1;
     --filter-active-charter: #e65100;
     --filter-active-landing: #2e7d32;
+    --filter-active-landed: #546e7a;
 
     --slider-bg: #fff;
     --size-btn-bg: #003366;
@@ -93,6 +94,7 @@
     --filter-active-linie: #1976d2;
     --filter-active-charter: #f57c00;
     --filter-active-landing: #388e3c;
+    --filter-active-landed: #78909c;
 
     --slider-bg: #1e1e1e;
     --size-btn-bg: #1565c0;
@@ -134,24 +136,37 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     background: var(--size-btn-bg); color: #fff; border: none; border-radius: 8px;
     padding: 8px 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; white-space: nowrap;
     transition: background 0.3s ease;
+    display: inline-flex; align-items: center; justify-content: center;
 }
 .size-btn:active { background: var(--size-btn-hover); }
+.menu-btn { padding: 8px 10px; }
+.menu-btn svg { display: block; width: 22px; height: 22px; }
 
-/* Schieberegler */
-.slider-box {
-    display: none; align-items: center; gap: 10px;
-    background: var(--slider-bg); padding: 10px 12px; border-radius: 8px;
+/* Verstecktes Menü (3 Striche) */
+.menu-box {
+    display: none; flex-direction: column; gap: 14px;
+    background: var(--slider-bg); padding: 12px; border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.12); margin-bottom: 12px;
+    border: 1px solid var(--border-color);
 }
-.slider-box.active { display: flex; }
-.slider-box .small-a { font-size: 0.8rem; font-weight: bold; }
-.slider-box .big-a { font-size: 1.3rem; font-weight: bold; }
-.slider-box input[type="range"] { flex: 1; min-width: 0; height: 28px; cursor: pointer; }
-.slider-box .size-value { min-width: 3.2em; text-align: right; font-weight: bold; color: var(--heading-color); }
+.menu-box.active { display: flex; }
+.menu-label { display: block; font-size: 0.8rem; font-weight: bold; color: var(--update-color); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+.size-row { display: flex; align-items: center; gap: 10px; }
+.size-row .small-a { font-size: 0.8rem; font-weight: bold; }
+.size-row .big-a { font-size: 1.3rem; font-weight: bold; }
+.size-row input[type="range"] { flex: 1; min-width: 0; height: 28px; cursor: pointer; }
+.size-row .size-value { min-width: 3.2em; text-align: right; font-weight: bold; color: var(--heading-color); }
 .reset-btn {
     background: var(--reset-btn-bg); color: var(--text-color); border: none; border-radius: 6px;
     padding: 6px 10px; font-size: 0.8rem; font-weight: bold; cursor: pointer;
 }
+.seg { display: flex; gap: 6px; }
+.seg-btn {
+    flex: 1; padding: 9px 6px; border: none; border-radius: 8px; cursor: pointer;
+    font-weight: bold; font-size: 0.9rem; font-family: var(--font);
+    background: var(--filter-bg); color: var(--text-color);
+}
+.seg-btn.active { background: var(--filter-active-all); color: #fff; }
 
 .update-info { font-size: 0.85rem; color: var(--update-color); margin-bottom: 12px; line-height: 1.5; }
 
@@ -188,15 +203,17 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .search-container.has-text .clear-search-btn { display: flex; }
 
 /* Filter */
-.filter-container { margin-bottom: 15px; display: flex; gap: 6px; }
+.filter-container { margin-bottom: 15px; display: flex; gap: 5px; }
 .filter-btn {
-    flex: 1; padding: 10px 6px; border: none; border-radius: 8px; cursor: pointer;
-    font-weight: bold; font-size: 0.95rem; text-align: center; background: var(--filter-bg); color: var(--text-color);
+    flex: 1; min-width: 0; padding: 10px 4px; border: none; border-radius: 8px; cursor: pointer;
+    font-weight: bold; font-size: 0.82rem; text-align: center; background: var(--filter-bg); color: var(--text-color);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .btn-all.active { background: var(--filter-active-all); color: #fff; }
 .btn-linie.active { background: var(--filter-active-linie); color: #fff; }
 .btn-charter.active { background: var(--filter-active-charter); color: #fff; }
 .btn-landing.active { background: var(--filter-active-landing); color: #fff; }
+.btn-landed.active { background: var(--filter-active-landed); color: #fff; }
 
 /* Flugkarten (Design 1) */
 .flight-card {
@@ -239,12 +256,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .no-flights { text-align: center; padding: 20px; color: var(--text-color); background: var(--card-bg); border-radius: 8px; }
 
 /* --- Ansicht 3: Flughafentafel --- */
-.tf-opt {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-    font-weight: 700; cursor: pointer; color: var(--text-color);
-}
-.tf-opt input { width: 20px; height: 20px; cursor: pointer; }
-
 .tf-board {
     background: linear-gradient(to bottom, var(--tf-top), var(--tf-bottom));
     border: 1px solid var(--tf-line); border-radius: 6px; padding: 14px 12px 12px;
@@ -273,10 +284,21 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     position: relative; overflow: hidden; background: var(--tf-row);
     border-left: 4px solid var(--tf-line);
 }
+.tf-body .tf-row > :not(.tf-bar) { position: relative; z-index: 1; }
 .tf-body .tf-row.s-anflug { border-left-color: var(--tf-ok); }
 .tf-body .tf-row.s-luft { border-left-color: var(--tf-warn); }
 .tf-body .tf-row.s-annulliert { border-left-color: var(--tf-bad); }
 .tf-body .tf-row.s-gelandet { border-left-color: var(--tf-dim); }
+
+/* Flaggen-Fortschrittsbalken (Option 1: Clip-Path ohne Quetschung) */
+.tf-bar {
+    position: absolute; z-index: 0; left: 0; top: 0; bottom: 0; width: 100%; pointer-events: none;
+    background-size: cover; background-position: left center; background-repeat: no-repeat;
+    opacity: 0.38; /* Dezent im Hintergrund */
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 1.4s cubic-bezier(.2, .7, .2, 1);
+}
+@media (prefers-reduced-motion: reduce) { .tf-bar { transition: none; } }
 
 .tf-flight { font-weight: 700; font-size: .8rem; letter-spacing: .04em; overflow-wrap: anywhere; }
 .tf-flight small { display: block; font-weight: 400; font-size: .62rem; color: var(--tf-dim); letter-spacing: .02em; }
@@ -286,7 +308,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 .tf-city small { font-family: var(--tf-data); font-size: .62rem; color: var(--tf-dim); letter-spacing: .08em; margin-left: 6px; }
 .tf-flag {
-    height: 1rem; width: auto; margin-left: 8px; vertical-align: middle;
+    height: .7em; width: auto; margin-left: 8px; vertical-align: baseline;
     border: 1px solid rgba(0,0,0,.25); border-radius: 2px;
 }
 .tf-time {
@@ -314,6 +336,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 @keyframes tf-pulse { 50% { opacity: .2; } }
 
 .tf-empty { padding: 24px 14px; color: var(--tf-dim); background: var(--tf-row); text-align: center; }
+.tf-footer { margin-top: 12px; color: var(--tf-dim); font-size: .62rem; line-height: 1.6; max-width: 62ch; }
 
 @media (max-width: 720px) {
     .tf-head { display: none; }
@@ -329,6 +352,21 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     .tf-kind { grid-area: kind; justify-self: start; }
     .tf-status { grid-area: status; justify-self: end; }
 }
+
+/* --- Nach-oben-Button (Overlay) --- */
+.to-top {
+    position: fixed; right: 16px; bottom: 16px; z-index: 100;
+    width: 48px; height: 48px; border: none; border-radius: 50%; cursor: pointer;
+    background: var(--size-btn-bg); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,.35);
+    opacity: 0; transform: translateY(12px); pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease, background .3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+.to-top:active { background: var(--size-btn-hover); }
+.to-top svg { width: 24px; height: 24px; display: block; }
 
 /* --- Taxi Dachzeichen Switch CSS --- */
 .tx-input { display: none; }
@@ -426,7 +464,30 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
             </span>
         </label>
 
-        <button class="size-btn" id="sizeToggle" type="button" aria-expanded="false">Aa</button>
+        <button class="size-btn menu-btn" id="menuToggle" type="button" aria-expanded="false" aria-controls="menuBox" aria-label="Menü">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+        </button>
+    </div>
+</div>
+
+<!-- Verstecktes Menü: Schriftgröße + Flagge/Name -->
+<div class="menu-box" id="menuBox">
+    <div>
+        <span class="menu-label">Schriftgröße</span>
+        <div class="size-row">
+            <span class="small-a">A</span>
+            <input type="range" id="sizeSlider" min="14" max="32" step="1" value="18" aria-label="Schriftgröße">
+            <span class="big-a">A</span>
+            <span class="size-value" id="sizeValue">18px</span>
+            <button class="reset-btn" id="sizeReset" type="button">Reset</button>
+        </div>
+    </div>
+    <div>
+        <span class="menu-label">Tafel: Herkunftsland</span>
+        <div class="seg">
+            <button type="button" class="seg-btn active" id="segFlag">Flagge</button>
+            <button type="button" class="seg-btn" id="segName">Name</button>
+        </div>
     </div>
 </div>
 
@@ -434,15 +495,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 <div class="view-switcher">
     <button class="view-btn active" id="btnView1" onclick="switchView('view1')">Detail</button>
     <button class="view-btn" id="btnView3" onclick="switchView('view3')">Tafel</button>
-</div>
-
-<!-- Schriftgrößen-Slider -->
-<div class="slider-box" id="sliderBox">
-    <span class="small-a">A</span>
-    <input type="range" id="sizeSlider" min="14" max="32" step="1" value="18" aria-label="Schriftgröße">
-    <span class="big-a">A</span>
-    <span class="size-value" id="sizeValue">18px</span>
-    <button class="reset-btn" id="sizeReset" type="button">Reset</button>
 </div>
 
 <!-- GEMEINSAME STEUERELEMENTE -->
@@ -456,6 +508,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     <button class="filter-btn btn-linie" onclick="filterFlights('Linie', event)">Linie</button>
     <button class="filter-btn btn-charter" onclick="filterFlights('Charter', event)">Charter</button>
     <button class="filter-btn btn-landing" onclick="filterFlights('landing', event)">Anflug</button>
+    <button class="filter-btn btn-landed" onclick="filterFlights('landed', event)" title="Die letzten 15 gelandeten Flüge">Gelandet</button>
 </div>
 
 <!-- ANSICHT 1: Klassische Detail-Karten -->
@@ -467,7 +520,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <!-- ANSICHT 3: Flughafentafel -->
 <div id="view3" class="view-section">
-    <label class="tf-opt"><input type="checkbox" id="flagToggle" checked> Flagge statt Land</label>
     <div class="tf-board">
         <div class="tf-head tf-row" aria-hidden="true">
             <div>Flug</div><div>Von</div><div>Erwartet</div><div>Ausgang</div><div>Art</div><div>Status</div>
@@ -475,8 +527,14 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
         <div class="tf-body" id="tfBody">
             <div class="tf-empty">Flüge werden geladen...</div>
         </div>
+        <div class="tf-footer">Der Balken zeigt die Nationalflagge des Abfluglandes als schrittweise wachsenden Fortschrittsbalken an.</div>
     </div>
 </div>
+
+<!-- Nach oben -->
+<button type="button" class="to-top" id="toTop" aria-label="Nach oben" title="Nach oben">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V6M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
 
 <script>
 const REFRESH_MINUTES = 5;
@@ -484,11 +542,14 @@ const DEFAULT_SIZE = 18;
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
 const VIEW_KEY = 'dus_active_view';
-const FLAG_KEY = 'dus_flag';
+const FLAG_KEY = 'dus_flag_mode';
+const TF_FENSTER = 90;
+const LANDED_COUNT = 15;
 
 let allFlights = [];
 let currentFilter = 'all';
 let currentSearch = '';
+let showFlag = true;
 
 /* ---------- Hilfsfunktion: Land zu ISO-Ländercode für FlagCDN ---------- */
 function getFlagCode(country) {
@@ -551,6 +612,7 @@ function switchView(viewId) {
     const btn = document.getElementById('btn' + target.id.charAt(0).toUpperCase() + target.id.slice(1));
     if (btn) btn.classList.add('active');
 
+    if (target.id === 'view3') updateBoardBars();
     try { localStorage.setItem(VIEW_KEY, target.id); } catch (e) {}
 }
 
@@ -595,9 +657,24 @@ themeCb.addEventListener('change', function (e) {
 
 loadTheme();
 
+/* ---------- Menü (3 Striche) ---------- */
+const menuToggle = document.getElementById('menuToggle');
+const menuBox = document.getElementById('menuBox');
+
+function setMenu(open) {
+    menuBox.classList.toggle('active', open);
+    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+menuToggle.addEventListener('click', () => setMenu(!menuBox.classList.contains('active')));
+
+document.addEventListener('click', e => {
+    if (!menuBox.classList.contains('active')) return;
+    if (menuBox.contains(e.target) || menuToggle.contains(e.target)) return;
+    setMenu(false);
+});
+
 /* ---------- Schriftgröße ---------- */
-const sizeToggle = document.getElementById('sizeToggle');
-const sliderBox = document.getElementById('sizeSlider').parentElement;
 const sizeSlider = document.getElementById('sizeSlider');
 const sizeValue = document.getElementById('sizeValue');
 const sizeReset = document.getElementById('sizeReset');
@@ -617,11 +694,6 @@ function loadFontSize() {
     applyFontSize(saved);
 }
 
-sizeToggle.addEventListener('click', () => {
-    const open = sliderBox.classList.toggle('active');
-    sizeToggle.setAttribute('aria-expanded', open);
-});
-
 sizeSlider.addEventListener('input', e => {
     const px = parseInt(e.target.value, 10);
     applyFontSize(px);
@@ -634,6 +706,22 @@ sizeReset.addEventListener('click', () => {
 });
 
 loadFontSize();
+
+/* ---------- Flagge / Name (Tafel) ---------- */
+const segFlag = document.getElementById('segFlag');
+const segName = document.getElementById('segName');
+
+function setFlagMode(flag, save) {
+    showFlag = flag;
+    segFlag.classList.toggle('active', flag);
+    segName.classList.toggle('active', !flag);
+    if (save) { try { localStorage.setItem(FLAG_KEY, flag ? 'flag' : 'name'); } catch (e) {} }
+}
+
+segFlag.addEventListener('click', () => { setFlagMode(true, true); applyFilter(); });
+segName.addEventListener('click', () => { setFlagMode(false, true); applyFilter(); });
+
+try { setFlagMode(localStorage.getItem(FLAG_KEY) !== 'name', false); } catch (e) { setFlagMode(true, false); }
 
 /* ---------- Such-Event-Listener & Clear Button ---------- */
 const searchInput = document.getElementById('searchInput');
@@ -658,13 +746,18 @@ clearSearchBtn.addEventListener('click', () => {
     searchInput.focus();
 });
 
-/* ---------- Checkbox: Flagge statt Land (Tafel) ---------- */
-const flagCb = document.getElementById('flagToggle');
-try { flagCb.checked = localStorage.getItem(FLAG_KEY) !== '0'; } catch (e) {}
-flagCb.addEventListener('change', () => {
-    try { localStorage.setItem(FLAG_KEY, flagCb.checked ? '1' : '0'); } catch (e) {}
-    applyFilter();
+/* ---------- Nach-oben-Button ---------- */
+const toTop = document.getElementById('toTop');
+
+function updateToTop() {
+    toTop.classList.toggle('show', (window.scrollY || document.documentElement.scrollTop) > 300);
+}
+
+window.addEventListener('scroll', updateToTop, { passive: true });
+toTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+updateToTop();
 
 /* ---------- Flugdaten Laden & Filtern ---------- */
 function loadData() {
@@ -687,6 +780,12 @@ function loadData() {
         });
 }
 
+function emptyText() {
+    if (currentFilter === 'landing') return 'Gerade keine Flüge im Anflug.';
+    if (currentFilter === 'landed') return 'Noch keine gelandeten Flüge.';
+    return 'Keine Flüge gefunden.';
+}
+
 function getFilteredList() {
     let list = allFlights;
 
@@ -695,6 +794,8 @@ function getFilteredList() {
             const s = String(f.status).toLowerCase();
             return s === 'active' || s === 'en-route';
         });
+    } else if (currentFilter === 'landed') {
+        list = list.filter(f => String(f.status).toLowerCase() === 'landed');
     } else if (currentFilter !== 'all') {
         list = list.filter(f => f.type === currentFilter);
     }
@@ -713,6 +814,17 @@ function getFilteredList() {
                    flightNo.includes(currentSearch) ||
                    gate.includes(currentSearch);
         });
+    }
+
+    // Gelandet: die letzten 15 Landungen ab jetzt, jüngste zuerst
+    if (currentFilter === 'landed') {
+        const now = berlinMin();
+        const ago = f => {
+            let d = (now - timeToMinutes(f.time_estimated || f.time_scheduled)) % 1440;
+            if (d < 0) d += 1440;
+            return d;
+        };
+        return [...list].sort((a, b) => ago(a) - ago(b)).slice(0, LANDED_COUNT);
     }
 
     const statusRank = f => {
@@ -743,9 +855,7 @@ function renderFlights(flights) {
     container.innerHTML = '';
 
     if (!flights || flights.length === 0) {
-        container.innerHTML = currentFilter === 'landing'
-            ? '<div class="no-flights">Gerade keine Flüge im Anflug.</div>'
-            : '<div class="no-flights">Keine Flüge gefunden.</div>';
+        container.innerHTML = '<div class="no-flights">' + emptyText() + '</div>';
         return;
     }
 
@@ -890,21 +1000,31 @@ function tfStatus(f) {
     return { cls: 's-luft', label: 'Geplant' };
 }
 
+function tfFortschritt(zeit, status) {
+    const s = String(status).toLowerCase();
+    if (s === 'landed' || s === 'cancelled' || s === 'diverted' || s === 'incident') return 1;
+    let diff = timeToMinutes(zeit) - berlinMin();
+    if (diff < -720) diff += 1440;
+    if (diff > 720) diff -= 1440;
+    if (diff <= 0) return 1;
+    return Math.max(0, Math.min(1, 1 - diff / TF_FENSTER));
+}
+
 function renderBoard(flights) {
     const body = document.getElementById('tfBody');
     if (!body) return;
     body.innerHTML = '';
 
     if (!flights || flights.length === 0) {
-        body.innerHTML = '<div class="tf-empty">' + (currentFilter === 'landing'
-            ? 'Gerade keine Flüge im Anflug.' : 'Keine Flüge gefunden.') + '</div>';
+        body.innerHTML = '<div class="tf-empty">' + emptyText() + '</div>';
         return;
     }
 
-    flights = [...flights].sort((a, b) =>
-        timeToMinutes(a.time_estimated || a.time_scheduled) - timeToMinutes(b.time_estimated || b.time_scheduled));
-
-    const showFlag = flagCb.checked;
+    // Bei "Gelandet" bleibt die Reihenfolge (jüngste Landung zuerst)
+    if (currentFilter !== 'landed') {
+        flights = [...flights].sort((a, b) =>
+            timeToMinutes(a.time_estimated || a.time_scheduled) - timeToMinutes(b.time_estimated || b.time_scheduled));
+    }
 
     flights.forEach(f => {
         const st = tfStatus(f);
@@ -914,7 +1034,7 @@ function renderBoard(flights) {
         const zeit = f.time_estimated || f.time_scheduled || '';
         const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
 
-        // Flaggen-URL über FlagCDN
+        // Flaggen-URL über FlagCDN (SVG ohne Größenordner)
         const cc = getFlagCode(f.country);
         const flagUrl = `https://flagcdn.com/${cc}.svg`;
 
@@ -928,6 +1048,7 @@ function renderBoard(flights) {
         const row = document.createElement('div');
         row.className = 'tf-row ' + st.cls + (isCancelled ? ' cancelled' : '');
         row.innerHTML = `
+            <div class="tf-bar" style="background-image: url('${flagUrl}');" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}"></div>
             <div class="tf-flight">${esc(f.flight_no)}<small>${esc(f.airline)}</small></div>
             <div class="tf-city">${esc(f.city)}${countryHtml}</div>
             <div class="tf-time">${esc(zeit)}</div>
@@ -937,12 +1058,22 @@ function renderBoard(flights) {
         `;
         body.appendChild(row);
     });
+    requestAnimationFrame(() => requestAnimationFrame(updateBoardBars));
+}
+
+function updateBoardBars() {
+    document.querySelectorAll('#tfBody .tf-bar').forEach(bar => {
+        const p = tfFortschritt(bar.dataset.zeit, bar.dataset.status);
+        const rightInset = ((1 - p) * 100).toFixed(1);
+        bar.style.clipPath = `inset(0 ${rightInset}% 0 0)`;
+    });
 }
 
 // Initialisierung
 loadSavedView();
 loadData();
 setInterval(loadData, REFRESH_MINUTES * 60 * 1000);
+setInterval(updateBoardBars, 20000);
 
 requestAnimationFrame(function () {
     requestAnimationFrame(function () { document.body.classList.remove('no-anim'); });
