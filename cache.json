@@ -1,5 +1,5 @@
 {
-  "updated_at": "09.10.2026 06:37",
+  "updated_at": "09.10.2026 06:53",
   "source": "Dus.com",
   "flights": [
     {
@@ -39,7 +39,7 @@
     {
       "dt": 1791521100.0,
       "time_scheduled": "06:45",
-      "time_estimated": "06:51",
+      "time_estimated": "06:48",
       "flight_no": "XQ1370",
       "airline": "Sun Express",
       "city": "Mersin-Çukurova",
@@ -49,9 +49,9 @@
       "terminal": "C",
       "baggage": "17",
       "gate": "Ausgang 6 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 6
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 4
     },
     {
       "dt": 1791523200.0,
@@ -73,7 +73,7 @@
     {
       "dt": 1791524400.0,
       "time_scheduled": "07:40",
-      "time_estimated": "07:39",
+      "time_estimated": "07:49",
       "flight_no": "KL1797",
       "airline": "KLM",
       "city": "Amsterdam",
@@ -85,7 +85,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 10
     },
     {
       "dt": 1791526200.0,
@@ -124,7 +124,7 @@
     {
       "dt": 1791526500.0,
       "time_scheduled": "08:15",
-      "time_estimated": "08:15",
+      "time_estimated": "08:27",
       "flight_no": "EJU3941",
       "airline": "Easy Jet Europe",
       "city": "Mailand-Malpensa",
@@ -136,7 +136,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 12
     },
     {
       "dt": 1791527100.0,
@@ -209,7 +209,7 @@
     {
       "dt": 1791528000.0,
       "time_scheduled": "08:40",
-      "time_estimated": "08:43",
+      "time_estimated": "08:39",
       "flight_no": "LH2004",
       "airline": "Lufthansa",
       "city": "München",
@@ -221,7 +221,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 3
+      "delay": 0
     },
     {
       "dt": 1791528000.0,
@@ -243,7 +243,7 @@
     {
       "dt": 1791528300.0,
       "time_scheduled": "08:45",
-      "time_estimated": "08:45",
+      "time_estimated": "08:41",
       "flight_no": "JU360",
       "airline": "Air Serbia",
       "city": "Belgrad",
@@ -254,13 +254,13 @@
       "baggage": "9",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 1
+      "status_text": "Vorhafen verlassen",
+      "delay": 0
     },
     {
       "dt": 1791528600.0,
       "time_scheduled": "08:50",
-      "time_estimated": "08:47",
+      "time_estimated": "08:54",
       "flight_no": "OS161",
       "airline": "Austrian Airlines",
       "city": "Wien",
@@ -272,7 +272,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 5
     },
     {
       "dt": 1791528900.0,
@@ -515,7 +515,7 @@
     {
       "dt": 1791531600.0,
       "time_scheduled": "09:40",
-      "time_estimated": "09:40",
+      "time_estimated": "09:43",
       "flight_no": "LH2006",
       "airline": "Lufthansa",
       "city": "München",
@@ -527,7 +527,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 3
     },
     {
       "dt": 1791531900.0,
@@ -999,6 +999,159 @@
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791538800.0,
+      "time_scheduled": "11:40",
+      "time_estimated": "11:40",
+      "flight_no": "EW9421",
+      "airline": "Eurowings",
+      "city": "Nizza",
+      "country": "Frankreich",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791538800.0,
+      "time_scheduled": "11:40",
+      "time_estimated": "11:40",
+      "flight_no": "A3540",
+      "airline": "Aegean Airlines",
+      "city": "Thessaloniki",
+      "country": "Griechenland",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791539100.0,
+      "time_scheduled": "11:45",
+      "time_estimated": "11:45",
+      "flight_no": "EW9043",
+      "airline": "Eurowings",
+      "city": "Berlin-Brandenburg",
+      "country": "Deutschland",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791539400.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:50",
+      "flight_no": "EW9501",
+      "airline": "Eurowings",
+      "city": "Ibiza",
+      "country": "Spanien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791539400.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:50",
+      "flight_no": "KL1799",
+      "airline": "KLM",
+      "city": "Amsterdam",
+      "country": "Niederlande",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791539400.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:50",
+      "flight_no": "EW9441",
+      "airline": "Eurowings",
+      "city": "Barcelona",
+      "country": "Spanien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791539400.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:50",
+      "flight_no": "VL2012",
+      "airline": "Lufthansa City Airlines",
+      "city": "München",
+      "country": "Deutschland",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791539400.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:50",
+      "flight_no": "X32313",
+      "airline": "Tuifly",
+      "city": "Palma de Mallorca",
+      "country": "Spanien",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791539400.0,
+      "time_scheduled": "11:50",
+      "time_estimated": "11:50",
+      "flight_no": "A3840",
+      "airline": "Aegean Airlines",
+      "city": "Athen",
+      "country": "Griechenland",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "B",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
