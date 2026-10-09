@@ -246,6 +246,8 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     background: #ffd6d6; color: #a00000; font-size: 0.8rem; font-weight: bold;
 }
 [data-theme="dark"] .delay-badge { background: #5c1d1d; color: #ff8080; }
+.delay-badge.early-badge { background: #d6f5e0; color: #11602d; }
+[data-theme="dark"] .delay-badge.early-badge { background: #12391f; color: #86ffae; }
 
 .status-icon { font-size: 1.5rem; line-height: 1; flex-shrink: 0; margin-left: 4px; }
 .status-icon.blink { animation: plane-blink 1s ease-in-out infinite; }
@@ -676,7 +678,15 @@ function getFilteredList() {
         if (s === 'active' || s === 'en-route') return 1;
         return 2;
     };
-    return [...list].sort((a, b) => (statusRank(a) - statusRank(b)) || (a.dt - b.dt));
+    const expected = f => timeToMinutes(f.time_estimated || f.time_scheduled);
+
+    return [...list].sort((a, b) => {
+        const ra = statusRank(a), rb = statusRank(b);
+        if (ra !== rb) return ra - rb;
+        // Im Anflug: nach erwarteter Landezeit sortieren
+        if (ra === 1) return (expected(a) - expected(b)) || (a.dt - b.dt);
+        return a.dt - b.dt;
+    });
 }
 
 function applyFilter() {
@@ -716,19 +726,27 @@ function renderFlights(flights) {
         const guessMark = isGuess ? ' ?' : '';
         const guessTitle = isGuess ? ' title="Vorläufig, Ausgang noch nicht vergeben"' : '';
 
-        const delayHtml = f.delay > 0 ? `<span class="delay-badge">+${f.delay} Min.</span>` : '';
+        const est = f.time_estimated;
+        const hasEst = est && est !== f.time_scheduled;
+        let diff = hasEst ? timeToMinutes(est) - timeToMinutes(f.time_scheduled) : 0;
+        if (diff < -720) diff += 1440;
+        if (diff > 720) diff -= 1440;
+        const diffTxt = hasEst ? ` (${diff > 0 ? '+' : ''}${diff} Min.)` : '';
+
+        const delayHtml = hasEst
+            ? `<span class="delay-badge${diff <= 0 ? ' early-badge' : ''}">${est} Uhr${diff > 0 ? ' (+' + diff + ')' : ''}</span>`
+            : '';
+
         const st = String(f.status).toLowerCase();
         let statusText;
         if (st === 'landed') {
-            statusText = 'Gelandet'
-                + (f.time_estimated !== f.time_scheduled ? ` ${f.time_estimated} Uhr` : '')
-                + (f.delay > 0 ? ` (+${f.delay} Min.)` : '');
-        } else if ((st === 'active' || st === 'en-route') && f.delay > 0) {
-            statusText = `Im Anflug, erwartet ${f.time_estimated} Uhr (+${f.delay} Min.)`;
+            statusText = 'Gelandet' + (hasEst ? ` ${est} Uhr${diffTxt}` : '');
+        } else if (st === 'active' || st === 'en-route') {
+            statusText = 'Im Anflug' + (hasEst ? `, erwartet ${est} Uhr${diffTxt}` : '');
         } else if (liveStatus(f) === 'airborne') {
-            statusText = 'In der Luft' + (f.delay > 0 ? `, erwartet ${f.time_estimated} Uhr (+${f.delay} Min.)` : '');
-        } else if (f.delay > 0) {
-            statusText = `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)`;
+            statusText = 'In der Luft' + (hasEst ? `, erwartet ${est} Uhr${diffTxt}` : '');
+        } else if (hasEst) {
+            statusText = `Erwartet: ${est} Uhr${diffTxt}`;
         } else {
             statusText = statusMap[st] || f.status;
         }
@@ -808,8 +826,11 @@ function liveStatus(f) {
     if (s === 'landed') return 'landed';
     if (s === 'active' || s === 'en-route') return 'approach';
     if (s === 'cancelled' || s === 'diverted' || s === 'incident') return s;
-    const t = flightTiming(f);
-    return berlinMin() >= t.startMin ? 'airborne' : 'scheduled';
+    // Kein Raten mehr: "In der Luft" nur, wenn der Scraper eine echte Abflugzeit liefert
+    // (Feld departure_actual bzw. time_departed, Format "HH:MM"). Sonst bleibt der Flug "Geplant".
+    const dep = f.departure_actual || f.time_departed;
+    if (dep && berlinMin() >= timeToMinutes(dep)) return 'airborne';
+    return 'scheduled';
 }
 
 /* ---------- Rendering Ansicht 3 (Flughafentafel) ---------- */
