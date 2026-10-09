@@ -773,6 +773,8 @@ function renderFlights(flights) {
                 + (f.delay > 0 ? ` (+${f.delay} Min.)` : '');
         } else if ((st === 'active' || st === 'en-route') && f.delay > 0) {
             statusText = `Im Anflug, erwartet ${f.time_estimated} Uhr (+${f.delay} Min.)`;
+        } else if (liveStatus(f) === 'airborne') {
+            statusText = 'In der Luft' + (f.delay > 0 ? `, erwartet ${f.time_estimated} Uhr (+${f.delay} Min.)` : '');
         } else if (f.delay > 0) {
             statusText = `Erwartet: ${f.time_estimated} Uhr (+${f.delay} Min.)`;
         } else {
@@ -835,6 +837,27 @@ function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     const [hours, minutes] = timeStr.split(':').map(Number);
     return (hours || 0) * 60 + (minutes || 0);
+}
+
+// Start- und Ankunftszeit in Minuten (Flugdauer wird mit 2 Stunden angenommen)
+function flightTiming(f) {
+    const arrivalMin = timeToMinutes(f.time_estimated || f.time_scheduled);
+    let startMin = timeToMinutes(f.time_scheduled) - 120;
+    if (!startMin || startMin >= arrivalMin || (arrivalMin - startMin) > 360) {
+        startMin = arrivalMin - 120;
+    }
+    return { startMin, arrivalMin };
+}
+
+// Gemeinsamer Live-Status für alle Ansichten:
+// landed / approach (laut Scraper im Anflug) / airborne (gestartet) / scheduled / cancelled ...
+function liveStatus(f) {
+    const s = String(f.status).toLowerCase();
+    if (s === 'landed') return 'landed';
+    if (s === 'active' || s === 'en-route') return 'approach';
+    if (s === 'cancelled' || s === 'diverted' || s === 'incident') return s;
+    const t = flightTiming(f);
+    return berlinMin() >= t.startMin ? 'airborne' : 'scheduled';
 }
 
 function renderDesign2Cards(flights) {
@@ -939,7 +962,7 @@ function updateProgress() {
             statusEl.textContent = "GELANDET";
             cardEl.classList.add('landed');
         } else {
-            statusEl.textContent = "Im Anflug";
+            statusEl.textContent = (flightStatus === 'active' || flightStatus === 'en-route') ? "Im Anflug" : "In der Luft";
             cardEl.classList.remove('landed');
         }
 
@@ -967,6 +990,7 @@ function tfStatus(f) {
     if (s === 'cancelled') return { cls: 's-annulliert', label: 'Annulliert' };
     if (s === 'diverted') return { cls: 's-annulliert', label: 'Umgeleitet' };
     if (s === 'incident') return { cls: 's-annulliert', label: 'Störung' };
+    if (liveStatus(f) === 'airborne') return { cls: 's-luft', label: 'In der Luft' };
     return { cls: 's-luft', label: 'Geplant' };
 }
 
