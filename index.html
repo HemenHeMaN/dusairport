@@ -239,6 +239,12 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .no-flights { text-align: center; padding: 20px; color: var(--text-color); background: var(--card-bg); border-radius: 8px; }
 
 /* --- Ansicht 3: Flughafentafel --- */
+.tf-opt {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+    font-weight: 700; cursor: pointer; color: var(--text-color);
+}
+.tf-opt input { width: 20px; height: 20px; cursor: pointer; }
+
 .tf-board {
     background: linear-gradient(to bottom, var(--tf-top), var(--tf-bottom));
     border: 1px solid var(--tf-line); border-radius: 6px; padding: 14px 12px 12px;
@@ -267,21 +273,10 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     position: relative; overflow: hidden; background: var(--tf-row);
     border-left: 4px solid var(--tf-line);
 }
-.tf-body .tf-row > :not(.tf-bar) { position: relative; z-index: 1; }
 .tf-body .tf-row.s-anflug { border-left-color: var(--tf-ok); }
 .tf-body .tf-row.s-luft { border-left-color: var(--tf-warn); }
 .tf-body .tf-row.s-annulliert { border-left-color: var(--tf-bad); }
 .tf-body .tf-row.s-gelandet { border-left-color: var(--tf-dim); }
-
-/* Flaggen-Fortschrittsbalken (Option 1: Clip-Path ohne Quetschung) */
-.tf-bar {
-    position: absolute; z-index: 0; left: 0; top: 0; bottom: 0; width: 100%; pointer-events: none;
-    background-size: cover; background-position: left center; background-repeat: no-repeat;
-    opacity: 0.38; /* Dezent im Hintergrund */
-    clip-path: inset(0 100% 0 0);
-    transition: clip-path 1.4s cubic-bezier(.2, .7, .2, 1);
-}
-@media (prefers-reduced-motion: reduce) { .tf-bar { transition: none; } }
 
 .tf-flight { font-weight: 700; font-size: .8rem; letter-spacing: .04em; overflow-wrap: anywhere; }
 .tf-flight small { display: block; font-weight: 400; font-size: .62rem; color: var(--tf-dim); letter-spacing: .02em; }
@@ -290,6 +285,10 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     text-transform: uppercase; min-width: 0; overflow-wrap: anywhere; line-height: 1.1;
 }
 .tf-city small { font-family: var(--tf-data); font-size: .62rem; color: var(--tf-dim); letter-spacing: .08em; margin-left: 6px; }
+.tf-flag {
+    height: 1rem; width: auto; margin-left: 8px; vertical-align: middle;
+    border: 1px solid rgba(0,0,0,.25); border-radius: 2px;
+}
 .tf-time {
     justify-self: start; background: var(--tf-flap); color: var(--tf-flap-text); font-weight: 700; font-size: 1rem;
     padding: 4px 8px; border-radius: 2px; font-variant-numeric: tabular-nums; letter-spacing: .06em;
@@ -315,7 +314,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 @keyframes tf-pulse { 50% { opacity: .2; } }
 
 .tf-empty { padding: 24px 14px; color: var(--tf-dim); background: var(--tf-row); text-align: center; }
-.tf-footer { margin-top: 12px; color: var(--tf-dim); font-size: .62rem; line-height: 1.6; max-width: 62ch; }
 
 @media (max-width: 720px) {
     .tf-head { display: none; }
@@ -469,6 +467,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <!-- ANSICHT 3: Flughafentafel -->
 <div id="view3" class="view-section">
+    <label class="tf-opt"><input type="checkbox" id="flagToggle" checked> Flagge statt Land</label>
     <div class="tf-board">
         <div class="tf-head tf-row" aria-hidden="true">
             <div>Flug</div><div>Von</div><div>Erwartet</div><div>Ausgang</div><div>Art</div><div>Status</div>
@@ -476,7 +475,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
         <div class="tf-body" id="tfBody">
             <div class="tf-empty">Flüge werden geladen...</div>
         </div>
-        <div class="tf-footer">Der Balken zeigt die Nationalflagge des Abfluglandes als schrittweise wachsenden Fortschrittsbalken an.</div>
     </div>
 </div>
 
@@ -486,7 +484,7 @@ const DEFAULT_SIZE = 18;
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
 const VIEW_KEY = 'dus_active_view';
-const TF_FENSTER = 90;
+const FLAG_KEY = 'dus_flag';
 
 let allFlights = [];
 let currentFilter = 'all';
@@ -512,7 +510,32 @@ function getFlagCode(country) {
         'polen': 'pl', 'poland': 'pl',
         'schweden': 'se', 'sweden': 'se',
         'norwegen': 'no', 'norway': 'no',
-        'dänemark': 'dk', 'denmark': 'dk'
+        'dänemark': 'dk', 'denmark': 'dk',
+        'kroatien': 'hr', 'croatia': 'hr',
+        'marokko': 'ma', 'morocco': 'ma',
+        'tunesien': 'tn', 'tunisia': 'tn',
+        'bulgarien': 'bg', 'bulgaria': 'bg',
+        'zypern': 'cy', 'cyprus': 'cy',
+        'malta': 'mt',
+        'irland': 'ie', 'ireland': 'ie',
+        'belgien': 'be', 'belgium': 'be',
+        'finnland': 'fi', 'finland': 'fi',
+        'tschechien': 'cz', 'czechia': 'cz', 'czech republic': 'cz',
+        'ungarn': 'hu', 'hungary': 'hu',
+        'rumänien': 'ro', 'romania': 'ro',
+        'serbien': 'rs', 'serbia': 'rs',
+        'albanien': 'al', 'albania': 'al',
+        'kosovo': 'xk',
+        'nordmazedonien': 'mk', 'north macedonia': 'mk',
+        'montenegro': 'me',
+        'bosnien und herzegowina': 'ba', 'bosnia and herzegovina': 'ba',
+        'island': 'is', 'iceland': 'is',
+        'usa': 'us', 'vereinigte staaten': 'us', 'united states': 'us',
+        'kanada': 'ca', 'canada': 'ca',
+        'katar': 'qa', 'qatar': 'qa',
+        'israel': 'il',
+        'jordanien': 'jo', 'jordan': 'jo',
+        'ukraine': 'ua'
     };
     const key = country.toLowerCase().trim();
     return map[key] || 'de'; // Standard-Fallback (Deutschland) falls unbekannt
@@ -528,7 +551,6 @@ function switchView(viewId) {
     const btn = document.getElementById('btn' + target.id.charAt(0).toUpperCase() + target.id.slice(1));
     if (btn) btn.classList.add('active');
 
-    if (target.id === 'view3') updateBoardBars();
     try { localStorage.setItem(VIEW_KEY, target.id); } catch (e) {}
 }
 
@@ -634,6 +656,14 @@ clearSearchBtn.addEventListener('click', () => {
     searchInput.value = '';
     updateSearchState();
     searchInput.focus();
+});
+
+/* ---------- Checkbox: Flagge statt Land (Tafel) ---------- */
+const flagCb = document.getElementById('flagToggle');
+try { flagCb.checked = localStorage.getItem(FLAG_KEY) !== '0'; } catch (e) {}
+flagCb.addEventListener('change', () => {
+    try { localStorage.setItem(FLAG_KEY, flagCb.checked ? '1' : '0'); } catch (e) {}
+    applyFilter();
 });
 
 /* ---------- Flugdaten Laden & Filtern ---------- */
@@ -860,16 +890,6 @@ function tfStatus(f) {
     return { cls: 's-luft', label: 'Geplant' };
 }
 
-function tfFortschritt(zeit, status) {
-    const s = String(status).toLowerCase();
-    if (s === 'landed' || s === 'cancelled' || s === 'diverted' || s === 'incident') return 1;
-    let diff = timeToMinutes(zeit) - berlinMin();
-    if (diff < -720) diff += 1440;
-    if (diff > 720) diff -= 1440;
-    if (diff <= 0) return 1;
-    return Math.max(0, Math.min(1, 1 - diff / TF_FENSTER));
-}
-
 function renderBoard(flights) {
     const body = document.getElementById('tfBody');
     if (!body) return;
@@ -884,6 +904,8 @@ function renderBoard(flights) {
     flights = [...flights].sort((a, b) =>
         timeToMinutes(a.time_estimated || a.time_scheduled) - timeToMinutes(b.time_estimated || b.time_scheduled));
 
+    const showFlag = flagCb.checked;
+
     flights.forEach(f => {
         const st = tfStatus(f);
         const s = String(f.status).toLowerCase();
@@ -892,16 +914,22 @@ function renderBoard(flights) {
         const zeit = f.time_estimated || f.time_scheduled || '';
         const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
 
-        // Dynamische Flaggen-URL über FlagCDN
+        // Flaggen-URL über FlagCDN
         const cc = getFlagCode(f.country);
         const flagUrl = `https://flagcdn.com/${cc}.svg`;
+
+        let countryHtml = '';
+        if (f.country) {
+            countryHtml = showFlag
+                ? `<img class="tf-flag" src="${flagUrl}" alt="${esc(f.country)}" title="${esc(f.country)}" loading="lazy">`
+                : '<small>' + esc(f.country) + '</small>';
+        }
 
         const row = document.createElement('div');
         row.className = 'tf-row ' + st.cls + (isCancelled ? ' cancelled' : '');
         row.innerHTML = `
-            <div class="tf-bar" style="background-image: url('${flagUrl}');" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}"></div>
             <div class="tf-flight">${esc(f.flight_no)}<small>${esc(f.airline)}</small></div>
-            <div class="tf-city">${esc(f.city)}${f.country ? '<small>' + esc(f.country) + '</small>' : ''}</div>
+            <div class="tf-city">${esc(f.city)}${countryHtml}</div>
             <div class="tf-time">${esc(zeit)}</div>
             <div class="tf-exit">${esc(f.gate)}${isGuess ? ' ?' : ''}</div>
             <div class="tf-kind">${esc(f.type)}</div>
@@ -909,22 +937,12 @@ function renderBoard(flights) {
         `;
         body.appendChild(row);
     });
-    requestAnimationFrame(() => requestAnimationFrame(updateBoardBars));
-}
-
-function updateBoardBars() {
-    document.querySelectorAll('#tfBody .tf-bar').forEach(bar => {
-        const p = tfFortschritt(bar.dataset.zeit, bar.dataset.status);
-        const rightInset = ((1 - p) * 100).toFixed(1);
-        bar.style.clipPath = `inset(0 ${rightInset}% 0 0)`;
-    });
 }
 
 // Initialisierung
 loadSavedView();
 loadData();
 setInterval(loadData, REFRESH_MINUTES * 60 * 1000);
-setInterval(updateBoardBars, 20000);
 
 requestAnimationFrame(function () {
     requestAnimationFrame(function () { document.body.classList.remove('no-anim'); });
