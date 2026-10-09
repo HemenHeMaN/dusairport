@@ -1,24 +1,7 @@
 {
-  "updated_at": "09.10.2026 23:19",
+  "updated_at": "09.10.2026 23:38",
   "source": "Dus.com",
   "flights": [
-    {
-      "dt": 1791574800.0,
-      "time_scheduled": "21:40",
-      "time_estimated": "22:19",
-      "flight_no": "EW9511",
-      "airline": "Eurowings",
-      "city": "Madrid-Barajas",
-      "country": "Spanien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "13",
-      "gate": "Ausgang 5 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 40
-    },
     {
       "dt": 1791575100.0,
       "time_scheduled": "21:45",
@@ -83,8 +66,8 @@
       "terminal": "A",
       "baggage": "1",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "im Anflug",
       "delay": 109
     },
     {
@@ -107,7 +90,7 @@
     {
       "dt": 1791576600.0,
       "time_scheduled": "22:10",
-      "time_estimated": "23:38",
+      "time_estimated": "23:32",
       "flight_no": "EW9847",
       "airline": "Eurowings",
       "city": "Mailand-Linate",
@@ -117,9 +100,9 @@
       "terminal": "B",
       "baggage": "11",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "status_text": "Im Anflug",
-      "delay": 88
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 82
     },
     {
       "dt": 1791576600.0,
@@ -137,57 +120,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 30
-    },
-    {
-      "dt": 1791576600.0,
-      "time_scheduled": "22:10",
-      "time_estimated": "22:24",
-      "flight_no": "SK629",
-      "airline": "Scandinavian Airlines",
-      "city": "Kopenhagen",
-      "country": "Dänemark",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "17",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 14
-    },
-    {
-      "dt": 1791576900.0,
-      "time_scheduled": "22:15",
-      "time_estimated": "22:35",
-      "flight_no": "EW4204",
-      "airline": "Eurowings",
-      "city": "Prag",
-      "country": "Tschechien",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "3",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 21
-    },
-    {
-      "dt": 1791576900.0,
-      "time_scheduled": "22:15",
-      "time_estimated": "22:31",
-      "flight_no": "EW9245",
-      "airline": "Eurowings",
-      "city": "Kopenhagen",
-      "country": "Dänemark",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "A",
-      "baggage": "5",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 17
     },
     {
       "dt": 1791576900.0,
@@ -241,40 +173,6 @@
       "delay": 19
     },
     {
-      "dt": 1791577500.0,
-      "time_scheduled": "22:25",
-      "time_estimated": "22:29",
-      "flight_no": "LH2034",
-      "airline": "Lufthansa",
-      "city": "München",
-      "country": "Deutschland",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "4",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 4
-    },
-    {
-      "dt": 1791577500.0,
-      "time_scheduled": "22:25",
-      "time_estimated": "22:22",
-      "flight_no": "KL1805",
-      "airline": "KLM",
-      "city": "Amsterdam",
-      "country": "Niederlande",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "19",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 0
-    },
-    {
       "dt": 1791577800.0,
       "time_scheduled": "22:30",
       "time_estimated": "22:52",
@@ -290,23 +188,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 22
-    },
-    {
-      "dt": 1791578100.0,
-      "time_scheduled": "22:35",
-      "time_estimated": "22:38",
-      "flight_no": "DE1429",
-      "airline": "Condor",
-      "city": "Teneriffa Süd",
-      "country": "Spanien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "11",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 3
     },
     {
       "dt": 1791578100.0,
@@ -375,23 +256,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 15
-    },
-    {
-      "dt": 1791578700.0,
-      "time_scheduled": "22:45",
-      "time_estimated": "22:33",
-      "flight_no": "DE1623",
-      "airline": "Condor",
-      "city": "Rhodos",
-      "country": "Griechenland",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "19",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 0
     },
     {
       "dt": 1791579000.0,
