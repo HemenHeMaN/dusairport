@@ -1,11 +1,11 @@
 {
-  "updated_at": "09.10.2026 05:45",
+  "updated_at": "09.10.2026 06:01",
   "source": "Dus.com",
   "flights": [
     {
       "dt": 1791518700.0,
       "time_scheduled": "06:05",
-      "time_estimated": "06:15",
+      "time_estimated": "06:21",
       "flight_no": "XC266",
       "airline": "Corendon Airlines",
       "city": "Kayseri",
@@ -13,11 +13,11 @@
       "type": "Charter",
       "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "17",
-      "gate": "Ausgang 6 (Charter)",
+      "baggage": "13",
+      "gate": "Ausgang 5 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 11
+      "delay": 17
     },
     {
       "dt": 1791519300.0,
@@ -32,8 +32,8 @@
       "terminal": "C",
       "baggage": "14",
       "gate": "Ausgang 5 (Charter)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "im Anflug",
       "delay": 0
     },
     {
@@ -47,8 +47,8 @@
       "type": "Charter",
       "type_source": "Ausgang",
       "terminal": "C",
-      "baggage": "13",
-      "gate": "Ausgang 5 (Charter)",
+      "baggage": "17",
+      "gate": "Ausgang 6 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
       "delay": 4
@@ -107,7 +107,7 @@
     {
       "dt": 1791526200.0,
       "time_scheduled": "08:10",
-      "time_estimated": "07:54",
+      "time_estimated": "07:55",
       "flight_no": "AY1391",
       "airline": "Finnair",
       "city": "Helsinki",
@@ -118,7 +118,7 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
@@ -141,7 +141,7 @@
     {
       "dt": 1791527100.0,
       "time_scheduled": "08:25",
-      "time_estimated": "08:25",
+      "time_estimated": "08:51",
       "flight_no": "H7403",
       "airline": "Hi Sky",
       "city": "Chisinau",
@@ -153,7 +153,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 26
     },
     {
       "dt": 1791527400.0,
@@ -277,7 +277,7 @@
     {
       "dt": 1791528900.0,
       "time_scheduled": "08:55",
-      "time_estimated": "08:55",
+      "time_estimated": "08:51",
       "flight_no": "EW4672",
       "airline": "Eurowings",
       "city": "Stockholm-Arlanda",
@@ -339,7 +339,7 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
@@ -374,7 +374,7 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 13
+      "delay": 12
     },
     {
       "dt": 1791529500.0,
@@ -413,7 +413,7 @@
     {
       "dt": 1791529500.0,
       "time_scheduled": "09:05",
-      "time_estimated": "09:05",
+      "time_estimated": "09:02",
       "flight_no": "TK1523",
       "airline": "Turkish Airlines",
       "city": "Istanbul",
@@ -430,7 +430,7 @@
     {
       "dt": 1791530100.0,
       "time_scheduled": "09:15",
-      "time_estimated": "09:05",
+      "time_estimated": "09:04",
       "flight_no": "XQ284",
       "airline": "Sun Express",
       "city": "Antalya",
@@ -814,6 +814,74 @@
       "terminal": "A",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791535800.0,
+      "time_scheduled": "10:50",
+      "time_estimated": "10:50",
+      "flight_no": "AF1606",
+      "airline": "Air France",
+      "city": "Paris-Charles de Gaulle",
+      "country": "Frankreich",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791536100.0,
+      "time_scheduled": "10:55",
+      "time_estimated": "10:55",
+      "flight_no": "FH1193",
+      "airline": "Freebird Airlines",
+      "city": "Antalya",
+      "country": "Türkei",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "C",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791536100.0,
+      "time_scheduled": "10:55",
+      "time_estimated": "10:55",
+      "flight_no": "PC5677",
+      "airline": "Pegasus Airlines",
+      "city": "Antalya",
+      "country": "Türkei",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "C",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791536400.0,
+      "time_scheduled": "11:00",
+      "time_estimated": "11:00",
+      "flight_no": "4M597",
+      "airline": "Mavi Gök Aviation",
+      "city": "Antalya",
+      "country": "Türkei",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "",
       "delay": 0
