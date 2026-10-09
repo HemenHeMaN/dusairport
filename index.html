@@ -290,14 +290,18 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .tf-body .tf-row.s-annulliert { border-left-color: var(--tf-bad); }
 .tf-body .tf-row.s-gelandet { border-left-color: var(--tf-dim); }
 
-/* Flaggen-Fortschrittsbalken (Option 1: Clip-Path ohne Quetschung) */
+/* Fortschrittsbalken (einfarbig, in der Statusfarbe) */
 .tf-bar {
     position: absolute; z-index: 0; left: 0; top: 0; bottom: 0; width: 100%; pointer-events: none;
-    background-size: cover; background-position: left center; background-repeat: no-repeat;
-    opacity: 0.38; /* Dezent im Hintergrund */
+    background: var(--tf-dim);
+    opacity: 0.22; /* Dezent im Hintergrund */
     clip-path: inset(0 100% 0 0);
     transition: clip-path 1.4s cubic-bezier(.2, .7, .2, 1);
 }
+.s-anflug .tf-bar { background: var(--tf-ok); }
+.s-luft .tf-bar { background: var(--tf-warn); }
+.s-annulliert .tf-bar { background: var(--tf-bad); }
+.s-gelandet .tf-bar { background: var(--tf-dim); }
 @media (prefers-reduced-motion: reduce) { .tf-bar { transition: none; } }
 
 .tf-flight { font-weight: 700; font-size: .8rem; letter-spacing: .04em; overflow-wrap: anywhere; }
@@ -527,7 +531,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
         <div class="tf-body" id="tfBody">
             <div class="tf-empty">Flüge werden geladen...</div>
         </div>
-        <div class="tf-footer">Der Balken zeigt die Nationalflagge des Abfluglandes als schrittweise wachsenden Fortschrittsbalken an.</div>
+        <div class="tf-footer">Der Balken zeigt den Fortschritt bis zur Landung (letzte 90 Minuten).</div>
     </div>
 </div>
 
@@ -1048,7 +1052,7 @@ function renderBoard(flights) {
         const row = document.createElement('div');
         row.className = 'tf-row ' + st.cls + (isCancelled ? ' cancelled' : '');
         row.innerHTML = `
-            <div class="tf-bar" style="background-image: url('${flagUrl}');" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}"></div>
+            <div class="tf-bar" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}"></div>
             <div class="tf-flight">${esc(f.flight_no)}<small>${esc(f.airline)}</small></div>
             <div class="tf-city">${esc(f.city)}${countryHtml}</div>
             <div class="tf-time">${esc(zeit)}</div>
