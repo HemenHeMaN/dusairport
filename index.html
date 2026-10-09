@@ -260,43 +260,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .detail-grid > div { overflow-wrap: anywhere; }
 .no-flights { text-align: center; padding: 20px; color: var(--text-color); background: var(--card-bg); border-radius: 8px; }
 
-/* Progress-Bar Design */
-.d2-flight-card {
-    position: relative; background-color: var(--card-bg); border: 1px solid var(--border-color);
-    border-radius: 8px; padding: 14px 18px 18px 18px; margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15); overflow: hidden;
-    border-left: 6px solid #ccc;
-}
-.d2-flight-card.card-linie { background-color: var(--card-linie-bg); border-left-color: var(--card-linie-border); }
-.d2-flight-card.card-charter { background-color: var(--card-charter-bg); border-left-color: var(--card-charter-border); }
-
-.d2-card-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.d2-flight-info h3 { margin: 0 0 2px 0; font-size: 1.15rem; font-weight: 700; color: var(--text-color); }
-.d2-flight-info p { margin: 0; color: var(--update-color); font-size: 0.9rem; }
-.d2-flight-right { text-align: right; }
-.d2-status-text { font-size: 0.95rem; font-weight: 600; color: var(--text-color); margin-bottom: 2px; }
-.d2-time-label { font-size: 1.15rem; font-weight: bold; font-variant-numeric: tabular-nums; }
-.d2-flight-card.landed .d2-status-text {
-    color: var(--success-green); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;
-}
-.d2-card-footer-bar { display: flex; flex-direction: column; gap: 6px; }
-.d2-bar-info-row {
-    display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600;
-    color: var(--update-color); text-transform: uppercase; letter-spacing: 0.05em;
-}
-.d2-progress-container {
-    position: relative; width: 100%; height: 6px;
-    background-color: rgba(0, 0, 0, 0.08); border-radius: 3px; overflow: hidden;
-}
-[data-theme="dark"] .d2-progress-container { background-color: rgba(255, 255, 255, 0.08); }
-.d2-progress-bar {
-    position: absolute; top: 0; left: 0; bottom: 0; width: 0%;
-    border-radius: 3px; transition: width 0.5s linear;
-}
-.d2-flight-card.card-linie .d2-progress-bar { background-color: var(--progress-linie); }
-.d2-flight-card.card-charter .d2-progress-bar { background-color: var(--progress-charter); }
-.d2-flight-card.landed .d2-progress-bar { background-color: var(--success-green); }
-
 /* --- Ansicht 3: Flughafentafel (alle Klassen mit tf- Präfix) --- */
 .tf-board {
     background: linear-gradient(to bottom, var(--tf-top), var(--tf-bottom));
@@ -497,10 +460,9 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     </div>
 </div>
 
-<!-- Design-Umschalter Reiter -->
+<!-- Reiter -->
 <div class="view-switcher">
     <button class="view-btn active" id="btnView1" onclick="switchView('view1')">Detail</button>
-    <button class="view-btn" id="btnView2" onclick="switchView('view2')">Progress</button>
     <button class="view-btn" id="btnView3" onclick="switchView('view3')">Tafel</button>
 </div>
 
@@ -522,19 +484,12 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     <button class="filter-btn btn-all active" onclick="filterFlights('all', event)">Alle</button>
     <button class="filter-btn btn-linie" onclick="filterFlights('Linie', event)">Linie</button>
     <button class="filter-btn btn-charter" onclick="filterFlights('Charter', event)">Charter</button>
-    <button class="filter-btn btn-landing" onclick="filterFlights('landing', event)">✈️ Anflug</button>
+    <button class="filter-btn btn-landing" onclick="filterFlights('landing', event)">Im Anflug</button>
 </div>
 
 <!-- ANSICHT 1: Klassische Detail-Karten -->
 <div id="view1" class="view-section active-view">
     <div id="flightList">
-        <div class="no-flights">Flüge werden geladen...</div>
-    </div>
-</div>
-
-<!-- ANSICHT 2: Progress-Bar Karten -->
-<div id="view2" class="view-section">
-    <div id="d2CardsContainer">
         <div class="no-flights">Flüge werden geladen...</div>
     </div>
 </div>
@@ -574,7 +529,6 @@ function switchView(viewId) {
     const btn = document.getElementById('btn' + target.id.charAt(0).toUpperCase() + target.id.slice(1));
     if (btn) btn.classList.add('active');
 
-    if (target.id === 'view2') updateProgress();
     if (target.id === 'view3') updateBoardBars();
     try { localStorage.setItem(VIEW_KEY, target.id); } catch (e) {}
 }
@@ -582,7 +536,7 @@ function switchView(viewId) {
 function loadSavedView() {
     try {
         const saved = localStorage.getItem(VIEW_KEY);
-        if (saved === 'view1' || saved === 'view2' || saved === 'view3') {
+        if (saved === 'view1' || saved === 'view3') {
             switchView(saved);
         }
     } catch (e) {}
@@ -683,7 +637,6 @@ function loadData() {
         .catch(() => {
             if (allFlights.length === 0) {
                 document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json</div>';
-                document.getElementById('d2CardsContainer').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json</div>';
                 document.getElementById('tfBody').innerHTML = '<div class="tf-empty">Fehler beim Laden der cache.json</div>';
             }
         });
@@ -729,7 +682,6 @@ function getFilteredList() {
 function applyFilter() {
     const filtered = getFilteredList();
     renderFlights(filtered);
-    renderDesign2Cards(filtered);
     renderBoard(filtered);
 }
 
@@ -832,7 +784,7 @@ function filterFlights(category, event) {
     applyFilter();
 }
 
-/* ---------- Rendering Ansicht 2 (Progress Bars) ---------- */
+/* ---------- Zeit-Hilfsfunktionen ---------- */
 function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -858,119 +810,6 @@ function liveStatus(f) {
     if (s === 'cancelled' || s === 'diverted' || s === 'incident') return s;
     const t = flightTiming(f);
     return berlinMin() >= t.startMin ? 'airborne' : 'scheduled';
-}
-
-function renderDesign2Cards(flights) {
-    const container = document.getElementById('d2CardsContainer');
-    if (!container) return;
-    container.innerHTML = '';
-
-    if (!flights || flights.length === 0) {
-        container.innerHTML = currentFilter === 'landing'
-            ? '<div class="no-flights">Gerade keine Flüge im Anflug.</div>'
-            : '<div class="no-flights">Keine Flüge gefunden.</div>';
-        return;
-    }
-
-    flights.forEach((flight, index) => {
-        const isCharter = flight.type === "Charter";
-        const cardClass = isCharter ? "d2-flight-card card-charter" : "d2-flight-card card-linie";
-
-        const card = document.createElement('div');
-        card.className = cardClass;
-        card.id = `d2-flight-${index}`;
-
-        // Ziel-Ankunftszeit: Verspätete geschätzte Zeit hat Priorität, sonst planmäßig
-        const arrivalTimeStr = flight.time_estimated || flight.time_scheduled;
-        const arrivalMin = timeToMinutes(arrivalTimeStr);
-        
-        // Startzeit: standardmäßig 2 Stunden Flugdauer vor Ankunft
-        let startMin = timeToMinutes(flight.time_scheduled) - 120;
-        if (!startMin || startMin >= arrivalMin || (arrivalMin - startMin) > 360) {
-            startMin = arrivalMin - 120;
-        }
-
-        card.dataset.startMin = startMin;
-        card.dataset.arrivalMin = arrivalMin;
-        card.dataset.status = flight.status || '';
-
-        const routeText = flight.country ? `${flight.city} (${flight.country})` : flight.city;
-
-        card.innerHTML = `
-            <div class="d2-card-content">
-                <div class="d2-flight-info">
-                    <h3>${flight.flight_no} (${flight.airline})</h3>
-                    <p>Von: ${routeText} — Gate: ${flight.gate}</p>
-                </div>
-                <div class="d2-flight-right">
-                    <div class="d2-status-text" id="d2-status-${index}">Im Anflug</div>
-                    <div class="d2-time-label">${arrivalTimeStr}</div>
-                </div>
-            </div>
-            <div class="d2-card-footer-bar">
-                <div class="d2-bar-info-row">
-                    <span>${flight.type}</span>
-                    <span id="d2-percent-${index}">0%</span>
-                </div>
-                <div class="d2-progress-container">
-                    <div class="d2-progress-bar" id="d2-progress-${index}"></div>
-                </div>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-    updateProgress();
-}
-
-function updateProgress() {
-    const now = new Date();
-    const currentTotalMinutesDecimal = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
-
-    const container = document.getElementById('d2CardsContainer');
-    if (!container) return;
-    const cards = container.querySelectorAll('.d2-flight-card');
-
-    cards.forEach((cardEl, index) => {
-        const barEl = document.getElementById(`d2-progress-${index}`);
-        const statusEl = document.getElementById(`d2-status-${index}`);
-        const percentEl = document.getElementById(`d2-percent-${index}`);
-
-        if (!cardEl || !barEl || !statusEl) return;
-
-        const startMin = parseFloat(cardEl.dataset.startMin);
-        const arrivalMin = parseFloat(cardEl.dataset.arrivalMin);
-        const flightStatus = String(cardEl.dataset.status).toLowerCase();
-        
-        const totalDuration = arrivalMin - startMin;
-        
-        let percentage = 0;
-        if (totalDuration > 0) {
-            const elapsed = currentTotalMinutesDecimal - startMin;
-            percentage = (elapsed / totalDuration) * 100;
-        }
-
-        if (flightStatus === 'landed') {
-            percentage = 100;
-            statusEl.textContent = "GELANDET";
-            cardEl.classList.add('landed');
-        } else if (percentage < 0) {
-            percentage = 0;
-            statusEl.textContent = "Geplant";
-            cardEl.classList.remove('landed');
-        } else if (percentage >= 100) {
-            percentage = 100;
-            statusEl.textContent = "GELANDET";
-            cardEl.classList.add('landed');
-        } else {
-            statusEl.textContent = (flightStatus === 'active' || flightStatus === 'en-route') ? "Im Anflug" : "In der Luft";
-            cardEl.classList.remove('landed');
-        }
-
-        barEl.style.width = Math.min(Math.max(percentage, 0), 100) + '%';
-        if (percentEl) {
-            percentEl.textContent = Math.round(percentage) + '%';
-        }
-    });
 }
 
 /* ---------- Rendering Ansicht 3 (Flughafentafel) ---------- */
@@ -1055,7 +894,6 @@ function updateBoardBars() {
 loadSavedView();
 loadData();
 setInterval(loadData, REFRESH_MINUTES * 60 * 1000);
-setInterval(updateProgress, 1000);
 setInterval(updateBoardBars, 20000);
 
 requestAnimationFrame(function () {
