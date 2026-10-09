@@ -5,7 +5,7 @@ on:
     # GitHub-Cron läuft immer in UTC. Damit Sommer- und Winterzeit stimmen,
     # startet der Job alle 10 Minuten von 03:00 bis 22:50 UTC.
     # Das Skript prüft selbst, ob es lokal (Europe/Berlin) zwischen 05:30 und 23:30 ist.
-   - cron: '3,13,23,33,43,53 3-22 * * *'
+   - cron: '3 3-22 * * *'
 
   workflow_dispatch:
 
