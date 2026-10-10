@@ -36,7 +36,7 @@ WINDOW_START = (5, 25)    # frühester Start (Soll: 05:30)
 WINDOW_END = (23, 40)     # spätester Start (Soll: 23:30)
 
 # Anzeige-Fenster (nach tatsächlicher/erwarteter Ankunft)
-MINUTES_PAST = 60
+MINUTES_PAST = 120
 HOURS_FUTURE = 5
 
 # Abfrage-Fenster (nach Plan-Zeit), größer als das Anzeige-Fenster,
