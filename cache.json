@@ -1,11 +1,11 @@
 {
-  "updated_at": "10.10.2026 05:56",
+  "updated_at": "10.10.2026 06:19",
   "source": "Dus.com",
   "flights": [
     {
       "dt": 1791605100.0,
       "time_scheduled": "06:05",
-      "time_estimated": "06:05",
+      "time_estimated": "06:01",
       "flight_no": "EW9675",
       "airline": "Eurowings",
       "city": "Heraklion (Kreta)",
@@ -15,14 +15,14 @@
       "terminal": "B",
       "baggage": "1",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "im Anflug",
+      "status": "landed",
+      "status_text": "gelandet",
       "delay": 0
     },
     {
       "dt": 1791605100.0,
       "time_scheduled": "06:05",
-      "time_estimated": "06:01",
+      "time_estimated": "06:03",
       "flight_no": "XC268",
       "airline": "Corendon Airlines",
       "city": "Mersin-Çukurova",
@@ -32,14 +32,14 @@
       "terminal": "C",
       "baggage": "17",
       "gate": "Ausgang 6 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
+      "status": "landed",
+      "status_text": "gelandet",
       "delay": 0
     },
     {
       "dt": 1791607500.0,
       "time_scheduled": "06:45",
-      "time_estimated": "06:35",
+      "time_estimated": "06:33",
       "flight_no": "XQ1350",
       "airline": "Sun Express",
       "city": "Samsun",
@@ -49,14 +49,14 @@
       "terminal": "C",
       "baggage": "18",
       "gate": "Ausgang 6 (Charter)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "im Anflug",
       "delay": 0
     },
     {
       "dt": 1791607800.0,
       "time_scheduled": "06:50",
-      "time_estimated": "06:36",
+      "time_estimated": "06:40",
       "flight_no": "XQ1334",
       "airline": "Sun Express",
       "city": "Elazig",
@@ -66,8 +66,8 @@
       "terminal": "C",
       "baggage": "13",
       "gate": "Ausgang 5 (Charter)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "Im Anflug",
       "delay": 0
     },
     {
@@ -243,7 +243,7 @@
     {
       "dt": 1791615000.0,
       "time_scheduled": "08:50",
-      "time_estimated": "08:55",
+      "time_estimated": "08:58",
       "flight_no": "XC198",
       "airline": "Corendon Airlines",
       "city": "Izmir",
@@ -254,8 +254,8 @@
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 6
+      "status_text": "Vorhafen verlassen",
+      "delay": 9
     },
     {
       "dt": 1791615000.0,
@@ -345,7 +345,7 @@
     {
       "dt": 1791615900.0,
       "time_scheduled": "09:05",
-      "time_estimated": "09:05",
+      "time_estimated": "09:13",
       "flight_no": "VY1896",
       "airline": "Vueling",
       "city": "Barcelona",
@@ -357,12 +357,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 9
     },
     {
       "dt": 1791615900.0,
       "time_scheduled": "09:05",
-      "time_estimated": "09:05",
+      "time_estimated": "09:03",
       "flight_no": "TK1523",
       "airline": "Turkish Airlines",
       "city": "Istanbul",
@@ -373,13 +373,13 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
       "dt": 1791617100.0,
       "time_scheduled": "09:25",
-      "time_estimated": "09:25",
+      "time_estimated": "09:03",
       "flight_no": "XR404",
       "airline": "Corendon Airlines Europe",
       "city": "Heraklion (Kreta)",
@@ -390,13 +390,13 @@
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
       "dt": 1791617400.0,
       "time_scheduled": "09:30",
-      "time_estimated": "09:30",
+      "time_estimated": "09:23",
       "flight_no": "PC1007",
       "airline": "Pegasus Airlines",
       "city": "Istanbul-Sabiha Gökçen",
@@ -413,7 +413,7 @@
     {
       "dt": 1791617400.0,
       "time_scheduled": "09:30",
-      "time_estimated": "09:30",
+      "time_estimated": "09:21",
       "flight_no": "SK1629",
       "airline": "Scandinavian Airlines",
       "city": "Kopenhagen",
@@ -583,7 +583,7 @@
     {
       "dt": 1791620100.0,
       "time_scheduled": "10:15",
-      "time_estimated": "10:15",
+      "time_estimated": "10:16",
       "flight_no": "ME247",
       "airline": "Middle East Airlines",
       "city": "Beirut",
@@ -594,8 +594,8 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 0
+      "status_text": "Vorhafen verlassen",
+      "delay": 1
     },
     {
       "dt": 1791620100.0,
@@ -865,6 +865,74 @@
       "terminal": "C",
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791622800.0,
+      "time_scheduled": "11:00",
+      "time_estimated": "11:00",
+      "flight_no": "BJ2640",
+      "airline": "Nouvelair",
+      "city": "Djerba",
+      "country": "Tunesien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "C",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791622800.0,
+      "time_scheduled": "11:00",
+      "time_estimated": "11:00",
+      "flight_no": "4M696",
+      "airline": "Mavi Gök Aviation",
+      "city": "Antalya",
+      "country": "Türkei",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791623100.0,
+      "time_scheduled": "11:05",
+      "time_estimated": "11:05",
+      "flight_no": "EW9921",
+      "airline": "Eurowings",
+      "city": "Mostar",
+      "country": "Bosnien und Herzegowina",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "C",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791623400.0,
+      "time_scheduled": "11:10",
+      "time_estimated": "11:10",
+      "flight_no": "IB1319",
+      "airline": "Iberia",
+      "city": "Madrid-Barajas",
+      "country": "Spanien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
       "delay": 0
