@@ -1,5 +1,5 @@
 {
-  "updated_at": "10.10.2026 06:19",
+  "updated_at": "10.10.2026 06:41",
   "source": "Dus.com",
   "flights": [
     {
@@ -39,7 +39,7 @@
     {
       "dt": 1791607500.0,
       "time_scheduled": "06:45",
-      "time_estimated": "06:33",
+      "time_estimated": "06:29",
       "flight_no": "XQ1350",
       "airline": "Sun Express",
       "city": "Samsun",
@@ -49,14 +49,14 @@
       "terminal": "C",
       "baggage": "18",
       "gate": "Ausgang 6 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
+      "status": "landed",
+      "status_text": "gelandet",
       "delay": 0
     },
     {
       "dt": 1791607800.0,
       "time_scheduled": "06:50",
-      "time_estimated": "06:40",
+      "time_estimated": "06:33",
       "flight_no": "XQ1334",
       "airline": "Sun Express",
       "city": "Elazig",
@@ -66,14 +66,14 @@
       "terminal": "C",
       "baggage": "13",
       "gate": "Ausgang 5 (Charter)",
-      "status": "active",
-      "status_text": "Im Anflug",
+      "status": "landed",
+      "status_text": "gelandet",
       "delay": 0
     },
     {
       "dt": 1791609600.0,
       "time_scheduled": "07:20",
-      "time_estimated": "07:10",
+      "time_estimated": "07:11",
       "flight_no": "PC1653",
       "airline": "Pegasus Airlines",
       "city": "Trabzon",
@@ -90,7 +90,7 @@
     {
       "dt": 1791610800.0,
       "time_scheduled": "07:40",
-      "time_estimated": "07:36",
+      "time_estimated": "07:53",
       "flight_no": "KL1797",
       "airline": "KLM",
       "city": "Amsterdam",
@@ -102,7 +102,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 14
     },
     {
       "dt": 1791611100.0,
@@ -209,7 +209,7 @@
     {
       "dt": 1791614700.0,
       "time_scheduled": "08:45",
-      "time_estimated": "08:57",
+      "time_estimated": "08:46",
       "flight_no": "JU360",
       "airline": "Air Serbia",
       "city": "Belgrad",
@@ -221,7 +221,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 12
+      "delay": 2
     },
     {
       "dt": 1791614700.0,
@@ -243,7 +243,7 @@
     {
       "dt": 1791615000.0,
       "time_scheduled": "08:50",
-      "time_estimated": "08:58",
+      "time_estimated": "08:57",
       "flight_no": "XC198",
       "airline": "Corendon Airlines",
       "city": "Izmir",
@@ -255,7 +255,7 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "Vorhafen verlassen",
-      "delay": 9
+      "delay": 8
     },
     {
       "dt": 1791615000.0,
@@ -294,7 +294,7 @@
     {
       "dt": 1791615300.0,
       "time_scheduled": "08:55",
-      "time_estimated": "09:04",
+      "time_estimated": "09:41",
       "flight_no": "XQ968",
       "airline": "Sun Express",
       "city": "Izmir",
@@ -306,7 +306,7 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 10
+      "delay": 47
     },
     {
       "dt": 1791615600.0,
@@ -357,7 +357,7 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 9
+      "delay": 8
     },
     {
       "dt": 1791615900.0,
@@ -396,7 +396,7 @@
     {
       "dt": 1791617400.0,
       "time_scheduled": "09:30",
-      "time_estimated": "09:23",
+      "time_estimated": "09:16",
       "flight_no": "PC1007",
       "airline": "Pegasus Airlines",
       "city": "Istanbul-Sabiha Gökçen",
@@ -407,7 +407,7 @@
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
@@ -430,7 +430,7 @@
     {
       "dt": 1791617400.0,
       "time_scheduled": "09:30",
-      "time_estimated": "09:30",
+      "time_estimated": "09:36",
       "flight_no": "LH072",
       "airline": "Lufthansa",
       "city": "Frankfurt",
@@ -442,12 +442,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 6
     },
     {
       "dt": 1791617700.0,
       "time_scheduled": "09:35",
-      "time_estimated": "09:35",
+      "time_estimated": "09:33",
       "flight_no": "LO403",
       "airline": "LOT Polish Airlines",
       "city": "Warschau",
@@ -464,7 +464,7 @@
     {
       "dt": 1791618000.0,
       "time_scheduled": "09:40",
-      "time_estimated": "09:40",
+      "time_estimated": "09:42",
       "flight_no": "OU422",
       "airline": "Croatia Airlines",
       "city": "Split",
@@ -476,12 +476,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 3
     },
     {
       "dt": 1791618000.0,
       "time_scheduled": "09:40",
-      "time_estimated": "09:40",
+      "time_estimated": "09:34",
       "flight_no": "LH2006",
       "airline": "Lufthansa",
       "city": "München",
@@ -498,7 +498,7 @@
     {
       "dt": 1791618300.0,
       "time_scheduled": "09:45",
-      "time_estimated": "09:45",
+      "time_estimated": "09:32",
       "flight_no": "EI692",
       "airline": "Aer Lingus",
       "city": "Dublin",
@@ -515,7 +515,7 @@
     {
       "dt": 1791618600.0,
       "time_scheduled": "09:50",
-      "time_estimated": "09:50",
+      "time_estimated": "09:32",
       "flight_no": "XQ794",
       "airline": "Sun Express",
       "city": "Ankara-Esenboğa",
@@ -526,7 +526,7 @@
       "baggage": "",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
@@ -928,6 +928,91 @@
       "airline": "Iberia",
       "city": "Madrid-Barajas",
       "country": "Spanien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791624600.0,
+      "time_scheduled": "11:30",
+      "time_estimated": "11:30",
+      "flight_no": "EW9953",
+      "airline": "Eurowings",
+      "city": "Dubrovnik",
+      "country": "Kroatien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "A",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791624900.0,
+      "time_scheduled": "11:35",
+      "time_estimated": "11:35",
+      "flight_no": "DE1515",
+      "airline": "Condor",
+      "city": "Palma de Mallorca",
+      "country": "Spanien",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791625200.0,
+      "time_scheduled": "11:40",
+      "time_estimated": "11:40",
+      "flight_no": "X32313",
+      "airline": "Tuifly",
+      "city": "Palma de Mallorca",
+      "country": "Spanien",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791625200.0,
+      "time_scheduled": "11:40",
+      "time_estimated": "11:40",
+      "flight_no": "X32323",
+      "airline": "Tuifly",
+      "city": "Palma de Mallorca",
+      "country": "Spanien",
+      "type": "Charter",
+      "type_source": "Airline",
+      "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 4 (Charter)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791625200.0,
+      "time_scheduled": "11:40",
+      "time_estimated": "11:40",
+      "flight_no": "A3540",
+      "airline": "Aegean Airlines",
+      "city": "Thessaloniki",
+      "country": "Griechenland",
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "B",
