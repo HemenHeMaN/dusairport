@@ -567,6 +567,7 @@ const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
 const VIEW_KEY = 'dus_active_view';
 const FLAG_KEY = 'dus_flag_mode';
+const FILTER_KEY = 'dus_active_filter';
 const TF_FENSTER = 90;
 const LANDED_STEPS = [5, 10, 15];   // Reihenfolge beim Tippen im Menü
 const LANDED_KEY = 'dus_landed_count';
@@ -624,7 +625,10 @@ function getFlagCode(country) {
         'katar': 'qa', 'qatar': 'qa',
         'israel': 'il',
         'jordanien': 'jo', 'jordan': 'jo',
-        'ukraine': 'ua'
+        'ukraine': 'ua',
+        'irak': 'iq', 'iraq': 'iq',
+        'libanon': 'lb', 'lebanon': 'lb',
+        'moldawien': 'md', 'moldova': 'md'
     };
     const key = country.toLowerCase().trim();
     return map[key] || 'de'; // Standard-Fallback (Deutschland) falls unbekannt
@@ -1019,11 +1023,27 @@ function renderFlights(flights) {
     });
 }
 
-function filterFlights(category, event) {
+function filterFlights(category, event, save = true) {
     document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
-    if (event && event.target) { event.target.classList.add("active"); }
+    
+    if (event && event.target) { 
+        event.target.classList.add("active"); 
+    } else {
+        const btnMap = {
+            'all': '.btn-all',
+            'Linie': '.btn-linie',
+            'Charter': '.btn-charter',
+            'landing': '.btn-landing',
+            'landed': '.btn-landed'
+        };
+        const b = document.querySelector(btnMap[category]);
+        if (b) b.classList.add("active");
+    }
 
     currentFilter = category;
+    if (save) {
+        try { localStorage.setItem(FILTER_KEY, category); } catch (e) {}
+    }
     applyFilter();
 }
 
@@ -1085,8 +1105,6 @@ function renderBoard(flights) {
         return;
     }
 
-    // Reihenfolge kommt bereits sortiert aus getFilteredList() (identisch zur Detail-Ansicht)
-
     flights.forEach(f => {
         const st = tfStatus(f);
         const s = String(f.status).toLowerCase();
@@ -1096,7 +1114,6 @@ function renderBoard(flights) {
         const zeit = f.time_estimated || f.time_scheduled || '';
         const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
 
-        // Flaggen-URL über FlagCDN (SVG ohne Größenordner)
         const cc = getFlagCode(f.country);
         const flagUrl = `https://flagcdn.com/${cc}.svg`;
 
@@ -1132,6 +1149,19 @@ function updateBoardBars() {
 
 // Initialisierung
 loadSavedView();
+
+// Gespeicherten Filter laden oder Standard ('all') nutzen
+try {
+    const savedFilter = localStorage.getItem(FILTER_KEY);
+    if (savedFilter) {
+        filterFlights(savedFilter, null, false);
+    } else {
+        filterFlights('all', null, false);
+    }
+} catch (e) {
+    filterFlights('all', null, false);
+}
+
 loadData();
 setInterval(loadData, REFRESH_MINUTES * 60 * 1000);
 setInterval(updateBoardBars, 20000);
