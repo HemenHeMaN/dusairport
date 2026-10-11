@@ -1,5 +1,5 @@
 {
-  "updated_at": "11.10.2026 06:58",
+  "updated_at": "11.10.2026 07:19",
   "source": "Dus.com",
   "flights": [
     {
@@ -73,7 +73,7 @@
     {
       "dt": 1791697200.0,
       "time_scheduled": "07:40",
-      "time_estimated": "07:37",
+      "time_estimated": "08:04",
       "flight_no": "KL1797",
       "airline": "KLM",
       "city": "Amsterdam",
@@ -85,7 +85,7 @@
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 24
     },
     {
       "dt": 1791698400.0,
@@ -158,7 +158,7 @@
     {
       "dt": 1791700800.0,
       "time_scheduled": "08:40",
-      "time_estimated": "08:47",
+      "time_estimated": "08:37",
       "flight_no": "VL2004",
       "airline": "Lufthansa City Airlines",
       "city": "München",
@@ -170,12 +170,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 7
+      "delay": 0
     },
     {
       "dt": 1791701100.0,
       "time_scheduled": "08:45",
-      "time_estimated": "08:48",
+      "time_estimated": "08:45",
       "flight_no": "LX1016",
       "airline": "Swiss",
       "city": "Zürich",
@@ -187,12 +187,12 @@
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 4
+      "delay": 0
     },
     {
       "dt": 1791701100.0,
       "time_scheduled": "08:45",
-      "time_estimated": "08:39",
+      "time_estimated": "08:44",
       "flight_no": "BT933",
       "airline": "Air Baltic",
       "city": "Vilnius",
@@ -209,7 +209,7 @@
     {
       "dt": 1791701400.0,
       "time_scheduled": "08:50",
-      "time_estimated": "08:45",
+      "time_estimated": "08:42",
       "flight_no": "OS161",
       "airline": "Austrian Airlines",
       "city": "Wien",
@@ -311,7 +311,7 @@
     {
       "dt": 1791702300.0,
       "time_scheduled": "09:05",
-      "time_estimated": "09:07",
+      "time_estimated": "09:09",
       "flight_no": "VY1896",
       "airline": "Vueling",
       "city": "Barcelona",
@@ -322,8 +322,8 @@
       "baggage": "7",
       "gate": "Ausgang 4 (Charter)",
       "status": "scheduled",
-      "status_text": "",
-      "delay": 3
+      "status_text": "Vorhafen verlassen",
+      "delay": 5
     },
     {
       "dt": 1791702600.0,
@@ -379,7 +379,7 @@
     {
       "dt": 1791703500.0,
       "time_scheduled": "09:25",
-      "time_estimated": "09:18",
+      "time_estimated": "09:12",
       "flight_no": "XR404",
       "airline": "Corendon Airlines Europe",
       "city": "Heraklion (Kreta)",
@@ -447,7 +447,7 @@
     {
       "dt": 1791704700.0,
       "time_scheduled": "09:45",
-      "time_estimated": "09:32",
+      "time_estimated": "09:31",
       "flight_no": "EI692",
       "airline": "Aer Lingus",
       "city": "Dublin",
@@ -481,7 +481,7 @@
     {
       "dt": 1791705600.0,
       "time_scheduled": "10:00",
-      "time_estimated": "10:00",
+      "time_estimated": "10:08",
       "flight_no": "LH072",
       "airline": "Lufthansa",
       "city": "Frankfurt",
@@ -493,7 +493,7 @@
       "gate": "Ausgang 5 (Charter)",
       "status": "scheduled",
       "status_text": "",
-      "delay": 0
+      "delay": 8
     },
     {
       "dt": 1791706500.0,
@@ -583,7 +583,7 @@
     {
       "dt": 1791707400.0,
       "time_scheduled": "10:30",
-      "time_estimated": "10:30",
+      "time_estimated": "10:23",
       "flight_no": "4M711",
       "airline": "Mavi Gök Aviation",
       "city": "Antalya",
@@ -594,7 +594,7 @@
       "baggage": "1",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
-      "status_text": "",
+      "status_text": "Vorhafen verlassen",
       "delay": 0
     },
     {
@@ -1016,6 +1016,40 @@
       "type": "Linie",
       "type_source": "Airline",
       "terminal": "B",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791712800.0,
+      "time_scheduled": "12:00",
+      "time_estimated": "12:00",
+      "flight_no": "EW9917",
+      "airline": "Eurowings",
+      "city": "Tirana",
+      "country": "Albanien",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "C",
+      "baggage": "",
+      "gate": "Ausgang 1 (Linie)",
+      "status": "scheduled",
+      "status_text": "",
+      "delay": 0
+    },
+    {
+      "dt": 1791713400.0,
+      "time_scheduled": "12:10",
+      "time_estimated": "12:10",
+      "flight_no": "VF025",
+      "airline": "A Jet",
+      "city": "Istanbul-Sabiha Gökçen",
+      "country": "Türkei",
+      "type": "Linie",
+      "type_source": "Airline",
+      "terminal": "C",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
       "status": "scheduled",
