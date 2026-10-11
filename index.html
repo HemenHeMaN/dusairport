@@ -7,7 +7,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=Barlow+Condensed:wght@500;700&family=B612+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=Barlow+Condensed:wght@500;700&family=B612+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 :root { 
@@ -364,64 +364,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     .tf-status { grid-area: status; justify-self: end; }
 }
 
-/* --- ANSICHT RETRO (Black & White Minimalistisch) --- */
-#viewRetro {
-    font-family: "Share Tech Mono", "B612 Mono", monospace;
-    background: #000;
-    color: #fff;
-    border: 2px solid #fff;
-    border-radius: 4px;
-    padding: 12px;
-}
-[data-theme="dark"] #viewRetro {
-    background: #000;
-    color: #fff;
-    border-color: #fff;
-}
-.retro-header {
-    display: grid;
-    grid-template-columns: 5rem 1fr 5rem 4.5rem;
-    padding: 6px 8px;
-    border-bottom: 1px dashed #fff;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    opacity: 0.7;
-    margin-bottom: 6px;
-}
-.retro-row {
-    display: grid;
-    grid-template-columns: 5rem 1fr 5rem 4.5rem;
-    padding: 8px;
-    border-bottom: 1px solid #222;
-    align-items: center;
-    font-size: 1rem;
-    letter-spacing: 0.05em;
-}
-.retro-row:hover {
-    background: #111;
-}
-.retro-time { font-weight: bold; }
-.retro-city { text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px; }
-.retro-flight { opacity: 0.8; font-size: 0.9rem; }
-.retro-status { font-size: 0.8rem; text-align: right; text-transform: uppercase; }
-.retro-empty { padding: 30px; text-align: center; opacity: 0.6; }
-
-@media (max-width: 600px) {
-    .retro-header { display: none; }
-    .retro-row {
-        grid-template-columns: 1fr auto;
-        grid-template-areas: "city time" "flight status";
-        row-gap: 4px;
-        border-bottom: 1px dashed #44N;
-        padding: 10px 4px;
-    }
-    .retro-city { grid-area: city; font-size: 1.1rem; }
-    .retro-time { grid-area: time; text-align: right; }
-    .retro-flight { grid-area: flight; }
-    .retro-status { grid-area: status; text-align: right; }
-}
-
 /* --- Nach-oben-Button (Overlay) --- */
 .to-top {
     position: fixed; right: 16px; bottom: 16px; z-index: 100;
@@ -577,7 +519,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 <div class="view-switcher">
     <button class="view-btn active" id="btnView1" onclick="switchView('view1')">Detail</button>
     <button class="view-btn" id="btnView3" onclick="switchView('view3')">Tafel</button>
-    <button class="view-btn" id="btnViewRetro" onclick="switchView('viewRetro')">Retro</button>
 </div>
 
 <!-- GEMEINSAME STEUERELEMENTE -->
@@ -611,16 +552,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
             <div class="tf-empty">Flüge werden geladen...</div>
         </div>
         <div class="tf-footer">Der Balken füllt sich, je näher die Landung rückt: blau für Linie, orange für Charter, rot für annullierte Flüge.</div>
-    </div>
-</div>
-
-<!-- ANSICHT RETRO: Schwarz-Weiß Minimalistisch -->
-<div id="viewRetro" class="view-section">
-    <div class="retro-header" aria-hidden="true">
-        <div>Zeit</div><div>Herkunft</div><div>Flug</div><div>Status</div>
-    </div>
-    <div id="retroBody">
-        <div class="retro-empty">Flüge werden geladen...</div>
     </div>
 </div>
 
@@ -697,7 +628,11 @@ function getFlagCode(country) {
         'ukraine': 'ua',
         'irak': 'iq', 'iraq': 'iq',
         'libanon': 'lb', 'lebanon': 'lb',
-        'moldawien': 'md', 'moldova': 'md'
+        'moldawien': 'md', 'moldova': 'md',
+        'libyen': 'ly', 'libya': 'ly',
+        'litauen': 'lt', 'lithuania': 'lt',
+        'lettland': 'lv', 'latvia': 'lv',
+        'kapverdische inseln': 'cv', 'kap verde': 'cv', 'cape verde': 'cv'
     };
     const key = country.toLowerCase().trim();
     return map[key] || 'de'; // Standard-Fallback (Deutschland) falls unbekannt
@@ -720,7 +655,7 @@ function switchView(viewId) {
 function loadSavedView() {
     try {
         const saved = localStorage.getItem(VIEW_KEY);
-        if (saved === 'view1' || saved === 'view3' || saved === 'viewRetro') {
+        if (saved === 'view1' || saved === 'view3') {
             switchView(saved);
         }
     } catch (e) {}
@@ -916,7 +851,6 @@ function loadData() {
             if (allFlights.length === 0) {
                 document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json</div>';
                 document.getElementById('tfBody').innerHTML = '<div class="tf-empty">Fehler beim Laden der cache.json</div>';
-                document.getElementById('retroBody').innerHTML = '<div class="retro-empty">Fehler beim Laden der cache.json</div>';
             }
         });
 }
@@ -941,6 +875,7 @@ function getFilteredList() {
         list = list.filter(f => f.type === currentFilter);
     }
 
+    // Gelandete in Alle / Linie / Charter ausblenden (Menü)
     if (!showLandedInLists && (currentFilter === 'all' || currentFilter === 'Linie' || currentFilter === 'Charter')) {
         list = list.filter(f => String(f.status).toLowerCase() !== 'landed');
     }
@@ -961,6 +896,7 @@ function getFilteredList() {
         });
     }
 
+    // Gelandet: die letzten N Landungen ab jetzt, später gelandete stehen unten
     if (currentFilter === 'landed') {
         const now = berlinMin();
         const ago = f => {
@@ -969,11 +905,12 @@ function getFilteredList() {
             return d;
         };
         return [...list]
-            .sort((a, b) => ago(a) - ago(b))
+            .sort((a, b) => ago(a) - ago(b))     // jüngste zuerst, um die letzten N zu wählen
             .slice(0, landedCount)
-            .sort((a, b) => ago(b) - ago(a));
+            .sort((a, b) => ago(b) - ago(a));    // Anzeige: ältere oben, später gelandete unten
     }
 
+    // Einheitlich für Detail UND Tafel: nach erwarteter Zeit sortiert
     const expected = f => timeToMinutes(f.time_estimated || f.time_scheduled);
 
     return [...list].sort((a, b) => (expected(a) - expected(b)) || ((a.dt || 0) - (b.dt || 0)));
@@ -983,7 +920,6 @@ function applyFilter() {
     const filtered = getFilteredList();
     renderFlights(filtered);
     renderBoard(filtered);
-    renderRetro(filtered);
 }
 
 /* ---------- Rendering Ansicht 1 (Detail-Karten) ---------- */
@@ -1215,36 +1151,10 @@ function updateBoardBars() {
     });
 }
 
-/* ---------- Rendering Ansicht Retro (Simplified B&W) ---------- */
-function renderRetro(flights) {
-    const body = document.getElementById('retroBody');
-    if (!body) return;
-    body.innerHTML = '';
-
-    if (!flights || flights.length === 0) {
-        body.innerHTML = '<div class="retro-empty">' + emptyText() + '</div>';
-        return;
-    }
-
-    flights.forEach(f => {
-        const st = tfStatus(f);
-        const zeit = f.time_estimated || f.time_scheduled || '';
-        
-        const row = document.createElement('div');
-        row.className = 'retro-row';
-        row.innerHTML = `
-            <div class="retro-time">${esc(zeit)}</div>
-            <div class="retro-city">${esc(f.city)}</div>
-            <div class="retro-flight">${esc(f.flight_no)}</div>
-            <div class="retro-status">${st.label}</div>
-        `;
-        body.appendChild(row);
-    });
-}
-
 // Initialisierung
 loadSavedView();
 
+// Gespeicherten Filter laden oder Standard ('all') nutzen
 try {
     const savedFilter = localStorage.getItem(FILTER_KEY);
     if (savedFilter) {
