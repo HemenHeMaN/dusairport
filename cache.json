@@ -1,24 +1,7 @@
 {
-  "updated_at": "11.10.2026 23:18",
+  "updated_at": "11.10.2026 23:37",
   "source": "Dus.com",
   "flights": [
-    {
-      "dt": 1791743400.0,
-      "time_scheduled": "20:30",
-      "time_estimated": "21:20",
-      "flight_no": "EW9637",
-      "airline": "Eurowings",
-      "city": "Kos",
-      "country": "Griechenland",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "A",
-      "baggage": "4",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 50
-    },
     {
       "dt": 1791744300.0,
       "time_scheduled": "20:45",
@@ -52,23 +35,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 73
-    },
-    {
-      "dt": 1791744900.0,
-      "time_scheduled": "20:55",
-      "time_estimated": "21:37",
-      "flight_no": "XR502",
-      "airline": "Corendon Airlines Europe",
-      "city": "Palma de Mallorca",
-      "country": "Spanien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "7",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 42
     },
     {
       "dt": 1791746400.0,
@@ -171,23 +137,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 66
-    },
-    {
-      "dt": 1791747600.0,
-      "time_scheduled": "21:40",
-      "time_estimated": "21:33",
-      "flight_no": "EW9511",
-      "airline": "Eurowings",
-      "city": "Madrid-Barajas",
-      "country": "Spanien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "8",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 0
     },
     {
       "dt": 1791747600.0,
@@ -328,36 +277,19 @@
     {
       "dt": 1791748500.0,
       "time_scheduled": "21:55",
-      "time_estimated": "23:32",
+      "time_estimated": "23:24",
       "flight_no": "EW9365",
       "airline": "Eurowings",
       "city": "Edinburgh",
       "country": "Großbritannien",
       "type": "Linie",
-      "type_source": "Airline",
-      "terminal": "A",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 97
-    },
-    {
-      "dt": 1791748500.0,
-      "time_scheduled": "21:55",
-      "time_estimated": "21:35",
-      "flight_no": "DE1613",
-      "airline": "Condor",
-      "city": "Korfu",
-      "country": "Griechenland",
-      "type": "Charter",
       "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "11",
-      "gate": "Ausgang 4 (Charter)",
+      "terminal": "A",
+      "baggage": "3",
+      "gate": "Ausgang 1 (Linie)",
       "status": "landed",
       "status_text": "gelandet",
-      "delay": 0
+      "delay": 89
     },
     {
       "dt": 1791748800.0,
