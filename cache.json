@@ -1,24 +1,7 @@
 {
-  "updated_at": "11.10.2026 22:55",
+  "updated_at": "11.10.2026 23:18",
   "source": "Dus.com",
   "flights": [
-    {
-      "dt": 1791738600.0,
-      "time_scheduled": "19:10",
-      "time_estimated": "21:06",
-      "flight_no": "IB755",
-      "airline": "Iberia",
-      "city": "Madrid-Barajas",
-      "country": "Spanien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "9",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 117
-    },
     {
       "dt": 1791743400.0,
       "time_scheduled": "20:30",
@@ -39,7 +22,7 @@
     {
       "dt": 1791744300.0,
       "time_scheduled": "20:45",
-      "time_estimated": "22:54",
+      "time_estimated": "22:55",
       "flight_no": "EW9673",
       "airline": "Eurowings",
       "city": "Heraklion (Kreta)",
@@ -49,8 +32,8 @@
       "terminal": "A",
       "baggage": "3",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "im Anflug",
+      "status": "landed",
+      "status_text": "gelandet",
       "delay": 130
     },
     {
@@ -86,74 +69,6 @@
       "status": "landed",
       "status_text": "gelandet",
       "delay": 42
-    },
-    {
-      "dt": 1791745200.0,
-      "time_scheduled": "21:00",
-      "time_estimated": "21:05",
-      "flight_no": "EW9765",
-      "airline": "Eurowings",
-      "city": "Zürich",
-      "country": "Schweiz",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "6",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 5
-    },
-    {
-      "dt": 1791745200.0,
-      "time_scheduled": "21:00",
-      "time_estimated": "20:56",
-      "flight_no": "BA924",
-      "airline": "British Airways",
-      "city": "London-Heathrow",
-      "country": "Großbritannien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "C",
-      "baggage": "19",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 0
-    },
-    {
-      "dt": 1791745500.0,
-      "time_scheduled": "21:05",
-      "time_estimated": "21:15",
-      "flight_no": "EW6894",
-      "airline": "Eurowings",
-      "city": "Palma de Mallorca",
-      "country": "Spanien",
-      "type": "Linie",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "5",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 10
-    },
-    {
-      "dt": 1791745500.0,
-      "time_scheduled": "21:05",
-      "time_estimated": "21:10",
-      "flight_no": "X37102",
-      "airline": "Tuifly",
-      "city": "Boa Vista (Kapverden)",
-      "country": "Kapverdische Inseln",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "C",
-      "baggage": "20",
-      "gate": "Ausgang 6 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "delay": 5
     },
     {
       "dt": 1791746400.0,
@@ -226,7 +141,7 @@
     {
       "dt": 1791747600.0,
       "time_scheduled": "21:40",
-      "time_estimated": "23:05",
+      "time_estimated": "23:00",
       "flight_no": "EW9519",
       "airline": "Eurowings",
       "city": "Bilbao",
@@ -236,9 +151,9 @@
       "terminal": "B",
       "baggage": "1",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 86
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 80
     },
     {
       "dt": 1791747600.0,
@@ -328,19 +243,19 @@
     {
       "dt": 1791748200.0,
       "time_scheduled": "21:50",
-      "time_estimated": "23:12",
+      "time_estimated": "23:10",
       "flight_no": "EW9591",
       "airline": "Eurowings",
       "city": "Palma de Mallorca",
       "country": "Spanien",
       "type": "Linie",
-      "type_source": "Airline",
+      "type_source": "Ausgang",
       "terminal": "A",
-      "baggage": "",
+      "baggage": "6",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "Im Anflug",
-      "delay": 83
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 80
     },
     {
       "dt": 1791748200.0,
@@ -423,8 +338,8 @@
       "terminal": "A",
       "baggage": "",
       "gate": "Ausgang 1 (Linie)",
-      "status": "scheduled",
-      "status_text": "Vorhafen verlassen",
+      "status": "active",
+      "status_text": "im Anflug",
       "delay": 97
     },
     {
@@ -583,19 +498,19 @@
     {
       "dt": 1791749100.0,
       "time_scheduled": "22:05",
-      "time_estimated": "23:04",
+      "time_estimated": "23:05",
       "flight_no": "EW9887",
       "airline": "Eurowings",
       "city": "Rom-Fiumicino",
       "country": "Italien",
       "type": "Linie",
-      "type_source": "Airline",
+      "type_source": "Ausgang",
       "terminal": "A",
-      "baggage": "",
+      "baggage": "2",
       "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "Im Anflug",
-      "delay": 59
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 60
     },
     {
       "dt": 1791749100.0,
@@ -787,19 +702,19 @@
     {
       "dt": 1791750300.0,
       "time_scheduled": "22:25",
-      "time_estimated": "23:19",
+      "time_estimated": "23:11",
       "flight_no": "EW9221",
       "airline": "Eurowings",
       "city": "Göteborg-Landvetter",
       "country": "Schweden",
-      "type": "Linie",
-      "type_source": "Airline",
+      "type": "Charter",
+      "type_source": "Ausgang",
       "terminal": "B",
-      "baggage": "",
-      "gate": "Ausgang 1 (Linie)",
-      "status": "active",
-      "status_text": "Im Anflug",
-      "delay": 55
+      "baggage": "14",
+      "gate": "Ausgang 5 (Charter)",
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 47
     },
     {
       "dt": 1791750300.0,
@@ -906,24 +821,24 @@
     {
       "dt": 1791750900.0,
       "time_scheduled": "22:35",
-      "time_estimated": "23:09",
+      "time_estimated": "23:08",
       "flight_no": "DE1517",
       "airline": "Condor",
       "city": "Palma de Mallorca",
       "country": "Spanien",
       "type": "Charter",
-      "type_source": "Airline",
+      "type_source": "Ausgang",
       "terminal": "B",
-      "baggage": "",
+      "baggage": "7",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "status_text": "Im Anflug",
-      "delay": 35
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 34
     },
     {
       "dt": 1791751200.0,
       "time_scheduled": "22:40",
-      "time_estimated": "23:02",
+      "time_estimated": "23:03",
       "flight_no": "X32293",
       "airline": "Tuifly",
       "city": "Lanzarote-Arrecife",
@@ -933,14 +848,14 @@
       "terminal": "B",
       "baggage": "8",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 22
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 24
     },
     {
       "dt": 1791751200.0,
       "time_scheduled": "22:40",
-      "time_estimated": "22:59",
+      "time_estimated": "23:02",
       "flight_no": "DE1617",
       "airline": "Condor",
       "city": "Heraklion (Kreta)",
@@ -950,9 +865,9 @@
       "terminal": "B",
       "baggage": "11",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 19
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 22
     },
     {
       "dt": 1791751500.0,
@@ -974,24 +889,24 @@
     {
       "dt": 1791751500.0,
       "time_scheduled": "22:45",
-      "time_estimated": "23:03",
+      "time_estimated": "23:06",
       "flight_no": "DE1429",
       "airline": "Condor",
       "city": "Teneriffa Süd",
       "country": "Spanien",
       "type": "Charter",
-      "type_source": "Airline",
+      "type_source": "Ausgang",
       "terminal": "B",
-      "baggage": "",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 19
+      "baggage": "17",
+      "gate": "Ausgang 6 (Charter)",
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 22
     },
     {
       "dt": 1791751500.0,
       "time_scheduled": "22:45",
-      "time_estimated": "23:11",
+      "time_estimated": "23:13",
       "flight_no": "DE1415",
       "airline": "Condor",
       "city": "Funchal (Madeira)",
@@ -1001,14 +916,14 @@
       "terminal": "B",
       "baggage": "10",
       "gate": "Ausgang 4 (Charter)",
-      "status": "active",
-      "status_text": "Im Anflug",
-      "delay": 27
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 29
     },
     {
       "dt": 1791751800.0,
       "time_scheduled": "22:50",
-      "time_estimated": "23:03",
+      "time_estimated": "22:58",
       "flight_no": "X32115",
       "airline": "Tuifly",
       "city": "Gran Canaria",
@@ -1018,9 +933,9 @@
       "terminal": "B",
       "baggage": "13",
       "gate": "Ausgang 5 (Charter)",
-      "status": "active",
-      "status_text": "im Anflug",
-      "delay": 14
+      "status": "landed",
+      "status_text": "gelandet",
+      "delay": 8
     }
   ]
 }
