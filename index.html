@@ -11,7 +11,7 @@
 
 <style>
 :root { 
-    --base-font-size: 18px; 
+    --base-font-size: 20px; 
     --font: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
     /* Hellmodus (Standard) */
@@ -164,40 +164,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .menu-box.active { display: flex; }
 .menu-label { display: block; font-size: 0.8rem; font-weight: bold; color: var(--update-color); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
 
-/* Radio-Drehrad Styles */
-.dial-frame {
-    position: relative; display: flex; align-items: center; justify-content: center; gap: 14px;
-    width: 100%; padding: 12px 10px; border-radius: 14px;
-    background: linear-gradient(145deg,#3b3d39,#171a19 60%,#303330);
-    border: 1px solid #8b8a7b;
-    box-shadow: inset 0 2px 3px #ffffff40,inset 0 -5px 10px #0008,0 4px 8px #0002;
-    user-select: none; -webkit-user-select: none; touch-action: pan-y;
-}
-.arrow { color: #e6e1cc; font-size: 1.3rem; font-weight: 800; flex: 0 0 auto; pointer-events: none; text-shadow: 0 1px 3px #000; }
-#dial {
-    position: relative; flex: 1; height: 50px; border-radius: 10px;
-    border: 2px solid #080a09; outline: 1px solid #62645b;
-    background: linear-gradient(#050706,#171a18 20%,#252925 48%,#090b0a 85%);
-    box-shadow: inset 0 5px 10px #000,0 2px 3px #ffffff24;
-    cursor: ew-resize; touch-action: pan-y; overflow: hidden;
-}
-#dial:before {
-    content: ""; position: absolute; inset: 6px 8px; border-radius: 6px;
-    background: repeating-linear-gradient(90deg,#151817 0 3px,#66695f 4px,#222622 7px,#090b0a 10px);
-    box-shadow: inset 0 2px 5px #000,0 1px 0 #ffffff20;
-    transform: translateX(var(--dial-shift,0px)); pointer-events: none;
-}
-#dial:after {
-    content: ""; position: absolute; left: 10px; right: 10px; top: 8px; height: 6px;
-    border-radius: 50%; background: linear-gradient(#ffffff38,transparent); pointer-events: none;
-}
-.dial-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-.readout { font-weight: 700; color: var(--heading-color); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
-
-.reset-btn {
-    background: var(--reset-btn-bg); color: var(--text-color); border: none; border-radius: 6px;
-    padding: 6px 10px; font-size: 0.8rem; font-weight: bold; cursor: pointer;
-}
 .seg { display: flex; gap: 6px; }
 .seg-btn {
     flex: 1; padding: 9px 6px; border: none; border-radius: 8px; cursor: pointer;
@@ -533,20 +499,14 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     </div>
 </div>
 
-<!-- Verstecktes Menü: Schriftgröße (Drehrad) + Flagge/Name -->
+<!-- Verstecktes Menü: Schriftgröße (Buttons 14, 20, 26) + Flagge/Name -->
 <div class="menu-box" id="menuBox">
     <div>
         <span class="menu-label">Schriftgröße</span>
-        <div class="control-area">
-            <div class="dial-frame">
-                <span class="arrow" aria-hidden="true">◀</span>
-                <div id="dial" role="slider" tabindex="0" aria-label="Schriftgröße einstellen" aria-valuemin="14" aria-valuemax="32" aria-valuenow="18" aria-valuetext="18 Pixel" title="Mit Maus oder Finger nach links und rechts ziehen"></div>
-                <span class="arrow" aria-hidden="true">▶</span>
-            </div>
-            <div class="dial-footer">
-                <div class="readout">Größe: <span id="sizeValue">18</span> px</div>
-                <button class="reset-btn" id="sizeReset" type="button">Reset</button>
-            </div>
+        <div class="seg">
+            <button type="button" class="seg-btn" data-size="14" onclick="setFontSize(14)">14 px</button>
+            <button type="button" class="seg-btn" data-size="20" onclick="setFontSize(20)">20 px</button>
+            <button type="button" class="seg-btn" data-size="26" onclick="setFontSize(26)">26 px</button>
         </div>
     </div>
     <div>
@@ -628,9 +588,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <script>
 const REFRESH_MINUTES = 5;
-const DEFAULT_SIZE = 18;
-const MIN_SIZE = 14;
-const MAX_SIZE = 26;
+const DEFAULT_SIZE = 20;
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
 const VIEW_KEY = 'dus_active_view';
@@ -780,21 +738,16 @@ document.addEventListener('click', e => {
     setMenu(false);
 });
 
-/* ---------- Schriftgröße (Drehrad) ---------- */
-const dial = document.getElementById('dial');
-const sizeValue = document.getElementById('sizeValue');
-const sizeReset = document.getElementById('sizeReset');
-let currentFontSize = DEFAULT_SIZE;
-let dragging = false, lastX = 0, accumulated = 0;
+/* ---------- Schriftgröße (Buttons 14, 20, 26) ---------- */
+function setFontSize(px, save = true) {
+    document.documentElement.style.setProperty('--base-font-size', px + 'px');
+    
+    document.querySelectorAll('[data-size]').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.getAttribute('data-size'), 10) === px);
+    });
 
-function applyFontSize(px) {
-    currentFontSize = Math.max(MIN_SIZE, Math.min(MAX_SIZE, px));
-    document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
-    sizeValue.textContent = currentFontSize;
-    if (dial) {
-        dial.setAttribute('aria-valuenow', currentFontSize);
-        dial.setAttribute('aria-valuetext', currentFontSize + ' Pixel');
-        dial.style.setProperty('--dial-shift', ((currentFontSize - DEFAULT_SIZE) * 2.4) + 'px');
+    if (save) {
+        try { localStorage.setItem(STORAGE_KEY, px); } catch (err) {}
     }
 }
 
@@ -802,51 +755,10 @@ function loadFontSize() {
     let saved = DEFAULT_SIZE;
     try {
         const v = parseInt(localStorage.getItem(STORAGE_KEY), 10);
-        if (v >= MIN_SIZE && v <= MAX_SIZE) saved = v;
+        if ([14, 20, 26].includes(v)) saved = v;
     } catch (e) {}
-    applyFontSize(saved);
+    setFontSize(saved, false);
 }
-
-if (dial) {
-    dial.addEventListener('pointerdown', e => {
-        dragging = true; lastX = e.clientX; accumulated = 0;
-        dial.setPointerCapture(e.pointerId);
-        dial.classList.add('dragging');
-        e.preventDefault();
-    });
-    dial.addEventListener('pointermove', e => {
-        if (!dragging) return;
-        const dx = e.clientX - lastX;
-        lastX = e.clientX;
-        accumulated += dx;
-        const steps = Math.trunc(accumulated / 7);
-        if (steps !== 0) {
-            applyFontSize(currentFontSize + steps);
-            accumulated -= steps * 7;
-        }
-    });
-    function stopDrag() { 
-        if (dragging) {
-            dragging = false; 
-            dial.classList.remove('dragging');
-            try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {}
-        }
-    }
-    dial.addEventListener('pointerup', stopDrag);
-    dial.addEventListener('pointercancel', stopDrag);
-    dial.addEventListener('lostpointercapture', stopDrag);
-    dial.addEventListener('keydown', e => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); applyFontSize(currentFontSize + 1); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
-        else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); applyFontSize(currentFontSize - 1); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
-        else if (e.key === 'Home') { e.preventDefault(); applyFontSize(MIN_SIZE); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
-        else if (e.key === 'End') { e.preventDefault(); applyFontSize(MAX_SIZE); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
-    });
-}
-
-sizeReset.addEventListener('click', () => {
-    applyFontSize(DEFAULT_SIZE);
-    try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
-});
 
 loadFontSize();
 
