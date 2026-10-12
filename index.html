@@ -163,11 +163,37 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 .menu-box.active { display: flex; }
 .menu-label { display: block; font-size: 0.8rem; font-weight: bold; color: var(--update-color); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
-.size-row { display: flex; align-items: center; gap: 10px; }
-.size-row .small-a { font-size: 0.8rem; font-weight: bold; }
-.size-row .big-a { font-size: 1.3rem; font-weight: bold; }
-.size-row input[type="range"] { flex: 1; min-width: 0; height: 28px; cursor: pointer; }
-.size-row .size-value { min-width: 3.2em; text-align: right; font-weight: bold; color: var(--heading-color); }
+
+/* Radio-Drehrad Styles */
+.dial-frame {
+    position: relative; display: flex; align-items: center; justify-content: center; gap: 14px;
+    width: 100%; padding: 12px 10px; border-radius: 14px;
+    background: linear-gradient(145deg,#3b3d39,#171a19 60%,#303330);
+    border: 1px solid #8b8a7b;
+    box-shadow: inset 0 2px 3px #ffffff40,inset 0 -5px 10px #0008,0 4px 8px #0002;
+    user-select: none; -webkit-user-select: none; touch-action: pan-y;
+}
+.arrow { color: #e6e1cc; font-size: 1.3rem; font-weight: 800; flex: 0 0 auto; pointer-events: none; text-shadow: 0 1px 3px #000; }
+#dial {
+    position: relative; flex: 1; height: 50px; border-radius: 10px;
+    border: 2px solid #080a09; outline: 1px solid #62645b;
+    background: linear-gradient(#050706,#171a18 20%,#252925 48%,#090b0a 85%);
+    box-shadow: inset 0 5px 10px #000,0 2px 3px #ffffff24;
+    cursor: ew-resize; touch-action: pan-y; overflow: hidden;
+}
+#dial:before {
+    content: ""; position: absolute; inset: 6px 8px; border-radius: 6px;
+    background: repeating-linear-gradient(90deg,#151817 0 3px,#66695f 4px,#222622 7px,#090b0a 10px);
+    box-shadow: inset 0 2px 5px #000,0 1px 0 #ffffff20;
+    transform: translateX(var(--dial-shift,0px)); pointer-events: none;
+}
+#dial:after {
+    content: ""; position: absolute; left: 10px; right: 10px; top: 8px; height: 6px;
+    border-radius: 50%; background: linear-gradient(#ffffff38,transparent); pointer-events: none;
+}
+.dial-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.readout { font-weight: 700; color: var(--heading-color); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
 .reset-btn {
     background: var(--reset-btn-bg); color: var(--text-color); border: none; border-radius: 6px;
     padding: 6px 10px; font-size: 0.8rem; font-weight: bold; cursor: pointer;
@@ -179,26 +205,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     background: var(--filter-bg); color: var(--text-color);
 }
 .seg-btn.active { background: var(--filter-active-all); color: #fff; }
-/* Scrollrad (Zeitfenster) */
-.wheel-wrap { position: relative; height: 120px; border-radius: 10px; background: var(--filter-bg); overflow: hidden; }
-.wheel-wrap::before {
-    content: ""; position: absolute; left: 0; right: 0; top: 40px; height: 40px; z-index: 1; pointer-events: none;
-    background: var(--filter-active-all); opacity: .18;
-    border-top: 2px solid var(--filter-active-all); border-bottom: 2px solid var(--filter-active-all);
-}
-.wheel {
-    height: 100%; overflow-y: auto; padding: 40px 0; scroll-snap-type: y mandatory;
-    overscroll-behavior: contain; scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
-}
-.wheel::-webkit-scrollbar { display: none; }
-.wheel-item {
-    height: 40px; line-height: 40px; text-align: center; scroll-snap-align: center;
-    font-weight: bold; font-size: 1.05rem; color: var(--update-color); opacity: .55;
-    cursor: pointer; user-select: none; -webkit-user-select: none;
-}
-.wheel-item.active { color: var(--heading-color); opacity: 1; font-size: 1.25rem; }
 
 .update-info { font-size: 0.85rem; color: var(--update-color); margin-bottom: 12px; line-height: 1.5; }
 
@@ -246,6 +252,30 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .btn-charter.active { background: var(--filter-active-charter); color: #fff; }
 .btn-landing.active { background: var(--filter-active-landing); color: #fff; }
 .btn-landed.active { background: var(--filter-active-landed); color: #fff; }
+
+/* --- Zähler: Noch landende Flüge --- */
+.remain-box {
+    display: none; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 10px; padding: 10px 14px; border-radius: 8px;
+    background: var(--card-bg); border: 1px solid var(--border-color);
+    border-left: 6px solid var(--filter-active-landing);
+    font-weight: 700; font-size: 0.95rem;
+}
+.remain-box.show { display: flex; }
+.remain-box .remain-num {
+    font-size: 1.5rem; color: var(--heading-color); font-variant-numeric: tabular-nums;
+}
+.tf-remain {
+    display: none; align-items: baseline; gap: 8px; text-align: right;
+    font-family: var(--tf-display); text-transform: uppercase; letter-spacing: .08em;
+    color: var(--tf-dim); font-size: .95rem; line-height: 1;
+}
+.tf-remain.show { display: flex; }
+.tf-remain b {
+    font-family: var(--tf-data); font-size: 1.6rem; color: var(--tf-flap-text);
+    background: var(--tf-flap); padding: 3px 8px; border-radius: 2px;
+    font-variant-numeric: tabular-nums;
+}
 
 /* Flugkarten (Design 1) */
 .flight-card {
@@ -295,7 +325,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     transition: background .6s ease, color .3s ease;
 }
 .tf-header {
-    display: flex; align-items: flex-end; justify-content: space-between;
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
     padding-bottom: 12px; border-bottom: 2px solid var(--tf-amber);
 }
 .tf-title {
@@ -349,6 +379,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 .tf-row.cancelled .tf-time { opacity: .6; text-decoration: line-through; }
 .tf-exit { font-weight: 700; font-size: .85rem; overflow-wrap: anywhere; }
+.tf-exit small { display: block; font-weight: 400; font-size: .85rem; color: var(--tf-dim); letter-spacing: .02em; margin-top: 2px; }
 .tf-kind { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .tf-status {
     display: flex; align-items: center; gap: 8px; font-size: .68rem; font-weight: 700;
@@ -380,6 +411,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     .tf-time { grid-area: time; justify-self: end; }
     .tf-city { grid-area: city; font-size: 1.6rem; }
     .tf-exit { grid-area: exit; font-size: .75rem; }
+    .tf-exit small { font-size: .8rem; }
     .tf-kind { grid-area: kind; justify-self: start; }
     .tf-status { grid-area: status; justify-self: end; }
 }
@@ -501,16 +533,20 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     </div>
 </div>
 
-<!-- Verstecktes Menü: Schriftgröße + Flagge/Name -->
+<!-- Verstecktes Menü: Schriftgröße (Drehrad) + Flagge/Name -->
 <div class="menu-box" id="menuBox">
     <div>
         <span class="menu-label">Schriftgröße</span>
-        <div class="size-row">
-            <span class="small-a">A</span>
-            <input type="range" id="sizeSlider" min="14" max="32" step="1" value="18" aria-label="Schriftgröße">
-            <span class="big-a">A</span>
-            <span class="size-value" id="sizeValue">18px</span>
-            <button class="reset-btn" id="sizeReset" type="button">Reset</button>
+        <div class="control-area">
+            <div class="dial-frame">
+                <span class="arrow" aria-hidden="true">◀</span>
+                <div id="dial" role="slider" tabindex="0" aria-label="Schriftgröße einstellen" aria-valuemin="14" aria-valuemax="32" aria-valuenow="18" aria-valuetext="18 Pixel" title="Mit Maus oder Finger nach links und rechts ziehen"></div>
+                <span class="arrow" aria-hidden="true">▶</span>
+            </div>
+            <div class="dial-footer">
+                <div class="readout">Größe: <span id="sizeValue">18</span> px</div>
+                <button class="reset-btn" id="sizeReset" type="button">Reset</button>
+            </div>
         </div>
     </div>
     <div>
@@ -531,12 +567,6 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
         <div class="seg">
             <button type="button" class="seg-btn active" id="segLandedOn">Einblenden</button>
             <button type="button" class="seg-btn" id="segLandedOff">Ausblenden</button>
-        </div>
-    </div>
-    <div>
-        <span class="menu-label">Zeitfenster: Nächste Stunden</span>
-        <div class="wheel-wrap">
-            <div class="wheel" id="wheel" role="listbox" aria-label="Zeitfenster in Stunden"></div>
         </div>
     </div>
 </div>
@@ -563,6 +593,10 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <!-- ANSICHT 1: Klassische Detail-Karten -->
 <div id="view1" class="view-section active-view">
+    <div class="remain-box" id="remainBox1">
+        <span id="remainLabel1">Noch zu landen</span>
+        <span class="remain-num" id="remainNum1">0</span>
+    </div>
     <div id="flightList">
         <div class="no-flights">Flüge werden geladen...</div>
     </div>
@@ -571,6 +605,12 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 <!-- ANSICHT 3: Flughafentafel -->
 <div id="view3" class="view-section">
     <div class="tf-board">
+        <div class="tf-header">
+            <h2 class="tf-title">Ankünfte</h2>
+            <div class="tf-remain" id="remainBox3">
+                <span id="remainLabel3">Noch zu landen</span><b id="remainNum3">0</b>
+            </div>
+        </div>
         <div class="tf-head tf-row" aria-hidden="true">
             <div>Flug</div><div>Von</div><div>Erwartet</div><div>Ausgang</div><div>Art</div><div>Status</div>
         </div>
@@ -589,19 +629,18 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 <script>
 const REFRESH_MINUTES = 5;
 const DEFAULT_SIZE = 18;
+const MIN_SIZE = 14;
+const MAX_SIZE = 32;
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
 const VIEW_KEY = 'dus_active_view';
 const FLAG_KEY = 'dus_flag_mode';
 const FILTER_KEY = 'dus_active_filter';
 const TF_FENSTER = 90;
+const EMPTY_MARK = '------';        // Platzhalter, wenn Ausgang/Band noch nicht festgelegt
 const LANDED_STEPS = [5, 10, 15];   // Reihenfolge beim Tippen im Menü
 const LANDED_KEY = 'dus_landed_count';
 const SHOWLANDED_KEY = 'dus_show_landed';
-const WINDOW_KEY = 'dus_window_min';
-const WINDOW_MAX_H = 13;            // größte Stufe des Rads (sinnvoll bis HOURS_FUTURE im Scraper)
-const WINDOW_STEP_MIN = 60;         // Rastung des Scrollrads in Minuten
-let windowMin = 0;                  // Zeitfenster in Minuten ab jetzt (0 = alle)
 let showLandedInLists = true;       // Gelandete in Alle/Linie/Charter anzeigen
 let landedCount = 15;               // Anzahl der Flüge im Filter "Gelandet"
 
@@ -731,7 +770,6 @@ const menuBox = document.getElementById('menuBox');
 function setMenu(open) {
     menuBox.classList.toggle('active', open);
     menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) syncWheel();
 }
 
 menuToggle.addEventListener('click', () => setMenu(!menuBox.classList.contains('active')));
@@ -742,31 +780,68 @@ document.addEventListener('click', e => {
     setMenu(false);
 });
 
-/* ---------- Schriftgröße ---------- */
-const sizeSlider = document.getElementById('sizeSlider');
+/* ---------- Schriftgröße (Drehrad) ---------- */
+const dial = document.getElementById('dial');
 const sizeValue = document.getElementById('sizeValue');
 const sizeReset = document.getElementById('sizeReset');
+let currentFontSize = DEFAULT_SIZE;
+let dragging = false, lastX = 0, accumulated = 0;
 
 function applyFontSize(px) {
-    document.documentElement.style.setProperty('--base-font-size', px + 'px');
-    sizeSlider.value = px;
-    sizeValue.textContent = px + 'px';
+    currentFontSize = Math.max(MIN_SIZE, Math.min(MAX_SIZE, px));
+    document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
+    sizeValue.textContent = currentFontSize;
+    if (dial) {
+        dial.setAttribute('aria-valuenow', currentFontSize);
+        dial.setAttribute('aria-valuetext', currentFontSize + ' Pixel');
+        dial.style.setProperty('--dial-shift', ((currentFontSize - DEFAULT_SIZE) * 2.4) + 'px');
+    }
 }
 
 function loadFontSize() {
     let saved = DEFAULT_SIZE;
     try {
         const v = parseInt(localStorage.getItem(STORAGE_KEY), 10);
-        if (v >= 14 && v <= 32) saved = v;
+        if (v >= MIN_SIZE && v <= MAX_SIZE) saved = v;
     } catch (e) {}
     applyFontSize(saved);
 }
 
-sizeSlider.addEventListener('input', e => {
-    const px = parseInt(e.target.value, 10);
-    applyFontSize(px);
-    try { localStorage.setItem(STORAGE_KEY, px); } catch (err) {}
-});
+if (dial) {
+    dial.addEventListener('pointerdown', e => {
+        dragging = true; lastX = e.clientX; accumulated = 0;
+        dial.setPointerCapture(e.pointerId);
+        dial.classList.add('dragging');
+        e.preventDefault();
+    });
+    dial.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX;
+        lastX = e.clientX;
+        accumulated += dx;
+        const steps = Math.trunc(accumulated / 7);
+        if (steps !== 0) {
+            applyFontSize(currentFontSize + steps);
+            accumulated -= steps * 7;
+        }
+    });
+    function stopDrag() { 
+        if (dragging) {
+            dragging = false; 
+            dial.classList.remove('dragging');
+            try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {}
+        }
+    }
+    dial.addEventListener('pointerup', stopDrag);
+    dial.addEventListener('pointercancel', stopDrag);
+    dial.addEventListener('lostpointercapture', stopDrag);
+    dial.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); applyFontSize(currentFontSize + 1); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); applyFontSize(currentFontSize - 1); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
+        else if (e.key === 'Home') { e.preventDefault(); applyFontSize(MIN_SIZE); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
+        else if (e.key === 'End') { e.preventDefault(); applyFontSize(MAX_SIZE); try { localStorage.setItem(STORAGE_KEY, currentFontSize); } catch (err) {} }
+    });
+}
 
 sizeReset.addEventListener('click', () => {
     applyFontSize(DEFAULT_SIZE);
@@ -827,67 +902,6 @@ segLandedOn.addEventListener('click', () => { setShowLanded(true, true); applyFi
 segLandedOff.addEventListener('click', () => { setShowLanded(false, true); applyFilter(); });
 
 try { setShowLanded(localStorage.getItem(SHOWLANDED_KEY) !== 'off', false); } catch (e) { setShowLanded(true, false); }
-
-/* ---------- Menü: Zeitfenster (Scrollrad) ---------- */
-const WHEEL_ITEM_H = 40;
-const wheel = document.getElementById('wheel');
-const wheelValues = [0];
-for (let m = WINDOW_STEP_MIN; m <= WINDOW_MAX_H * 60; m += WINDOW_STEP_MIN) wheelValues.push(m);
-
-function windowLabel(m) {
-    if (m === 0) return 'Alle';
-    if (m < 60) return m + ' Min.';
-    const h = Math.floor(m / 60), r = m % 60;
-    return r === 0 ? h + ' Std.' : h + ':' + String(r).padStart(2, '0') + ' Std.';
-}
-
-wheelValues.forEach(m => {
-    const d = document.createElement('div');
-    d.className = 'wheel-item';
-    d.dataset.m = m;
-    d.setAttribute('role', 'option');
-    d.textContent = windowLabel(m);
-    wheel.appendChild(d);
-});
-
-function wheelIndex() {
-    return Math.max(0, Math.min(wheelValues.length - 1, Math.round(wheel.scrollTop / WHEEL_ITEM_H)));
-}
-
-function markWheel(i) {
-    wheel.querySelectorAll('.wheel-item').forEach((el, j) => el.classList.toggle('active', j === i));
-}
-
-// Position setzen (nur möglich, solange das Menü sichtbar ist)
-function syncWheel() {
-    const i = Math.max(0, wheelValues.indexOf(windowMin));
-    wheel.scrollTop = i * WHEEL_ITEM_H;
-    markWheel(i);
-}
-
-let wheelTimer = null;
-wheel.addEventListener('scroll', () => {
-    markWheel(wheelIndex());
-    clearTimeout(wheelTimer);
-    wheelTimer = setTimeout(() => {
-        const m = wheelValues[wheelIndex()];
-        if (m === windowMin) return;
-        windowMin = m;
-        try { localStorage.setItem(WINDOW_KEY, m); } catch (e) {}
-        applyFilter();
-    }, 150);
-}, { passive: true });
-
-wheel.addEventListener('click', e => {
-    const it = e.target.closest('.wheel-item');
-    if (!it) return;
-    wheel.scrollTo({ top: wheelValues.indexOf(parseInt(it.dataset.m, 10)) * WHEEL_ITEM_H, behavior: 'smooth' });
-});
-
-try {
-    const v = parseInt(localStorage.getItem(WINDOW_KEY), 10);
-    if (wheelValues.includes(v)) windowMin = v;
-} catch (e) {}
 
 try { setFlagMode(localStorage.getItem(FLAG_KEY) !== 'name', false); } catch (e) { setFlagMode(true, false); }
 
@@ -973,18 +987,6 @@ function getFilteredList() {
         list = list.filter(f => String(f.status).toLowerCase() !== 'landed');
     }
 
-    // Zeitfenster: nur Flüge der nächsten X Stunden (Gelandete bleiben unberührt)
-    if (windowMin > 0 && currentFilter !== 'landed') {
-        const now = berlinMin();
-        list = list.filter(f => {
-            if (String(f.status).toLowerCase() === 'landed') return true;
-            const t = timeToMinutes(f.time_estimated || f.time_scheduled);
-            // Bereich -120 … +1320 Min.: leicht überfällige Flüge bleiben, Rest wird nach vorn gerechnet
-            const d = ((((t - now + 120) % 1440) + 1440) % 1440) - 120;
-            return d <= windowMin;
-        });
-    }
-
     if (currentSearch) {
         list = list.filter(f => {
             const city = (f.city || '').toLowerCase();
@@ -1021,10 +1023,47 @@ function getFilteredList() {
     return [...list].sort((a, b) => (expected(a) - expected(b)) || ((a.dt || 0) - (b.dt || 0)));
 }
 
+/* ---------- Zähler: Wie viele Flüge landen noch? ---------- */
+function isStillLanding(f) {
+    const s = String(f.status).toLowerCase();
+    return s !== 'landed' && s !== 'cancelled' && s !== 'diverted' && s !== 'incident';
+}
+
+function updateRemaining() {
+    let list = allFlights.filter(isStillLanding);
+    let label = 'Noch zu landen';
+
+    if (currentFilter === 'Linie') {
+        list = list.filter(f => f.type === 'Linie');
+        label = 'Noch zu landen (Linie)';
+    } else if (currentFilter === 'Charter') {
+        list = list.filter(f => f.type === 'Charter');
+        label = 'Noch zu landen (Charter)';
+    } else if (currentFilter === 'landing') {
+        list = list.filter(f => {
+            const s = String(f.status).toLowerCase();
+            return s === 'active' || s === 'en-route';
+        });
+        label = 'Gerade im Anflug';
+    } else if (currentFilter === 'all') {
+        label = 'Noch zu landen (Alle)';
+    }
+
+    const show = currentFilter !== 'landed';
+    [1, 3].forEach(n => {
+        const box = document.getElementById('remainBox' + n);
+        if (!box) return;
+        box.classList.toggle('show', show);
+        document.getElementById('remainLabel' + n).textContent = label;
+        document.getElementById('remainNum' + n).textContent = list.length;
+    });
+}
+
 function applyFilter() {
     const filtered = getFilteredList();
     renderFlights(filtered);
     renderBoard(filtered);
+    updateRemaining();
 }
 
 /* ---------- Rendering Ansicht 1 (Detail-Karten) ---------- */
@@ -1061,7 +1100,7 @@ function renderFlights(flights) {
 
         const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
         const guessMark = isGuess ? ' ?' : '';
-        const guessTitle = isGuess ? ' title="Vorläufig, Ausgang noch nicht vergeben"' : '';
+        const guessTitle = isGuess ? ' title="Vorläufig, Art noch nicht sicher"' : '';
 
         const est = f.time_estimated;
         const hasEst = est && est !== f.time_scheduled;
@@ -1111,7 +1150,7 @@ function renderFlights(flights) {
                 <div class="main-info">
                     <div class="city-name">${f.city}${countryHtml}</div>
                     <div class="gate-info">
-                        <span class="${badgeClass}"${guessTitle}>${f.gate}${guessMark}</span>
+                        <span class="${badgeClass}">${esc(cleanGate(f.gate))}</span>
                     </div>
                 </div>
                 ${iconHtml}
@@ -1122,7 +1161,7 @@ function renderFlights(flights) {
                     <div><strong>Flug-Nr.:</strong> ${f.flight_no}</div>
                     <div><strong>Airline:</strong> ${f.airline}</div>
                     <div><strong>Von:</strong> ${fromText}</div>
-                    <div><strong>Typ:</strong> ${f.type}</div>
+                    <div${guessTitle}><strong>Typ:</strong> ${f.type}${guessMark}</div>
                     <div><strong>Status:</strong> ${statusText}</div>
                     ${beltHtml}
                 </div>
@@ -1171,6 +1210,15 @@ function liveStatus(f) {
     const dep = f.departure_actual || f.time_departed;
     if (dep && berlinMin() >= timeToMinutes(dep)) return 'airborne';
     return 'scheduled';
+}
+
+/* ---------- Ausgang bereinigen: "[ Charter ]" / "[ Linie ]" entfernen ---------- */
+function cleanGate(g) {
+    let t = String(g == null ? '' : g);
+    t = t.replace(/[\[\(\uFF3B\u3010][^\]\)\uFF3D\u3011]*[\]\)\uFF3D\u3011]/g, ' ');  // alles in Klammern
+    t = t.replace(/\b(charter|linie)\b/gi, ' ');                                          // lose Wörter
+    t = t.replace(/[\[\]\(\)]/g, ' ').replace(/\s+/g, ' ').trim();                        // Reste
+    return t || EMPTY_MARK;
 }
 
 /* ---------- Rendering Ansicht 3 (Flughafentafel) ---------- */
@@ -1223,6 +1271,9 @@ function renderBoard(flights) {
         const zeit = f.time_estimated || f.time_scheduled || '';
         const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
 
+        const gateText = cleanGate(f.gate);
+        const beltText = String(f.baggage == null ? '' : f.baggage).trim() || EMPTY_MARK;
+
         const cc = getFlagCode(f.country);
         const flagUrl = `https://flagcdn.com/${cc}.svg`;
 
@@ -1240,8 +1291,8 @@ function renderBoard(flights) {
             <div class="tf-flight">${esc(f.flight_no)}<small>${esc(f.airline)}</small></div>
             <div class="tf-city">${esc(f.city)}${countryHtml}</div>
             <div class="tf-time">${esc(zeit)}</div>
-            <div class="tf-exit">${esc(f.gate)}${isGuess ? ' ?' : ''}</div>
-            <div class="tf-kind">${esc(f.type)}</div>
+            <div class="tf-exit">${esc(gateText)}<small>Band ${esc(beltText)}</small></div>
+            <div class="tf-kind"${isGuess ? ' title="Vorläufig, Art noch nicht sicher"' : ''}>${esc(f.type)}${isGuess ? ' ?' : ''}</div>
             <div class="tf-status"><span class="tf-dot"></span><span>${st.label}${!isCancelled && f.delay > 0 ? '<span class="tf-delay">+' + esc(f.delay) + ' Min.</span>' : ''}</span></div>
         `;
         body.appendChild(row);
@@ -1259,7 +1310,6 @@ function updateBoardBars() {
 // Initialisierung
 loadSavedView();
 
-// Gespeicherten Filter laden oder Standard ('all') nutzen
 try {
     const savedFilter = localStorage.getItem(FILTER_KEY);
     if (savedFilter) {
