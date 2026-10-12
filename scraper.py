@@ -37,7 +37,7 @@ WINDOW_END = (23, 40)     # spätester Start (Soll: 23:30)
 
 # Anzeige-Fenster (nach tatsächlicher/erwarteter Ankunft)
 MINUTES_PAST = 120
-HOURS_FUTURE = 5
+HOURS_FUTURE = 13
 
 # Abfrage-Fenster (nach Plan-Zeit), größer als das Anzeige-Fenster,
 # damit stark verspätete oder zu früh gelandete Flüge nicht fehlen
