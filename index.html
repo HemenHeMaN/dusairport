@@ -179,8 +179,26 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     background: var(--filter-bg); color: var(--text-color);
 }
 .seg-btn.active { background: var(--filter-active-all); color: #fff; }
-.seg-wrap { flex-wrap: wrap; }
-.seg-wrap .seg-btn { flex: 1 0 28%; }
+/* Scrollrad (Zeitfenster) */
+.wheel-wrap { position: relative; height: 120px; border-radius: 10px; background: var(--filter-bg); overflow: hidden; }
+.wheel-wrap::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 40px; height: 40px; z-index: 1; pointer-events: none;
+    background: var(--filter-active-all); opacity: .18;
+    border-top: 2px solid var(--filter-active-all); border-bottom: 2px solid var(--filter-active-all);
+}
+.wheel {
+    height: 100%; overflow-y: auto; padding: 40px 0; scroll-snap-type: y mandatory;
+    overscroll-behavior: contain; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+}
+.wheel::-webkit-scrollbar { display: none; }
+.wheel-item {
+    height: 40px; line-height: 40px; text-align: center; scroll-snap-align: center;
+    font-weight: bold; font-size: 1.05rem; color: var(--update-color); opacity: .55;
+    cursor: pointer; user-select: none; -webkit-user-select: none;
+}
+.wheel-item.active { color: var(--heading-color); opacity: 1; font-size: 1.25rem; }
 
 .update-info { font-size: 0.85rem; color: var(--update-color); margin-bottom: 12px; line-height: 1.5; }
 
@@ -517,13 +535,8 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     </div>
     <div>
         <span class="menu-label">Zeitfenster: Nächste Stunden</span>
-        <div class="seg seg-wrap" id="segWindow">
-            <button type="button" class="seg-btn active" data-h="0">Alle</button>
-            <button type="button" class="seg-btn" data-h="3">3 h</button>
-            <button type="button" class="seg-btn" data-h="5">5 h</button>
-            <button type="button" class="seg-btn" data-h="7">7 h</button>
-            <button type="button" class="seg-btn" data-h="9">9 h</button>
-            <button type="button" class="seg-btn" data-h="13">13 h</button>
+        <div class="wheel-wrap">
+            <div class="wheel" id="wheel" role="listbox" aria-label="Zeitfenster in Stunden"></div>
         </div>
     </div>
 </div>
@@ -585,9 +598,10 @@ const TF_FENSTER = 90;
 const LANDED_STEPS = [5, 10, 15];   // Reihenfolge beim Tippen im Menü
 const LANDED_KEY = 'dus_landed_count';
 const SHOWLANDED_KEY = 'dus_show_landed';
-const WINDOW_KEY = 'dus_window_hours';
-const WINDOW_STEPS = [0, 3, 5, 7, 9, 13];   // 0 = alle
-let windowHours = 0;                // Zeitfenster in Stunden ab jetzt (0 = unbegrenzt)
+const WINDOW_KEY = 'dus_window_min';
+const WINDOW_MAX_H = 13;            // größte Stufe des Rads (sinnvoll bis HOURS_FUTURE im Scraper)
+const WINDOW_STEP_MIN = 60;         // Rastung des Scrollrads in Minuten
+let windowMin = 0;                  // Zeitfenster in Minuten ab jetzt (0 = alle)
 let showLandedInLists = true;       // Gelandete in Alle/Linie/Charter anzeigen
 let landedCount = 15;               // Anzahl der Flüge im Filter "Gelandet"
 
@@ -717,6 +731,7 @@ const menuBox = document.getElementById('menuBox');
 function setMenu(open) {
     menuBox.classList.toggle('active', open);
     menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) syncWheel();
 }
 
 menuToggle.addEventListener('click', () => setMenu(!menuBox.classList.contains('active')));
@@ -813,28 +828,66 @@ segLandedOff.addEventListener('click', () => { setShowLanded(false, true); apply
 
 try { setShowLanded(localStorage.getItem(SHOWLANDED_KEY) !== 'off', false); } catch (e) { setShowLanded(true, false); }
 
-/* ---------- Menü: Zeitfenster (nächste X Stunden) ---------- */
-const segWindow = document.getElementById('segWindow');
+/* ---------- Menü: Zeitfenster (Scrollrad) ---------- */
+const WHEEL_ITEM_H = 40;
+const wheel = document.getElementById('wheel');
+const wheelValues = [0];
+for (let m = WINDOW_STEP_MIN; m <= WINDOW_MAX_H * 60; m += WINDOW_STEP_MIN) wheelValues.push(m);
 
-function setWindowHours(h, save) {
-    windowHours = h;
-    segWindow.querySelectorAll('.seg-btn').forEach(b => {
-        b.classList.toggle('active', parseInt(b.dataset.h, 10) === h);
-    });
-    if (save) { try { localStorage.setItem(WINDOW_KEY, h); } catch (e) {} }
+function windowLabel(m) {
+    if (m === 0) return 'Alle';
+    if (m < 60) return m + ' Min.';
+    const h = Math.floor(m / 60), r = m % 60;
+    return r === 0 ? h + ' Std.' : h + ':' + String(r).padStart(2, '0') + ' Std.';
 }
 
-segWindow.addEventListener('click', e => {
-    const b = e.target.closest('.seg-btn');
-    if (!b) return;
-    setWindowHours(parseInt(b.dataset.h, 10), true);
-    applyFilter();
+wheelValues.forEach(m => {
+    const d = document.createElement('div');
+    d.className = 'wheel-item';
+    d.dataset.m = m;
+    d.setAttribute('role', 'option');
+    d.textContent = windowLabel(m);
+    wheel.appendChild(d);
+});
+
+function wheelIndex() {
+    return Math.max(0, Math.min(wheelValues.length - 1, Math.round(wheel.scrollTop / WHEEL_ITEM_H)));
+}
+
+function markWheel(i) {
+    wheel.querySelectorAll('.wheel-item').forEach((el, j) => el.classList.toggle('active', j === i));
+}
+
+// Position setzen (nur möglich, solange das Menü sichtbar ist)
+function syncWheel() {
+    const i = Math.max(0, wheelValues.indexOf(windowMin));
+    wheel.scrollTop = i * WHEEL_ITEM_H;
+    markWheel(i);
+}
+
+let wheelTimer = null;
+wheel.addEventListener('scroll', () => {
+    markWheel(wheelIndex());
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => {
+        const m = wheelValues[wheelIndex()];
+        if (m === windowMin) return;
+        windowMin = m;
+        try { localStorage.setItem(WINDOW_KEY, m); } catch (e) {}
+        applyFilter();
+    }, 150);
+}, { passive: true });
+
+wheel.addEventListener('click', e => {
+    const it = e.target.closest('.wheel-item');
+    if (!it) return;
+    wheel.scrollTo({ top: wheelValues.indexOf(parseInt(it.dataset.m, 10)) * WHEEL_ITEM_H, behavior: 'smooth' });
 });
 
 try {
     const v = parseInt(localStorage.getItem(WINDOW_KEY), 10);
-    setWindowHours(WINDOW_STEPS.includes(v) ? v : 0, false);
-} catch (e) { setWindowHours(0, false); }
+    if (wheelValues.includes(v)) windowMin = v;
+} catch (e) {}
 
 try { setFlagMode(localStorage.getItem(FLAG_KEY) !== 'name', false); } catch (e) { setFlagMode(true, false); }
 
@@ -921,14 +974,14 @@ function getFilteredList() {
     }
 
     // Zeitfenster: nur Flüge der nächsten X Stunden (Gelandete bleiben unberührt)
-    if (windowHours > 0 && currentFilter !== 'landed') {
+    if (windowMin > 0 && currentFilter !== 'landed') {
         const now = berlinMin();
         list = list.filter(f => {
             if (String(f.status).toLowerCase() === 'landed') return true;
             const t = timeToMinutes(f.time_estimated || f.time_scheduled);
             // Bereich -120 … +1320 Min.: leicht überfällige Flüge bleiben, Rest wird nach vorn gerechnet
             const d = ((((t - now + 120) % 1440) + 1440) % 1440) - 120;
-            return d <= windowHours * 60;
+            return d <= windowMin;
         });
     }
 
