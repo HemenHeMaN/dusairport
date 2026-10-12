@@ -179,6 +179,8 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     background: var(--filter-bg); color: var(--text-color);
 }
 .seg-btn.active { background: var(--filter-active-all); color: #fff; }
+.seg-wrap { flex-wrap: wrap; }
+.seg-wrap .seg-btn { flex: 1 0 28%; }
 
 .update-info { font-size: 0.85rem; color: var(--update-color); margin-bottom: 12px; line-height: 1.5; }
 
@@ -513,6 +515,17 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
             <button type="button" class="seg-btn" id="segLandedOff">Ausblenden</button>
         </div>
     </div>
+    <div>
+        <span class="menu-label">Zeitfenster: Nächste Stunden</span>
+        <div class="seg seg-wrap" id="segWindow">
+            <button type="button" class="seg-btn active" data-h="0">Alle</button>
+            <button type="button" class="seg-btn" data-h="3">3 h</button>
+            <button type="button" class="seg-btn" data-h="5">5 h</button>
+            <button type="button" class="seg-btn" data-h="7">7 h</button>
+            <button type="button" class="seg-btn" data-h="9">9 h</button>
+            <button type="button" class="seg-btn" data-h="13">13 h</button>
+        </div>
+    </div>
 </div>
 
 <!-- Reiter -->
@@ -572,6 +585,9 @@ const TF_FENSTER = 90;
 const LANDED_STEPS = [5, 10, 15];   // Reihenfolge beim Tippen im Menü
 const LANDED_KEY = 'dus_landed_count';
 const SHOWLANDED_KEY = 'dus_show_landed';
+const WINDOW_KEY = 'dus_window_hours';
+const WINDOW_STEPS = [0, 3, 5, 7, 9, 13];   // 0 = alle
+let windowHours = 0;                // Zeitfenster in Stunden ab jetzt (0 = unbegrenzt)
 let showLandedInLists = true;       // Gelandete in Alle/Linie/Charter anzeigen
 let landedCount = 15;               // Anzahl der Flüge im Filter "Gelandet"
 
@@ -797,6 +813,29 @@ segLandedOff.addEventListener('click', () => { setShowLanded(false, true); apply
 
 try { setShowLanded(localStorage.getItem(SHOWLANDED_KEY) !== 'off', false); } catch (e) { setShowLanded(true, false); }
 
+/* ---------- Menü: Zeitfenster (nächste X Stunden) ---------- */
+const segWindow = document.getElementById('segWindow');
+
+function setWindowHours(h, save) {
+    windowHours = h;
+    segWindow.querySelectorAll('.seg-btn').forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.h, 10) === h);
+    });
+    if (save) { try { localStorage.setItem(WINDOW_KEY, h); } catch (e) {} }
+}
+
+segWindow.addEventListener('click', e => {
+    const b = e.target.closest('.seg-btn');
+    if (!b) return;
+    setWindowHours(parseInt(b.dataset.h, 10), true);
+    applyFilter();
+});
+
+try {
+    const v = parseInt(localStorage.getItem(WINDOW_KEY), 10);
+    setWindowHours(WINDOW_STEPS.includes(v) ? v : 0, false);
+} catch (e) { setWindowHours(0, false); }
+
 try { setFlagMode(localStorage.getItem(FLAG_KEY) !== 'name', false); } catch (e) { setFlagMode(true, false); }
 
 /* ---------- Such-Event-Listener & Clear Button ---------- */
@@ -879,6 +918,18 @@ function getFilteredList() {
     // Gelandete in Alle / Linie / Charter ausblenden (Menü)
     if (!showLandedInLists && (currentFilter === 'all' || currentFilter === 'Linie' || currentFilter === 'Charter')) {
         list = list.filter(f => String(f.status).toLowerCase() !== 'landed');
+    }
+
+    // Zeitfenster: nur Flüge der nächsten X Stunden (Gelandete bleiben unberührt)
+    if (windowHours > 0 && currentFilter !== 'landed') {
+        const now = berlinMin();
+        list = list.filter(f => {
+            if (String(f.status).toLowerCase() === 'landed') return true;
+            const t = timeToMinutes(f.time_estimated || f.time_scheduled);
+            // Bereich -120 … +1320 Min.: leicht überfällige Flüge bleiben, Rest wird nach vorn gerechnet
+            const d = ((((t - now + 120) % 1440) + 1440) % 1440) - 120;
+            return d <= windowHours * 60;
+        });
     }
 
     if (currentSearch) {
