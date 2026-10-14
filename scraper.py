@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
 DUS-Ankünfte Scraper (dus.com Flug-API)
-Läuft zwischen 05:30 und 23:30 (Europe/Berlin), Takt über Cron/Scheduler.
+Läuft zwischen 05:25 und 00:05 (Europe/Berlin), Takt über Cron/Scheduler.
 Aufruf mit --force ignoriert das Zeitfenster (zum Testen).
 
 Charter/Linie-Zuordnung (Reihenfolge):
   1. Ausgang   : Ausgang 1-2 = Linie, Ausgang 3-6 = Charter   (verlässlich)
-  2. Gepäckband: Band 1-6 = Linie, Band 7+ = Charter           (verlässlich)
+  2. Gepäckband: Band 1-6 = Linie, Band 7+ = Charter            (verlässlich)
   3. Flugtyp   : dus.com-Flugtyp 21 (Pauschalreise-Charter)    (Fallback)
-  4. Airline   : Airline-Liste                                  (Fallback)
+  4. Airline   : Airline-Liste                                (Fallback)
 Ausgang und Band vergibt der Flughafen erst kurz vor der Landung, davor
 greifen die Fallbacks. type_source zeigt, woher die Zuordnung stammt.
 """
@@ -31,13 +31,13 @@ CACHE_FILE = "cache.json"
 
 TZ = ZoneInfo("Europe/Berlin")
 
-# Abruf-Zeitfenster (lokale Zeit). Etwas Toleranz für verspätete Cron-Starts.
+# Abruf-Zeitfenster (lokale Zeit). Endet am Folgetag um 00:05 Uhr.
 WINDOW_START = (5, 25)    # frühester Start (Soll: 05:30)
-WINDOW_END = (0, 35)     # spätester Start (Soll: 00:35)
+WINDOW_END = (0, 35)      # spätester Start (bis 00:35 Uhr, cronjob läuft bis 00:55 )
 
 # Anzeige-Fenster (nach tatsächlicher/erwarteter Ankunft)
 MINUTES_PAST = 120
-HOURS_FUTURE = 13
+HOURS_FUTURE = 5
 
 # Abfrage-Fenster (nach Plan-Zeit), größer als das Anzeige-Fenster,
 # damit stark verspätete oder zu früh gelandete Flüge nicht fehlen
@@ -57,7 +57,6 @@ HEADERS = {
 }
 
 # Flughafennamen kommen direkt von dus.com (Name + Land auf Deutsch).
-# Hier nur Überschreibungen, wenn du einen anderen/genaueren Namen willst.
 AIRPORT_NAME_OVERRIDES = {
     "HER": "Heraklion (Kreta)", "CHQ": "Chania (Kreta)",
     "SUF": "Lamezia Terme (Kalabrien)", "GWT": "Sylt (Westerland)",
@@ -69,11 +68,8 @@ AIRPORT_NAME_OVERRIDES = {
     "SAW": "Istanbul-Sabiha Gökçen", "GZP": "Gazipaşa-Alanya",
     "HEL": "Helsinki",
 }
-# Falls dus.com ein Land anders benennt als du: {"Vereinigtes Königreich": "Großbritannien"}
 COUNTRY_RENAMES = {}
 
-# Nur Fallback, wenn weder Ausgang, Band noch Flugtyp vorhanden sind.
-# Alles klein schreiben (Vergleich erfolgt mit .lower())
 CHARTER_AIRLINES = [
     "condor", "tuifly", "corendon", "freebird", "smartlynx",
     "eurowings discover", "discover airlines", "sunexpress", "sun express",
@@ -89,6 +85,14 @@ SKIP_AIRLINE_KEYWORDS = ("flugschule", "training", "flight school")
 def in_run_window(now_local):
     start = now_local.replace(hour=WINDOW_START[0], minute=WINDOW_START[1], second=0, microsecond=0)
     end = now_local.replace(hour=WINDOW_END[0], minute=WINDOW_END[1], second=0, microsecond=0)
+    
+    # Wenn das End-Fenster vor dem Start liegt, geht es über Mitternacht hinweg
+    if end < start:
+        if now_local >= start:
+            end = end + timedelta(days=1)
+        else:
+            start = start - timedelta(days=1)
+            
     return start <= now_local <= end
 
 
@@ -100,7 +104,6 @@ def write_json_atomic(path, data):
 
 
 def parse_dt(s):
-    """ISO-String mit Offset -> zeitzonenbewusste Zeit in Europe/Berlin oder None."""
     if not s:
         return None
     try:
@@ -113,7 +116,6 @@ def parse_dt(s):
 
 
 def first_int(v):
-    """Erste Zahl aus String oder Liste ('02' -> 2, ['17'] -> 17), sonst None."""
     if isinstance(v, (list, tuple)):
         v = v[0] if v else None
     m = re.search(r"\d+", str(v or ""))
@@ -141,8 +143,12 @@ def terminal_letter(fl, airline):
     return str(airline.get("terminalGateArrival") or "").strip().upper()
 
 
+def remark_text(fl):
+    r = fl.get("remark") or {}
+    return str((r.get("publicRemark") or {}).get("name") or r.get("description") or "").strip()
+
+
 def classify(fl, airline_name, airline_iata):
-    """Gibt (Typ, Quelle) zurück."""
     ex = first_int(fl.get("arrivalExit"))
     if ex is not None:
         return ("Linie" if ex <= 2 else "Charter"), "Ausgang"
@@ -170,7 +176,6 @@ def exit_text(fl, flight_type):
 
 
 def map_status(fl):
-    """Gibt (Status im alten AirLabs-Format, Originaltext) zurück."""
     st = fl.get("status") or {}
     text = str((st.get("publicStatus") or {}).get("name") or st.get("description") or "").strip()
     low = text.lower()
@@ -188,7 +193,6 @@ def map_status(fl):
 
 
 def airport_info(fl):
-    """Gibt (Stadt/Flughafenname, Land) zurück."""
     dest = fl.get("destination") or {}
     iata = str(dest.get("iataCode") or "").upper()
     city_obj = dest.get("city") or {}
@@ -212,7 +216,7 @@ def get_json(url, retries=3):
                 raise RuntimeError(f"Unerwartete Antwort: {str(data)[:200]}")
             return data["data"]
         except urllib.error.HTTPError as e:
-            if e.code in (403, 429):  # blockiert/gedrosselt: nicht weiter hämmern
+            if e.code in (403, 429):
                 raise
             last = e
         except Exception as e:
@@ -264,7 +268,6 @@ def build_flights(raw, now):
         if not flight_no:
             continue
 
-        # Codeshare-Partner überspringen (Betreiberflug bleibt erhalten)
         if fl.get("codeshare"):
             continue
 
@@ -277,10 +280,8 @@ def build_flights(raw, now):
         sched = parse_dt(fl.get("scheduledTime"))
         if not sched:
             continue
-        # tatsächliche Zeit, sonst erwartete, sonst Plan
         real = parse_dt(fl.get("actualTime")) or parse_dt(fl.get("estimatedTime")) or sched
 
-        # Fenster nach erwarteter/tatsächlicher Ankunft, nicht nach Plan-Zeit
         if not (time_min <= real <= time_max):
             continue
 
@@ -291,6 +292,8 @@ def build_flights(raw, now):
 
         city, country = airport_info(fl)
         ftype, type_source = classify(fl, airline_name, airline_iata)
+        remark = remark_text(fl)
+        status_detail = status_text + (", " + remark if remark and status_text else remark)
         flights.append({
             "dt": sched.timestamp(),
             "time_scheduled": sched.strftime("%H:%M"),
@@ -306,12 +309,13 @@ def build_flights(raw, now):
             "gate": exit_text(fl, ftype),
             "status": status,
             "status_text": status_text,
+            "status_detail": status_detail,
+            "remark": remark,
             "delay": delay,
         })
 
     flights.sort(key=lambda x: x["dt"])
 
-    # Restliche Duplikate: gleiche Flugnummer + gleiche Zeit
     unique, seen = [], set()
     for f in flights:
         key = (f["flight_no"], f["time_scheduled"])
@@ -326,7 +330,7 @@ def main():
     now = datetime.now(TZ)
 
     if "--force" not in sys.argv and not in_run_window(now):
-        print(f"{now:%H:%M} liegt außerhalb 05:30–23:30, kein Abruf.")
+        print(f"{now:%H:%M} liegt außerhalb des erlaubten Zeitfensters (05:25–00:05), kein Abruf.")
         return
 
     try:

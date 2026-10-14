@@ -11,7 +11,7 @@
 
 <style>
 :root { 
-    --base-font-size: 20px; 
+    --base-font-size: 18px; 
     --font: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
     /* Hellmodus (Standard) */
@@ -163,7 +163,44 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 }
 .menu-box.active { display: flex; }
 .menu-label { display: block; font-size: 0.8rem; font-weight: bold; color: var(--update-color); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+.size-row { display: flex; align-items: flex-start; gap: 10px; }
+.size-row .small-a, .size-row .big-a, .size-row .size-value { line-height: 34px; }
+.size-row .small-a { font-size: 0.8rem; font-weight: bold; }
+.size-row .big-a { font-size: 1.3rem; font-weight: bold; }
+.size-row .size-value { min-width: 3.2em; text-align: right; font-weight: bold; color: var(--heading-color); }
 
+/* Stufen-Schieberegler (S / M / L / XL / XXL) */
+.size-ctl { flex: 1; min-width: 0; padding: 0 14px; }
+.step-slider {
+    position: relative; height: 34px; cursor: pointer; touch-action: none;
+    -webkit-tap-highlight-color: transparent; outline: none; user-select: none;
+}
+.step-track {
+    position: absolute; left: 0; right: 0; top: 50%; height: 8px; transform: translateY(-50%);
+    border-radius: 999px; background: var(--filter-bg);
+}
+.step-fill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 25%;
+    border-radius: 999px; background: var(--size-btn-bg);
+}
+.step-dot {
+    position: absolute; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px;
+    border-radius: 50%; background: var(--card-bg); opacity: .8; pointer-events: none;
+}
+.step-thumb {
+    position: absolute; top: 50%; left: 25%; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+    border-radius: 50%; background: #fff; border: 3px solid var(--size-btn-bg);
+    box-shadow: 0 2px 6px rgba(0,0,0,.3); pointer-events: none;
+    transition: left .15s ease;
+}
+.step-slider:focus-visible .step-thumb { box-shadow: 0 0 0 4px rgba(21,101,192,.35); }
+.step-labels { position: relative; height: 1.7rem; }
+.step-label {
+    position: absolute; top: 0; transform: translateX(-50%); min-width: 2em; padding: 4px 2px;
+    border: none; background: transparent; cursor: pointer; font-family: var(--font);
+    font-size: .8rem; font-weight: 700; color: var(--update-color); text-align: center;
+}
+.step-label.active { color: var(--heading-color); font-size: .95rem; }
 .seg { display: flex; gap: 6px; }
 .seg-btn {
     flex: 1; padding: 9px 6px; border: none; border-radius: 8px; cursor: pointer;
@@ -363,6 +400,8 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .s-gelandet .tf-status { color: var(--tf-dim); }
 @keyframes tf-pulse { 50% { opacity: .2; } }
 
+.tf-remark { display: none; }
+
 .tf-empty { padding: 24px 14px; color: var(--tf-dim); background: var(--tf-row); text-align: center; }
 .tf-footer { margin-top: 12px; color: var(--tf-dim); font-size: .62rem; line-height: 1.6; max-width: 62ch; }
 
@@ -380,6 +419,18 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     .tf-exit small { font-size: .8rem; }
     .tf-kind { grid-area: kind; justify-self: start; }
     .tf-status { grid-area: status; justify-self: end; }
+
+    /* Annullierte Flüge mit Bemerkung: Bemerkung steht zwischen Flugnummer und Uhrzeit */
+    .tf-row.has-remark {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+        grid-template-areas: "flight remark time" "city city city" "exit kind status";
+    }
+    .tf-row.has-remark .tf-remark {
+        display: block; grid-area: remark; justify-self: center; text-align: center;
+        font-size: .62rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+        color: var(--tf-bad); line-height: 1.3; overflow-wrap: anywhere;
+    }
+    .tf-row.has-remark .tf-delay-inline { display: none; }
 }
 
 /* --- Nach-oben-Button (Overlay) --- */
@@ -452,7 +503,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 <body class="no-anim">
 
 <div class="top-bar">
-    <h1>DUS Ankünfte</h1>
+    <h1>DUS Airport</h1>
     <div class="header-controls">
         <input type="checkbox" id="themeSwitch" class="tx-input" role="switch" aria-label="Nachtmodus umschalten">
         <label class="tx" for="themeSwitch" title="Design umschalten">
@@ -499,14 +550,30 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     </div>
 </div>
 
-<!-- Verstecktes Menü: Schriftgröße (Buttons 14, 20, 26) + Flagge/Name -->
+<!-- Verstecktes Menü: Schriftgröße + Flagge/Name -->
 <div class="menu-box" id="menuBox">
     <div>
         <span class="menu-label">Schriftgröße</span>
-        <div class="seg">
-            <button type="button" class="seg-btn" data-size="14" onclick="setFontSize(14)">14 px</button>
-            <button type="button" class="seg-btn" data-size="20" onclick="setFontSize(20)">20 px</button>
-            <button type="button" class="seg-btn" data-size="26" onclick="setFontSize(26)">26 px</button>
+        <div class="size-row">
+            <span class="small-a">A</span>
+            <div class="size-ctl">
+                <div class="step-slider" id="stepSlider" role="slider" tabindex="0" aria-label="Schriftgröße" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1">
+                    <div class="step-track">
+                        <div class="step-fill" id="stepFill"></div>
+                        <i class="step-dot" style="left:0%"></i><i class="step-dot" style="left:25%"></i><i class="step-dot" style="left:50%"></i><i class="step-dot" style="left:75%"></i><i class="step-dot" style="left:100%"></i>
+                    </div>
+                    <div class="step-thumb" id="stepThumb"></div>
+                </div>
+                <div class="step-labels">
+                    <button type="button" class="step-label" style="left:0%">S</button>
+                    <button type="button" class="step-label" style="left:25%">M</button>
+                    <button type="button" class="step-label" style="left:50%">L</button>
+                    <button type="button" class="step-label" style="left:75%">XL</button>
+                    <button type="button" class="step-label" style="left:100%">XXL</button>
+                </div>
+            </div>
+            <span class="big-a">A</span>
+            <span class="size-value" id="sizeValue">17px</span>
         </div>
     </div>
     <div>
@@ -588,26 +655,29 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 <script>
 const REFRESH_MINUTES = 5;
-const DEFAULT_SIZE = 20;
+const FONT_STEPS = [
+    { label: 'S', px: 14 }, { label: 'M', px: 17 }, { label: 'L', px: 20 },
+    { label: 'XL', px: 23 }, { label: 'XXL', px: 26 }
+];
+const DEFAULT_STEP = 1;   // M (17px)
 const STORAGE_KEY = 'dus_font_size';
 const THEME_KEY = 'dus_theme';
 const VIEW_KEY = 'dus_active_view';
 const FLAG_KEY = 'dus_flag_mode';
 const FILTER_KEY = 'dus_active_filter';
 const TF_FENSTER = 90;
-const EMPTY_MARK = '????';        // Platzhalter, wenn Ausgang/Band noch nicht festgelegt
-const LANDED_STEPS = [5, 10, 15];   // Reihenfolge beim Tippen im Menü
+const EMPTY_MARK = '------';
+const LANDED_STEPS = [5, 10, 15];
 const LANDED_KEY = 'dus_landed_count';
 const SHOWLANDED_KEY = 'dus_show_landed';
-let showLandedInLists = true;       // Gelandete in Alle/Linie/Charter anzeigen
-let landedCount = 15;               // Anzahl der Flüge im Filter "Gelandet"
+let showLandedInLists = true;
+let landedCount = 15;
 
 let allFlights = [];
 let currentFilter = 'all';
 let currentSearch = '';
 let showFlag = true;
 
-/* ---------- Hilfsfunktion: Land zu ISO-Ländercode für FlagCDN ---------- */
 function getFlagCode(country) {
     if (!country) return 'de';
     const map = {
@@ -663,10 +733,9 @@ function getFlagCode(country) {
         'estland': 'ee', 'estonia': 'ee',
     };
     const key = country.toLowerCase().trim();
-    return map[key] || 'de'; // Standard-Fallback (Deutschland) falls unbekannt
+    return map[key] || 'de';
 }
 
-/* ---------- Reiter / Design Switch ---------- */
 function switchView(viewId) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
     document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
@@ -689,7 +758,6 @@ function loadSavedView() {
     } catch (e) {}
 }
 
-/* ---------- Theme ---------- */
 const root = document.documentElement;
 const themeCb = document.getElementById('themeSwitch');
 
@@ -721,7 +789,6 @@ themeCb.addEventListener('change', function (e) {
 
 loadTheme();
 
-/* ---------- Menü (3 Striche) ---------- */
 const menuToggle = document.getElementById('menuToggle');
 const menuBox = document.getElementById('menuBox');
 
@@ -738,31 +805,80 @@ document.addEventListener('click', e => {
     setMenu(false);
 });
 
-/* ---------- Schriftgröße (Buttons 14, 20, 26) ---------- */
-function setFontSize(px, save = true) {
-    document.documentElement.style.setProperty('--base-font-size', px + 'px');
-    
-    document.querySelectorAll('[data-size]').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.getAttribute('data-size'), 10) === px);
-    });
+const stepSlider = document.getElementById('stepSlider');
+const stepThumb = document.getElementById('stepThumb');
+const stepFill = document.getElementById('stepFill');
+const sizeValue = document.getElementById('sizeValue');
+const stepBtns = document.querySelectorAll('.step-label');
+let currentStep = DEFAULT_STEP;
 
-    if (save) {
-        try { localStorage.setItem(STORAGE_KEY, px); } catch (err) {}
-    }
+function applyStep(i, save) {
+    currentStep = Math.max(0, Math.min(FONT_STEPS.length - 1, i));
+    const s = FONT_STEPS[currentStep];
+    const pct = (currentStep / (FONT_STEPS.length - 1)) * 100;
+    document.documentElement.style.setProperty('--base-font-size', s.px + 'px');
+    stepThumb.style.left = pct + '%';
+    stepFill.style.width = pct + '%';
+    sizeValue.textContent = s.px + 'px';
+    stepSlider.setAttribute('aria-valuenow', currentStep);
+    stepSlider.setAttribute('aria-valuetext', s.label + ' (' + s.px + 'px)');
+    stepBtns.forEach((b, idx) => b.classList.toggle('active', idx === currentStep));
+    if (save) { try { localStorage.setItem(STORAGE_KEY, s.px); } catch (err) {} }
 }
 
 function loadFontSize() {
-    let saved = DEFAULT_SIZE;
+    let idx = DEFAULT_STEP;
     try {
         const v = parseInt(localStorage.getItem(STORAGE_KEY), 10);
-        if ([14, 20, 26].includes(v)) saved = v;
+        if (v >= 10 && v <= 40) {
+            // Gespeicherten Pixelwert der nächstliegenden Stufe zuordnen
+            let best = Infinity;
+            FONT_STEPS.forEach((s, i) => {
+                const d = Math.abs(s.px - v);
+                if (d < best) { best = d; idx = i; }
+            });
+        }
     } catch (e) {}
-    setFontSize(saved, false);
+    applyStep(idx, false);
 }
+
+// Zieh-Logik: Geometrie beim Start einfrieren, damit die Skalierung der Schrift
+// den Regler während des Ziehens nicht verschiebt.
+let dragBox = null;
+
+function stepFromX(clientX) {
+    const w = dragBox.width || 1;
+    const p = Math.max(0, Math.min(1, (clientX - dragBox.left) / w));
+    return Math.round(p * (FONT_STEPS.length - 1));
+}
+
+stepSlider.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const r = stepSlider.getBoundingClientRect();
+    dragBox = { left: r.left, width: r.width };
+    try { stepSlider.setPointerCapture(e.pointerId); } catch (err) {}
+    applyStep(stepFromX(e.clientX), true);
+});
+
+stepSlider.addEventListener('pointermove', e => {
+    if (!dragBox) return;
+    const i = stepFromX(e.clientX);
+    if (i !== currentStep) applyStep(i, true);
+});
+
+function endDrag() { dragBox = null; }
+stepSlider.addEventListener('pointerup', endDrag);
+stepSlider.addEventListener('pointercancel', endDrag);
+
+stepSlider.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); applyStep(currentStep + 1, true); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); applyStep(currentStep - 1, true); }
+});
+
+stepBtns.forEach((b, idx) => b.addEventListener('click', () => applyStep(idx, true)));
 
 loadFontSize();
 
-/* ---------- Flagge / Name (Tafel) ---------- */
 const segFlag = document.getElementById('segFlag');
 const segName = document.getElementById('segName');
 
@@ -776,7 +892,6 @@ function setFlagMode(flag, save) {
 segFlag.addEventListener('click', () => { setFlagMode(true, true); applyFilter(); });
 segName.addEventListener('click', () => { setFlagMode(false, true); applyFilter(); });
 
-/* ---------- Menü: Anzahl im Filter "Gelandet" (5 → 10 → 15 → 5 ...) ---------- */
 const landedBtn = document.getElementById('landedBtn');
 
 function updateLandedBtn() {
@@ -799,7 +914,6 @@ try {
 } catch (e) {}
 updateLandedBtn();
 
-/* ---------- Menü: Gelandete in Alle/Linie/Charter ein-/ausblenden ---------- */
 const segLandedOn = document.getElementById('segLandedOn');
 const segLandedOff = document.getElementById('segLandedOff');
 
@@ -814,10 +928,8 @@ segLandedOn.addEventListener('click', () => { setShowLanded(true, true); applyFi
 segLandedOff.addEventListener('click', () => { setShowLanded(false, true); applyFilter(); });
 
 try { setShowLanded(localStorage.getItem(SHOWLANDED_KEY) !== 'off', false); } catch (e) { setShowLanded(true, false); }
-
 try { setFlagMode(localStorage.getItem(FLAG_KEY) !== 'name', false); } catch (e) { setFlagMode(true, false); }
 
-/* ---------- Such-Event-Listener & Clear Button ---------- */
 const searchInput = document.getElementById('searchInput');
 const searchContainer = document.getElementById('searchContainer');
 const clearSearchBtn = document.getElementById('clearSearchBtn');
@@ -840,7 +952,6 @@ clearSearchBtn.addEventListener('click', () => {
     searchInput.focus();
 });
 
-/* ---------- Nach-oben-Button ---------- */
 const toTop = document.getElementById('toTop');
 
 function updateToTop() {
@@ -853,7 +964,6 @@ toTop.addEventListener('click', () => {
 });
 updateToTop();
 
-/* ---------- Flugdaten Laden & Filtern ---------- */
 function loadData() {
     fetch('cache.json?t=' + Date.now(), { cache: 'no-store' })
         .then(response => response.json())
@@ -894,7 +1004,6 @@ function getFilteredList() {
         list = list.filter(f => f.type === currentFilter);
     }
 
-    // Gelandete in Alle / Linie / Charter ausblenden (Menü)
     if (!showLandedInLists && (currentFilter === 'all' || currentFilter === 'Linie' || currentFilter === 'Charter')) {
         list = list.filter(f => String(f.status).toLowerCase() !== 'landed');
     }
@@ -915,7 +1024,6 @@ function getFilteredList() {
         });
     }
 
-    // Gelandet: die letzten N Landungen ab jetzt, später gelandete stehen unten
     if (currentFilter === 'landed') {
         const now = berlinMin();
         const ago = f => {
@@ -924,18 +1032,16 @@ function getFilteredList() {
             return d;
         };
         return [...list]
-            .sort((a, b) => ago(a) - ago(b))     // jüngste zuerst, um die letzten N zu wählen
+            .sort((a, b) => ago(a) - ago(b))
             .slice(0, landedCount)
-            .sort((a, b) => ago(b) - ago(a));    // Anzeige: ältere oben, später gelandete unten
+            .sort((a, b) => ago(b) - ago(a));
     }
 
-    // Einheitlich für Detail UND Tafel: nach erwarteter Zeit sortiert
     const expected = f => timeToMinutes(f.time_estimated || f.time_scheduled);
 
     return [...list].sort((a, b) => (expected(a) - expected(b)) || ((a.dt || 0) - (b.dt || 0)));
 }
 
-/* ---------- Zähler: Wie viele Flüge landen noch? ---------- */
 function isStillLanding(f) {
     const s = String(f.status).toLowerCase();
     return s !== 'landed' && s !== 'cancelled' && s !== 'diverted' && s !== 'incident';
@@ -1027,7 +1133,8 @@ function renderFlights(flights) {
 
         let statusText;
         if (isCancelled) {
-            statusText = statusMap[st] || "Annulliert";
+            // Nutzt den exakten Detailtext von der API (z.B. "annulliert, Folgetag" oder "annulliert, Umleitung nach Köln/Bonn")
+            statusText = f.status_detail ? f.status_detail : (statusMap[st] || "Annulliert");
         } else if (st === 'landed') {
             statusText = 'Gelandet' + (hasEst ? ` ${est} Uhr${diffTxt}` : '');
         } else if (st === 'active' || st === 'en-route') {
@@ -1107,7 +1214,6 @@ function filterFlights(category, event, save = true) {
     applyFilter();
 }
 
-/* ---------- Zeit-Hilfsfunktionen ---------- */
 function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -1124,16 +1230,14 @@ function liveStatus(f) {
     return 'scheduled';
 }
 
-/* ---------- Ausgang bereinigen: "[ Charter ]" / "[ Linie ]" entfernen ---------- */
 function cleanGate(g) {
     let t = String(g == null ? '' : g);
-    t = t.replace(/[\[\(\uFF3B\u3010][^\]\)\uFF3D\u3011]*[\]\)\uFF3D\u3011]/g, ' ');  // alles in Klammern
-    t = t.replace(/\b(charter|linie)\b/gi, ' ');                                          // lose Wörter
-    t = t.replace(/[\[\]\(\)]/g, ' ').replace(/\s+/g, ' ').trim();                        // Reste
+    t = t.replace(/[\[\(\uFF3B\u3010][^\]\)\uFF3D\u3011]*[\]\)\uFF3D\u3011]/g, ' ');
+    t = t.replace(/\b(charter|linie)\b/gi, ' ');
+    t = t.replace(/[\[\(\)]/g, ' ').replace(/\s+/g, ' ').trim();
     return t || EMPTY_MARK;
 }
 
-/* ---------- Rendering Ansicht 3 (Flughafentafel) ---------- */
 function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -1197,15 +1301,17 @@ function renderBoard(flights) {
         }
 
         const row = document.createElement('div');
-        row.className = 'tf-row ' + st.cls + (isCancelled ? ' cancelled' : '');
+        const remarkText = (isCancelled && f.remark) ? String(f.remark) : '';
+        row.className = 'tf-row ' + st.cls + (isCancelled ? ' cancelled' : '') + (remarkText ? ' has-remark' : '');
         row.innerHTML = `
             <div class="tf-bar ${art}" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}"></div>
             <div class="tf-flight">${esc(f.flight_no)}<small>${esc(f.airline)}</small></div>
+            ${remarkText ? '<div class="tf-remark">' + esc(remarkText) + '</div>' : ''}
             <div class="tf-city">${esc(f.city)}${countryHtml}</div>
             <div class="tf-time">${esc(zeit)}</div>
             <div class="tf-exit">${esc(gateText)}<small>Band ${esc(beltText)}</small></div>
             <div class="tf-kind"${isGuess ? ' title="Vorläufig, Art noch nicht sicher"' : ''}>${esc(f.type)}${isGuess ? ' ?' : ''}</div>
-            <div class="tf-status"><span class="tf-dot"></span><span>${st.label}${!isCancelled && f.delay > 0 ? '<span class="tf-delay">+' + esc(f.delay) + ' Min.</span>' : ''}</span></div>
+            <div class="tf-status"><span class="tf-dot"></span><span>${st.label}${!isCancelled && f.delay > 0 ? '<span class="tf-delay">+' + esc(f.delay) + ' Min.</span>' : ''}${remarkText ? '<span class="tf-delay tf-delay-inline">' + esc(remarkText) + '</span>' : ''}</span></div>
         `;
         body.appendChild(row);
     });
@@ -1219,7 +1325,6 @@ function updateBoardBars() {
     });
 }
 
-// Initialisierung
 loadSavedView();
 
 try {
