@@ -1,5 +1,5 @@
 {
-  "updated_at": "15.10.2026 00:15",
+  "updated_at": "15.10.2026 00:28",
   "source": "Dus.com",
   "flights": [
     {
@@ -22,25 +22,6 @@
       "delay": 83
     },
     {
-      "dt": 1792008300.0,
-      "time_scheduled": "22:05",
-      "time_estimated": "22:21",
-      "flight_no": "EW9887",
-      "airline": "Eurowings",
-      "city": "Rom-Fiumicino",
-      "country": "Italien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "9",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "status_detail": "gelandet",
-      "remark": "",
-      "delay": 16
-    },
-    {
       "dt": 1792008600.0,
       "time_scheduled": "22:10",
       "time_estimated": "22:52",
@@ -58,25 +39,6 @@
       "status_detail": "gelandet",
       "remark": "",
       "delay": 42
-    },
-    {
-      "dt": 1792008900.0,
-      "time_scheduled": "22:15",
-      "time_estimated": "22:24",
-      "flight_no": "EW9245",
-      "airline": "Eurowings",
-      "city": "Kopenhagen",
-      "country": "Dänemark",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "13",
-      "gate": "Ausgang 5 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "status_detail": "gelandet",
-      "remark": "",
-      "delay": 9
     },
     {
       "dt": 1792009200.0,
@@ -115,25 +77,6 @@
       "status_detail": "gelandet",
       "remark": "",
       "delay": 27
-    },
-    {
-      "dt": 1792009500.0,
-      "time_scheduled": "22:25",
-      "time_estimated": "22:19",
-      "flight_no": "KL1805",
-      "airline": "KLM",
-      "city": "Amsterdam",
-      "country": "Niederlande",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "12",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "status_detail": "gelandet",
-      "remark": "",
-      "delay": 0
     },
     {
       "dt": 1792009800.0,
@@ -229,25 +172,6 @@
       "status_detail": "gelandet",
       "remark": "",
       "delay": 35
-    },
-    {
-      "dt": 1792010400.0,
-      "time_scheduled": "22:40",
-      "time_estimated": "22:27",
-      "flight_no": "DE1517",
-      "airline": "Condor",
-      "city": "Palma de Mallorca",
-      "country": "Spanien",
-      "type": "Charter",
-      "type_source": "Ausgang",
-      "terminal": "B",
-      "baggage": "11",
-      "gate": "Ausgang 4 (Charter)",
-      "status": "landed",
-      "status_text": "gelandet",
-      "status_detail": "gelandet",
-      "remark": "",
-      "delay": 0
     },
     {
       "dt": 1792010700.0,
