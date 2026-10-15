@@ -962,8 +962,8 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    // Math.random() bricht zusätzlich das CDN-Caching von GitHub auf
-    const dataUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json?t=' + Date.now() + '&r=' + Math.random();
+    // Nutzt die blitzschnelle GitHub Pages URL statt der Raw-URL
+    const dataUrl = 'https://hemenheman.github.io/dusflugdaten/cache.json?t=' + Date.now();
 
     fetch(dataUrl, { cache: 'no-store' })
         .then(res => res.json())
