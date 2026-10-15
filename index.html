@@ -962,8 +962,8 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    // Korrigierte RAW-URL, die direkt die aktualisierte cache.json aus dem dusflugdaten-Repo lädt
-    const dataUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json?t=' + Date.now();
+    // Nutzt das ultraschnelle jsDelivr CDN für GitHub, um Cache-Verzögerungen zu verhindern
+    const dataUrl = 'https://cdn.jsdelivr.net/gh/hemenheman/dusflugdaten@main/cache.json?t=' + Date.now();
 
     fetch(dataUrl, { cache: 'no-store' })
         .then(res => res.json())
