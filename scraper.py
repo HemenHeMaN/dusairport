@@ -30,6 +30,8 @@ from zoneinfo import ZoneInfo
 API_URL = "https://www.dus.com/api/sitecore/flightapi/SearchFlightsWithOutParams"
 REFERER = "https://www.dus.com/de-de/fliegen/ankunft"
 CACHE_FILE = "cache.json"
+# Daten-Repo (GitHub-Reserve) nur alle X Minuten aktualisieren
+DATA_REPO_EVERY_MIN = 10
 FIREBASE_URL = "https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/cache.json"
 
 TZ = ZoneInfo("Europe/Berlin")
@@ -430,7 +432,12 @@ def main():
     
     # Zuerst Firebase (schnell, ohne Cache), dann das Daten-Repo als Reserve
     push_to_firebase()
-    push_to_data_repo()
+
+    # Reserve im Daten-Repo nur alle 10 Minuten (erste 3 Minuten jedes 10er-Blocks)
+    if "--force" in sys.argv or now.minute % DATA_REPO_EVERY_MIN < 3:
+        push_to_data_repo()
+    else:
+        print("Daten-Repo: diesmal übersprungen (nur alle 10 Minuten).")
 
 
 if __name__ == "__main__":
