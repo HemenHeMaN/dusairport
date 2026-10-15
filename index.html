@@ -654,7 +654,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 </button>
 
 <script>
-const REFRESH_MINUTES = 5;
+const REFRESH_MINUTES = 1;
 const FONT_STEPS = [
     { label: 'S', px: 14 }, { label: 'M', px: 17 }, { label: 'L', px: 20 },
     { label: 'XL', px: 23 }, { label: 'XXL', px: 26 }
@@ -961,12 +961,20 @@ toTop.addEventListener('click', () => {
 });
 updateToTop();
 
-function loadData() {
-    // Korrigierte RAW-URL, die direkt die aktualisierte cache.json aus dem dusflugdaten-Repo lädt
-    const dataUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json?t=' + Date.now();
+let loadTimer = null;
 
-    fetch(dataUrl, { cache: 'no-store' })
-        .then(res => res.json())
+function loadData() {
+    // GitHub-API statt raw.githubusercontent.com: raw wird vom CDN ca. 5 Min. gecacht
+    const dataUrl = 'https://api.github.com/repos/hemenheman/dusflugdaten/contents/cache.json?ref=main&t=' + Date.now();
+
+    fetch(dataUrl, {
+        cache: 'no-store',
+        headers: { 'Accept': 'application/vnd.github.raw+json' }
+    })
+        .then(res => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
         .then(data => {
             document.getElementById('updateInfo').innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Abflüge`;
             allFlights = data.flights;
@@ -978,6 +986,13 @@ function loadData() {
             }
         });
 }
+
+// Sofort neu laden, wenn der Tab/die App wieder sichtbar wird
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) loadData();
+});
+
+    
 function emptyText() {
     if (currentFilter === 'landing') return 'Gerade keine Flüge im Anflug.';
     if (currentFilter === 'landed') return 'Noch keine gelandeten Flüge.';
