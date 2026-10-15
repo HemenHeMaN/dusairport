@@ -962,10 +962,16 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    // Nutzt die blitzschnelle GitHub Pages URL statt der Raw-URL
-    const dataUrl = 'https://hemenheman.github.io/dusflugdaten/cache.json?t=' + Date.now();
+    // Direkte Raw-URL mit Cache-Busting
+    const dataUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json?t=' + Date.now();
 
-    fetch(dataUrl, { cache: 'no-store' })
+    fetch(dataUrl, { 
+        cache: 'no-store',
+        headers: {
+            'Pragma': 'no-store',
+            'Cache-Control': 'no-cache'
+        }
+    })
         .then(res => res.json())
         .then(data => {
             document.getElementById('updateInfo').innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Abflüge`;
