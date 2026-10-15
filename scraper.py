@@ -332,7 +332,7 @@ def push_to_data_repo():
     token = os.environ.get("DUSFLUGDATENKEY")
     username = "HemenHeMaN"   # Hier deinen GitHub-Namen eintragen
     
-    repo_url = f"https://{token}@github.com/{username}/dus-flugdaten.git"
+    repo_url = f"https://{token}@github.com/{username}/dusflugdaten.git"
     data_dir = ".git_dus_data"
     
     try:
