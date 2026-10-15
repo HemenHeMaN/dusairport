@@ -831,7 +831,6 @@ function loadFontSize() {
     try {
         const v = parseInt(localStorage.getItem(STORAGE_KEY), 10);
         if (v >= 10 && v <= 40) {
-            // Gespeicherten Pixelwert der nächstliegenden Stufe zuordnen
             let best = Infinity;
             FONT_STEPS.forEach((s, i) => {
                 const d = Math.abs(s.px - v);
@@ -842,8 +841,6 @@ function loadFontSize() {
     applyStep(idx, false);
 }
 
-// Zieh-Logik: Geometrie beim Start einfrieren, damit die Skalierung der Schrift
-// den Regler während des Ziehens nicht verschiebt.
 let dragBox = null;
 
 function stepFromX(clientX) {
@@ -965,8 +962,8 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    // Hier wird die cache.json direkt und ohne Seiten-Rebuild aus dem neuen Repo geladen
-    const dataUrl = 'https://raw.githubusercontent.com/HemenHeMaN/dusflugdaten/main/cache.json?t=' + Date.now();
+    // Korrigierte RAW-URL, die direkt die aktualisierte cache.json aus dem dusflugdaten-Repo lädt
+    const dataUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json?t=' + Date.now();
 
     fetch(dataUrl, { cache: 'no-store' })
         .then(res => res.json())
@@ -1082,7 +1079,6 @@ function applyFilter() {
     updateRemaining();
 }
 
-/* ---------- Rendering Ansicht 1 (Detail-Karten) ---------- */
 function renderFlights(flights) {
     const container = document.getElementById('flightList');
     container.innerHTML = '';
@@ -1131,7 +1127,6 @@ function renderFlights(flights) {
 
         let statusText;
         if (isCancelled) {
-            // Nutzt den exakten Detailtext von der API (z.B. "annulliert, Folgetag" oder "annulliert, Umleitung nach Köln/Bonn")
             statusText = f.status_detail ? f.status_detail : (statusMap[st] || "Annulliert");
         } else if (st === 'landed') {
             statusText = 'Gelandet' + (hasEst ? ` ${est} Uhr${diffTxt}` : '');
