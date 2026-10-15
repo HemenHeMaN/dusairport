@@ -962,8 +962,9 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    // Nutzt das ultraschnelle jsDelivr CDN für GitHub, um Cache-Verzögerungen zu verhindern
-    const dataUrl = 'https://cdn.jsdelivr.net/gh/hemenheman/dusflugdaten@main/cache.json?t=' + Date.now();
+    // Wir nutzen einen Cache-Busting-Proxy, der GitHub zwingt, die echte Datei ohne CDN-Cache auszuliefern
+    const targetUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json';
+    const dataUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl + '?t=' + Date.now());
 
     fetch(dataUrl, { cache: 'no-store' })
         .then(res => res.json())
@@ -978,7 +979,6 @@ function loadData() {
             }
         });
 }
-
 function emptyText() {
     if (currentFilter === 'landing') return 'Gerade keine Flüge im Anflug.';
     if (currentFilter === 'landed') return 'Noch keine gelandeten Flüge.';
