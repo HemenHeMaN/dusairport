@@ -8,7 +8,7 @@ Charter/Linie-Zuordnung (Reihenfolge):
   1. Ausgang   : Ausgang 1-2 = Linie, Ausgang 3-6 = Charter   (verlässlich)
   2. Gepäckband: Band 1-6 = Linie, Band 7+ = Charter            (verlässlich)
   3. Flugtyp   : dus.com-Flugtyp 21 (Pauschalreise-Charter)    (Fallback)
-  4. Airline   : Airline-Liste                                (Fallback)
+  4. Airline   : Airline-Liste                               (Fallback)
 Ausgang und Band vergibt der Flughafen erst kurz vor der Landung, davor
 greifen die Fallbacks. type_source zeigt, woher die Zuordnung stammt.
 """
@@ -21,6 +21,8 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import subprocess
+import shutil
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -326,6 +328,40 @@ def build_flights(raw, now):
     return unique, unknown_status
 
 
+def push_to_data_repo():
+    token = os.environ.get("GITHUB_PAT")
+    username = "HemenHeMaN"   # Hier deinen GitHub-Namen eintragen
+    
+    repo_url = f"https://{token}@github.com/{username}/dus-flugdaten.git"
+    data_dir = ".git_dus_data"
+    
+    try:
+        subprocess.run(["git", "config", "--global", "user.name", "DUS Scraper Bot"], check=True)
+        subprocess.run(["git", "config", "--global", "user.email", "bot@dus.local"], check=True)
+        
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir, exist_ok=True)
+            subprocess.run(["git", "-C", data_dir, "init"], check=True)
+            subprocess.run(["git", "-C", data_dir, "remote", "add", "origin", repo_url], check=True)
+        else:
+            subprocess.run(["git", "-C", data_dir, "remote", "set-url", "origin", repo_url], check=True)
+
+        shutil.copy(CACHE_FILE, os.path.join(data_dir, "cache.json"))
+        
+        subprocess.run(["git", "-C", data_dir, "checkout", "-B", "main"], check=True)
+        subprocess.run(["git", "-C", data_dir, "add", "cache.json"], check=True)
+        
+        status = subprocess.run(["git", "-C", data_dir, "diff", "--cached", "--quiet"])
+        if status.returncode != 0:
+            subprocess.run(["git", "-C", data_dir, "commit", "-m", "Auto-update flight cache"], check=True)
+            subprocess.run(["git", "-C", data_dir, "push", "-f", "origin", "main"], check=True)
+            print("Flugdaten erfolgreich in das Daten-Repo gepusht!")
+        else:
+            print("Keine neuen Flugdaten-Änderungen, kein Push nötig.")
+    except Exception as e:
+        print(f"Fehler beim Pushen ins Daten-Repo: {e}")
+
+
 def main():
     now = datetime.now(TZ)
 
@@ -357,7 +393,10 @@ def main():
         "source": "Dus.com",
         "flights": unique,
     })
-    print(f"cache.json aktualisiert: {len(unique)} Flüge.")
+    print(f"cache.json lokal aktualisiert: {len(unique)} Flüge.")
+    
+    # Abruf ins separate Daten-Repository pushen
+    push_to_data_repo()
 
 
 if __name__ == "__main__":
