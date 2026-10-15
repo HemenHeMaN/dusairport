@@ -962,9 +962,8 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    // Wir nutzen einen Cache-Busting-Proxy, der GitHub zwingt, die echte Datei ohne CDN-Cache auszuliefern
-    const targetUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json';
-    const dataUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl + '?t=' + Date.now());
+    // Korrigierte RAW-URL, die direkt die aktualisierte cache.json aus dem dusflugdaten-Repo lädt
+    const dataUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json?t=' + Date.now();
 
     fetch(dataUrl, { cache: 'no-store' })
         .then(res => res.json())
