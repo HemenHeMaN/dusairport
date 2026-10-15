@@ -329,7 +329,7 @@ def build_flights(raw, now):
 
 
 def push_to_data_repo():
-    token = os.environ.get("GITHUB_PAT")
+    token = os.environ.get("DUSFLUGDATENKEY")
     username = "HemenHeMaN"   # Hier deinen GitHub-Namen eintragen
     
     repo_url = f"https://{token}@github.com/{username}/dus-flugdaten.git"
