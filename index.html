@@ -982,7 +982,7 @@ function loadData() {
             return res.json();
         })
         .then(data => {
-            document.getElementById('updateInfo').innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Abflüge`;
+            document.getElementById('updateInfo').innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Ankünfte`;
             allFlights = data.flights;
             applyFilter();
         })
