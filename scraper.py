@@ -30,6 +30,7 @@ from zoneinfo import ZoneInfo
 API_URL = "https://www.dus.com/api/sitecore/flightapi/SearchFlightsWithOutParams"
 REFERER = "https://www.dus.com/de-de/fliegen/ankunft"
 CACHE_FILE = "cache.json"
+FIREBASE_URL = "https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/cache.json"
 
 TZ = ZoneInfo("Europe/Berlin")
 
@@ -362,6 +363,38 @@ def push_to_data_repo():
         print(f"Fehler beim Pushen ins Daten-Repo: {e}")
 
 
+def push_to_firebase():
+    sa_text = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+    if not sa_text:
+        print("FIREBASE_SERVICE_ACCOUNT fehlt, Firebase wird übersprungen.")
+        return
+    try:
+        from google.oauth2 import service_account
+        from google.auth.transport.requests import Request
+
+        creds = service_account.Credentials.from_service_account_info(
+            json.loads(sa_text),
+            scopes=[
+                "https://www.googleapis.com/auth/firebase.database",
+                "https://www.googleapis.com/auth/userinfo.email",
+            ],
+        )
+        creds.refresh(Request())
+
+        with open(CACHE_FILE, "rb") as f:
+            body = f.read()
+        req = urllib.request.Request(
+            FIREBASE_URL + "?access_token=" + creds.token,
+            data=body,
+            method="PUT",
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            print(f"Firebase aktualisiert (HTTP {resp.status}).")
+    except Exception as e:
+        print(f"Fehler beim Schreiben in Firebase: {e}")
+
+
 def main():
     now = datetime.now(TZ)
 
@@ -395,7 +428,8 @@ def main():
     })
     print(f"cache.json lokal aktualisiert: {len(unique)} Flüge.")
     
-    # Abruf ins separate Daten-Repository pushen
+    # Zuerst Firebase (schnell, ohne Cache), dann das Daten-Repo als Reserve
+    push_to_firebase()
     push_to_data_repo()
 
 
