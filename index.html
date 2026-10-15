@@ -965,21 +965,19 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    fetch('cache.json?t=' + Date.now(), { cache: 'no-store' })
-        .then(response => response.json())
+    // Hier wird die cache.json direkt und ohne Seiten-Rebuild aus dem neuen Repo geladen
+    const dataUrl = 'https://raw.githubusercontent.com/HemenHeMaN/dusflugdaten/main/cache.json?t=' + Date.now();
+
+    fetch(dataUrl, { cache: 'no-store' })
+        .then(res => res.json())
         .then(data => {
-            const updateInfo = document.getElementById('updateInfo');
-            updateInfo.innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Ankünfte`;
-
-            if (JSON.stringify(data.flights) === JSON.stringify(allFlights)) return;
-
+            document.getElementById('updateInfo').innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Abflüge`;
             allFlights = data.flights;
             applyFilter();
         })
         .catch(() => {
             if (allFlights.length === 0) {
-                document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der cache.json</div>';
-                document.getElementById('tfBody').innerHTML = '<div class="tf-empty">Fehler beim Laden der cache.json</div>';
+                document.getElementById('flightList').innerHTML = '<div class="no-flights">Fehler beim Laden der Flugdaten</div>';
             }
         });
 }
