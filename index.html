@@ -962,16 +962,10 @@ toTop.addEventListener('click', () => {
 updateToTop();
 
 function loadData() {
-    // Direkte Raw-URL mit Cache-Busting
+    // Korrigierte RAW-URL, die direkt die aktualisierte cache.json aus dem dusflugdaten-Repo lädt
     const dataUrl = 'https://raw.githubusercontent.com/hemenheman/dusflugdaten/main/cache.json?t=' + Date.now();
 
-    fetch(dataUrl, { 
-        cache: 'no-store',
-        headers: {
-            'Pragma': 'no-store',
-            'Cache-Control': 'no-cache'
-        }
-    })
+    fetch(dataUrl, { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
             document.getElementById('updateInfo').innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${data.flights.length} Abflüge`;
