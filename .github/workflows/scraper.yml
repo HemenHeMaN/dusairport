@@ -1,13 +1,10 @@
 name: DUS Ankuenfte Clean Table
 
 on:
-  schedule:
-    # GitHub-Cron läuft immer in UTC. Damit Sommer- und Winterzeit stimmen,
-    # startet der Job alle 10 Minuten von 03:00 bis 22:50 UTC.
-    # Das Skript prüft selbst, ob es lokal (Europe/Berlin) zwischen 05:30 und 23:30 ist.
-   - cron: '3,23,43 3-22 * * *'
-
+  # Erlaubt den externen Start über cron-job.org via GitHub API (Repository Dispatch oder Workflow Dispatch)
   workflow_dispatch:
+  repository_dispatch:
+    types: [run-scraper]
 
 concurrency:
   group: dus-scraper
@@ -17,8 +14,6 @@ jobs:
   run-scraper:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions:
-      contents: write
 
     steps:
       - name: Repository auschecken
@@ -29,19 +24,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Scraper ausführen
+      - name: Scraper ausführen und ins Daten-Repo pushen
+        env:
+          DUSFLUGDATENKEY: ${{ secrets.DUSFLUGDATENKEY }}
         run: |
           python scraper.py
-
-      - name: Änderungen committen und pushen
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add cache.json
-          if git diff --staged --quiet; then
-            echo "Keine Änderungen an cache.json."
-          else
-            git commit -m "Update cache.json (dus.com)"
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            git push
-          fi
