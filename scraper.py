@@ -29,10 +29,10 @@ from zoneinfo import ZoneInfo
 # ---------------------------------------------------------------- Konfiguration
 API_URL = "https://www.dus.com/api/sitecore/flightapi/SearchFlightsWithOutParams"
 REFERER = "https://www.dus.com/de-de/fliegen/ankunft"
-CACHE_FILE = "cache.json"
+CACHE_FILE = "arrival.json"  # Vorher: "cache.json"
 # Daten-Repo (GitHub-Reserve) nur alle X Minuten aktualisieren
 DATA_REPO_EVERY_MIN = 10
-FIREBASE_URL = "https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/cache.json"
+FIREBASE_URL = "https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/arrival.json"
 
 TZ = ZoneInfo("Europe/Berlin")
 
@@ -349,10 +349,10 @@ def push_to_data_repo():
         else:
             subprocess.run(["git", "-C", data_dir, "remote", "set-url", "origin", repo_url], check=True)
 
-        shutil.copy(CACHE_FILE, os.path.join(data_dir, "cache.json"))
+        shutil.copy(CACHE_FILE, os.path.join(data_dir, "arrival,json"))
         
         subprocess.run(["git", "-C", data_dir, "checkout", "-B", "main"], check=True)
-        subprocess.run(["git", "-C", data_dir, "add", "cache.json"], check=True)
+        subprocess.run(["git", "-C", data_dir, "add", "arrival,json"], check=True)
         
         status = subprocess.run(["git", "-C", data_dir, "diff", "--cached", "--quiet"])
         if status.returncode != 0:
