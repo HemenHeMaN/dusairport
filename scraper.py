@@ -37,7 +37,7 @@ FIREBASE_URL = "https://dus-airport-default-rtdb.europe-west1.firebasedatabase.a
 TZ = ZoneInfo("Europe/Berlin")
 
 # Abruf-Zeitfenster (lokale Zeit). Endet am Folgetag um 00:05 Uhr.
-WINDOW_START = (5, 25)    # frühester Start (Soll: 05:30)
+WINDOW_START = (5, 0)    # frühester Start (Soll: 05:00)
 WINDOW_END = (0, 35)      # spätester Start (bis 00:35 Uhr, cronjob läuft bis 00:55 )
 
 # Anzeige-Fenster (nach tatsächlicher/erwarteter Ankunft)
