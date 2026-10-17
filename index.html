@@ -1004,7 +1004,7 @@ function loadData() {
             const hour = Math.floor(berlinMin() / 60);
             let info = `${data.flights.length} Ankünfte`;
             if (ageMin > 30) {
-                info = hour < 5 ? 'Nachtpause, Updates ab ca. 05:30 Uhr'
+                info = hour < 5 ? 'Nachtpause, Updates ab ca. 05:00 Uhr'
                                 : `Achtung: Daten sind ${Math.round(ageMin)} Min. alt`;
             }
             document.getElementById('updateInfo').innerHTML = `Letztes Update: <b>${data.updated_at} Uhr</b> (${data.source})<br>${info}`;
