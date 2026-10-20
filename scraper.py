@@ -42,7 +42,7 @@ WINDOW_END = (0, 35)      # spätester Start (bis 00:35 Uhr, cronjob läuft bis 
 
 # Anzeige-Fenster (nach tatsächlicher/erwarteter Ankunft)
 MINUTES_PAST = 120
-HOURS_FUTURE = 5
+HOURS_FUTURE = 8
 
 # Abfrage-Fenster (nach Plan-Zeit), größer als das Anzeige-Fenster,
 # damit stark verspätete oder zu früh gelandete Flüge nicht fehlen
