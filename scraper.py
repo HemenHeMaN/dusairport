@@ -294,9 +294,11 @@ def build_flights(raw, now):
         if not (time_min <= real <= time_max):
             continue
 
-        # Nur Flüge des heutigen Kalendertags (Europe/Berlin).
+        # Keine Flüge des nächsten Kalendertags (Europe/Berlin) anzeigen.
         # Maßgeblich ist die tatsächliche bzw. erwartete Landezeit.
-        if ONLY_TODAY and real.date() != now.date():
+        # Flüge von gestern bleiben im Anzeige-Fenster (MINUTES_PAST) kurz
+        # erhalten und werden in der Seite nach Datum richtig einsortiert.
+        if ONLY_TODAY and real.date() > now.date():
             continue
 
         delay = max(0, int(round((real - sched).total_seconds() / 60)))
@@ -310,6 +312,7 @@ def build_flights(raw, now):
         status_detail = status_text + (", " + remark if remark and status_text else remark)
         flights.append({
             "dt": sched.timestamp(),
+            "dt_real": real.timestamp(),
             "time_scheduled": sched.strftime("%H:%M"),
             "time_estimated": real.strftime("%H:%M"),
             "flight_no": flight_no,
@@ -328,7 +331,7 @@ def build_flights(raw, now):
             "delay": delay,
         })
 
-    flights.sort(key=lambda x: x["dt"])
+    flights.sort(key=lambda x: (x["dt_real"], x["dt"]))
 
     unique, seen = [], set()
     for f in flights:
