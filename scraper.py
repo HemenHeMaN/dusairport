@@ -44,6 +44,10 @@ WINDOW_END = (0, 35)      # spätester Start (bis 00:35 Uhr, cronjob läuft bis 
 MINUTES_PAST = 120
 HOURS_FUTURE = 8
 
+# Nur Flüge des heutigen Kalendertags (Europe/Berlin) anzeigen.
+# Ab 00:00 Uhr springt die Anzeige automatisch auf das neue Datum.
+ONLY_TODAY = True
+
 # Abfrage-Fenster (nach Plan-Zeit), größer als das Anzeige-Fenster,
 # damit stark verspätete oder zu früh gelandete Flüge nicht fehlen
 FETCH_BACK_HOURS = 4
@@ -290,6 +294,11 @@ def build_flights(raw, now):
         if not (time_min <= real <= time_max):
             continue
 
+        # Nur Flüge des heutigen Kalendertags (Europe/Berlin).
+        # Maßgeblich ist die tatsächliche bzw. erwartete Landezeit.
+        if ONLY_TODAY and real.date() != now.date():
+            continue
+
         delay = max(0, int(round((real - sched).total_seconds() / 60)))
         status, status_text = map_status(fl)
         if status == "scheduled" and status_text:
@@ -349,10 +358,10 @@ def push_to_data_repo():
         else:
             subprocess.run(["git", "-C", data_dir, "remote", "set-url", "origin", repo_url], check=True)
 
-        shutil.copy(CACHE_FILE, os.path.join(data_dir, "arrival,json"))
+        shutil.copy(CACHE_FILE, os.path.join(data_dir, "arrival.json"))
         
         subprocess.run(["git", "-C", data_dir, "checkout", "-B", "main"], check=True)
-        subprocess.run(["git", "-C", data_dir, "add", "arrival,json"], check=True)
+        subprocess.run(["git", "-C", data_dir, "add", "arrival.json"], check=True)
         
         status = subprocess.run(["git", "-C", data_dir, "diff", "--cached", "--quiet"])
         if status.returncode != 0:
@@ -408,10 +417,10 @@ def main():
         raw = fetch_flights(now)
     except Exception as e:
         print(f"Fehler beim Abruf: {e}")
-        print("cache.json bleibt unverändert.")
+        print(f"{CACHE_FILE} bleibt unverändert.")
         sys.exit(1)
     if not raw:
-        print("API lieferte keine Flüge, cache.json bleibt unverändert.")
+        print(f"API lieferte keine Flüge, {CACHE_FILE} bleibt unverändert.")
         sys.exit(1)
 
     unique, unknown_status = build_flights(raw, now)
@@ -428,7 +437,7 @@ def main():
         "source": "Dus.com",
         "flights": unique,
     })
-    print(f"cache.json lokal aktualisiert: {len(unique)} Flüge.")
+    print(f"{CACHE_FILE} lokal aktualisiert: {len(unique)} Flüge.")
     
     # Zuerst Firebase (schnell, ohne Cache), dann das Daten-Repo als Reserve
     push_to_firebase()
