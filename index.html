@@ -975,7 +975,7 @@ updateToTop();
 let loadTimer = null;
 
 const FIREBASE_URL = 'https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/arrival.json';
-const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/HemenHeMaN/dusflugdaten/main/cache.json';
+const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/HemenHeMaN/dusflugdaten/main/arrival.json';
 
 function parseUpdated(s) {
     const m = String(s).match(/(\d+)\.(\d+)\.(\d+) (\d+):(\d+)/);
@@ -1030,6 +1030,18 @@ function emptyText() {
     return 'Keine Flüge gefunden.';
 }
 
+// Echter Zeitstempel (Sekunden) der Landung inkl. Datum.
+// Reserve für ältere Daten ohne dt_real: Plan-Zeitstempel + Verspätung.
+function realTs(f) {
+    if (f.dt_real) return f.dt_real;
+    const base = f.dt || 0;
+    if (!f.time_estimated || !f.time_scheduled) return base;
+    let diff = timeToMinutes(f.time_estimated) - timeToMinutes(f.time_scheduled);
+    if (diff < -720) diff += 1440;
+    if (diff > 720) diff -= 1440;
+    return base + diff * 60;
+}
+
 function getFilteredList() {
     let list = allFlights;
 
@@ -1065,21 +1077,15 @@ function getFilteredList() {
     }
 
     if (currentFilter === 'landed') {
-        const now = berlinMin();
-        const ago = f => {
-            let d = (now - timeToMinutes(f.time_estimated || f.time_scheduled)) % 1440;
-            if (d < 0) d += 1440;
-            return d;
-        };
+        const nowTs = Date.now() / 1000;
+        const ago = f => nowTs - realTs(f);
         return [...list]
             .sort((a, b) => ago(a) - ago(b))
             .slice(0, landedCount)
             .sort((a, b) => ago(b) - ago(a));
     }
 
-    const expected = f => timeToMinutes(f.time_estimated || f.time_scheduled);
-
-    return [...list].sort((a, b) => (expected(a) - expected(b)) || ((a.dt || 0) - (b.dt || 0)));
+    return [...list].sort((a, b) => realTs(a) - realTs(b));
 }
 
 function isStillLanding(f) {
