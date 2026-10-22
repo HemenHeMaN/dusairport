@@ -154,29 +154,119 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .menu-btn { padding: 8px 10px; }
 .menu-btn svg { display: block; width: 22px; height: 22px; }
 
-/* Verstecktes Menü (3 Striche) */
+/* Verstecktes Menü (3 Striche) - Kompakt */
 .menu-box {
-    display: none; flex-direction: column; gap: 14px;
+    display: none; flex-direction: column; gap: 10px;
     background: var(--slider-bg); padding: 12px; border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.12); margin-bottom: 12px;
     border: 1px solid var(--border-color);
 }
 .menu-box.active { display: flex; }
-.menu-label { display: block; font-size: 0.8rem; font-weight: bold; color: var(--update-color); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
-.size-row { display: flex; align-items: flex-start; gap: 10px; }
-.size-row .small-a, .size-row .big-a, .size-row .size-value { line-height: 34px; }
-.size-row .small-a { font-size: 0.8rem; font-weight: bold; }
-.size-row .big-a { font-size: 1.3rem; font-weight: bold; }
-.size-row .size-value { min-width: 3.2em; text-align: right; font-weight: bold; color: var(--heading-color); }
+.menu-label { display: block; font-size: 0.75rem; font-weight: bold; color: var(--update-color); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+
+/* Kompakte Grid-Zeile für Scrollrad und Herkunftsland */
+.menu-grid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.menu-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Vertikales Stunden-Scrollrad im Menü (Kompakt) */
+.hour-wheel-menu-container {
+    position: relative;
+    width: 100%;
+    height: 105px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--filter-bg);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.hour-wheel-center-highlight {
+    position: absolute;
+    width: 90%;
+    height: 30px;
+    border-radius: 4px;
+    background: var(--size-btn-bg);
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+.hour-wheel-vert {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    width: 100%;
+    height: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    z-index: 2;
+}
+.hour-wheel-vert::-webkit-scrollbar { display: none; }
+.hour-item-v {
+    flex: 0 0 30px;
+    width: 100%;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.6;
+}
+.hour-item-v.active {
+    color: #fff;
+    opacity: 1;
+    font-size: 0.95rem;
+}
+.hour-wheel-spacer-v {
+    flex: 0 0 37px;
+}
+
+/* Herkunftsland übereinander stapeln */
+.country-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 105px;
+    justify-content: space-between;
+}
+.country-stack .seg {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.country-stack .seg-btn {
+    flex: 1;
+    padding: 4px 6px;
+    font-size: 0.8rem;
+}
+
+.size-row { display: flex; align-items: flex-start; gap: 8px; }
+.size-row .small-a, .size-row .big-a, .size-row .size-value { line-height: 30px; }
+.size-row .small-a { font-size: 0.75rem; font-weight: bold; }
+.size-row .big-a { font-size: 1.1rem; font-weight: bold; }
+.size-row .size-value { min-width: 3em; text-align: right; font-weight: bold; color: var(--heading-color); font-size: 0.9rem; }
 
 /* Stufen-Schieberegler (S / M / L / XL / XXL) */
-.size-ctl { flex: 1; min-width: 0; padding: 0 14px; }
+.size-ctl { flex: 1; min-width: 0; padding: 0 10px; }
 .step-slider {
-    position: relative; height: 34px; cursor: pointer; touch-action: none;
+    position: relative; height: 30px; cursor: pointer; touch-action: none;
     -webkit-tap-highlight-color: transparent; outline: none; user-select: none;
 }
 .step-track {
-    position: absolute; left: 0; right: 0; top: 50%; height: 8px; transform: translateY(-50%);
+    position: absolute; left: 0; right: 0; top: 50%; height: 6px; transform: translateY(-50%);
     border-radius: 999px; background: var(--filter-bg);
 }
 .step-fill {
@@ -184,27 +274,26 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     border-radius: 999px; background: var(--size-btn-bg);
 }
 .step-dot {
-    position: absolute; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px;
+    position: absolute; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px;
     border-radius: 50%; background: var(--card-bg); opacity: .8; pointer-events: none;
 }
 .step-thumb {
-    position: absolute; top: 50%; left: 25%; width: 26px; height: 26px; margin: -13px 0 0 -13px;
-    border-radius: 50%; background: #fff; border: 3px solid var(--size-btn-bg);
-    box-shadow: 0 2px 6px rgba(0,0,0,.3); pointer-events: none;
+    position: absolute; top: 50%; left: 25%; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+    border-radius: 50%; background: #fff; border: 2px solid var(--size-btn-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,.3); pointer-events: none;
     transition: left .15s ease;
 }
-.step-slider:focus-visible .step-thumb { box-shadow: 0 0 0 4px rgba(21,101,192,.35); }
-.step-labels { position: relative; height: 1.7rem; }
+.step-labels { position: relative; height: 1.4rem; }
 .step-label {
-    position: absolute; top: 0; transform: translateX(-50%); min-width: 2em; padding: 4px 2px;
+    position: absolute; top: 0; transform: translateX(-50%); min-width: 1.8em; padding: 2px 1px;
     border: none; background: transparent; cursor: pointer; font-family: var(--font);
-    font-size: .8rem; font-weight: 700; color: var(--update-color); text-align: center;
+    font-size: 0.75rem; font-weight: 700; color: var(--update-color); text-align: center;
 }
-.step-label.active { color: var(--heading-color); font-size: .95rem; }
-.seg { display: flex; gap: 6px; }
+.step-label.active { color: var(--heading-color); font-size: 0.85rem; }
+.seg { display: flex; gap: 4px; }
 .seg-btn {
-    flex: 1; padding: 9px 6px; border: none; border-radius: 8px; cursor: pointer;
-    font-weight: bold; font-size: 0.9rem; font-family: var(--font);
+    flex: 1; padding: 7px 4px; border: none; border-radius: 6px; cursor: pointer;
+    font-weight: bold; font-size: 0.82rem; font-family: var(--font);
     background: var(--filter-bg); color: var(--text-color);
 }
 .seg-btn.active { background: var(--filter-active-all); color: #fff; }
@@ -551,7 +640,7 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
     </div>
 </div>
 
-<!-- Verstecktes Menü: Schriftgröße + Flagge/Name -->
+<!-- Verstecktes Menü (3 Striche) - Kompakt -->
 <div class="menu-box" id="menuBox">
     <div>
         <span class="menu-label">Schriftgröße</span>
@@ -577,11 +666,36 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
             <span class="size-value" id="sizeValue">17px</span>
         </div>
     </div>
-    <div>
-        <span class="menu-label">Tafel: Herkunftsland</span>
-        <div class="seg">
-            <button type="button" class="seg-btn active" id="segFlag">Flagge</button>
-            <button type="button" class="seg-btn" id="segName">Name</button>
+
+    <div class="menu-grid-row">
+        <!-- Linke Spalte: Stunden-Scrollrad -->
+        <div class="menu-col">
+            <span class="menu-label">Stunden-Filter</span>
+            <div class="hour-wheel-menu-container">
+                <div class="hour-wheel-center-highlight"></div>
+                <div class="hour-wheel-vert" id="hourWheelVert">
+                    <div class="hour-wheel-spacer-v"></div>
+                    <div class="hour-item-v active" data-hours="0">Max 8 Std.</div>
+                    <div class="hour-item-v" data-hours="6">6 Std.</div>
+                    <div class="hour-item-v" data-hours="5">5 Std.</div>
+                    <div class="hour-item-v" data-hours="4">4 Std.</div>
+                    <div class="hour-item-v" data-hours="3">3 Std.</div>
+                    <div class="hour-item-v" data-hours="2">2 Std.</div>
+                    <div class="hour-item-v" data-hours="1">1 Std.</div>
+                    <div class="hour-wheel-spacer-v"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Rechte Spalte: Herkunftsland (Flagge & Name übereinander) -->
+        <div class="menu-col">
+            <span class="menu-label">Tafel: Herkunft</span>
+            <div class="country-stack">
+                <span class="menu-label" style="font-size:0.65rem; margin:0;">Anzeigeformat</span>
+                <div class="seg">
+                    <button type="button" class="seg-btn active" id="segFlag">Flagge</button>
+                    <button type="button" class="seg-btn" id="segName">Name</button>
+                </div>
+            </div>
         </div>
     </div>
     <div>
@@ -670,6 +784,7 @@ const THEME_KEY = 'dus_theme';
 const VIEW_KEY = 'dus_active_view';
 const FLAG_KEY = 'dus_flag_mode';
 const FILTER_KEY = 'dus_active_filter';
+
 const TF_FENSTER = 90;
 const EMPTY_MARK = '----';
 const LANDED_STEPS = [5, 10, 15];
@@ -682,11 +797,12 @@ let allFlights = [];
 let currentFilter = 'all';
 let currentSearch = '';
 let showFlag = true;
+let selectedHours = 0; // 0 = Alle, 1-6 = Filter nach Stunden
 
 function getFlagCode(country) {
     if (!country) return 'de';
     const map = {
-                'ägypten': 'eg', 'egypt': 'eg',
+        'ägypten': 'eg', 'egypt': 'eg',
         'albanien': 'al', 'albania': 'al',
         'barbados': 'bb',
         'belgien': 'be', 'belgium': 'be',
@@ -960,6 +1076,59 @@ clearSearchBtn.addEventListener('click', () => {
     searchInput.focus();
 });
 
+/* --- LOGIK FÜR DAS VERTIKALE STUNDEN-SCROLLRAD --- */
+const hourWheelVert = document.getElementById('hourWheelVert');
+const hourItemsV = document.querySelectorAll('.hour-item-v');
+let wheelScrollTimeoutV = null;
+
+function initHourWheelVert() {
+    hourWheelVert.addEventListener('scroll', () => {
+        clearTimeout(wheelScrollTimeoutV);
+        wheelScrollTimeoutV = setTimeout(updateActiveHourByScrollVert, 60);
+    });
+
+    hourItemsV.forEach(item => {
+        item.addEventListener('click', () => {
+            const h = parseInt(item.dataset.hours, 10);
+            scrollHourToCenterVert(h);
+        });
+    });
+}
+
+function scrollHourToCenterVert(hours) {
+    const targetItem = document.querySelector(`.hour-item-v[data-hours="${hours}"]`);
+    if (targetItem) {
+        const scrollTopPos = targetItem.offsetTop - (hourWheelVert.offsetHeight / 2) + (targetItem.offsetHeight / 2);
+        hourWheelVert.scrollTo({ top: scrollTopPos, behavior: 'smooth' });
+    }
+}
+
+function updateActiveHourByScrollVert() {
+    const wheelCenter = hourWheelVert.scrollTop + (hourWheelVert.offsetHeight / 2);
+    let closestItem = null;
+    let minDistance = Infinity;
+
+    hourItemsV.forEach(item => {
+        const itemCenter = item.offsetTop + (item.offsetHeight / 2);
+        const distance = Math.abs(wheelCenter - itemCenter);
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestItem = item;
+        }
+    });
+
+    if (closestItem) {
+        const hours = parseInt(closestItem.dataset.hours, 10);
+        if (selectedHours !== hours) {
+            selectedHours = hours;
+            hourItemsV.forEach(it => it.classList.toggle('active', it === closestItem));
+            applyFilter();
+        }
+    }
+}
+
+initHourWheelVert();
+
 const toTop = document.getElementById('toTop');
 
 function updateToTop() {
@@ -1027,6 +1196,7 @@ document.addEventListener('visibilitychange', () => {
 function emptyText() {
     if (currentFilter === 'landing') return 'Gerade keine Flüge im Anflug.';
     if (currentFilter === 'landed') return 'Noch keine gelandeten Flüge.';
+    if (selectedHours > 0) return `Keine Flüge in den nächsten ${selectedHours} Std. gefunden.`;
     return 'Keine Flüge gefunden.';
 }
 
@@ -1040,6 +1210,11 @@ function realTs(f) {
     if (diff < -720) diff += 1440;
     if (diff > 720) diff -= 1440;
     return base + diff * 60;
+}
+
+// Minuten bis zur Landung (negativ = schon vorbei), mit Datum gerechnet
+function minsUntil(f) {
+    return (realTs(f) - Date.now() / 1000) / 60;
 }
 
 function getFilteredList() {
@@ -1058,6 +1233,19 @@ function getFilteredList() {
 
     if (!showLandedInLists && (currentFilter === 'all' || currentFilter === 'Linie' || currentFilter === 'Charter')) {
         list = list.filter(f => String(f.status).toLowerCase() !== 'landed');
+    }
+
+    /* FILTERN NACH ZUKÜNFTIGEN STUNDEN */
+    if (selectedHours > 0) {
+        const maxMin = selectedHours * 60;
+
+        list = list.filter(f => {
+            const s = String(f.status).toLowerCase();
+            if (s === 'landed') return false;
+
+            const d = minsUntil(f);
+            return d > -1 && d <= maxMin;
+        });
     }
 
     if (currentSearch) {
@@ -1111,6 +1299,15 @@ function updateRemaining() {
         label = 'Gerade im Anflug';
     } else if (currentFilter === 'all') {
         label = 'Noch zu landen (Alle)';
+    }
+
+    if (selectedHours > 0) {
+        label += ` (nächste ${selectedHours} Std.)`;
+        const maxMin = selectedHours * 60;
+        list = list.filter(f => {
+            const d = minsUntil(f);
+            return d > -1 && d <= maxMin;
+        });
     }
 
     const show = currentFilter !== 'landed';
