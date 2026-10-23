@@ -797,7 +797,14 @@ let allFlights = [];
 let currentFilter = 'all';
 let currentSearch = '';
 let showFlag = true;
-let selectedHours = 0; // 0 = Alle, 1-6 = Filter nach Stunden
+const HOURS_KEY = 'dus_selected_hours';
+const HOURS_VALID = [0, 1, 2, 3, 4, 5, 6];
+let selectedHours = 0; // 0 = Alle (max. 8 Std.), 1-6 = Filter nach Stunden
+// Gespeicherte Auswahl wiederherstellen (bleibt, bis man sie selbst ändert)
+try {
+    const savedHours = parseInt(localStorage.getItem(HOURS_KEY), 10);
+    if (HOURS_VALID.includes(savedHours)) selectedHours = savedHours;
+} catch (e) {}
 
 function getFlagCode(country) {
     if (!country) return 'de';
@@ -922,6 +929,8 @@ const menuBox = document.getElementById('menuBox');
 function setMenu(open) {
     menuBox.classList.toggle('active', open);
     menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    // Das Rad kann erst positioniert werden, wenn das Menü sichtbar ist
+    if (open) syncHourWheel();
 }
 
 menuToggle.addEventListener('click', () => setMenu(!menuBox.classList.contains('active')));
@@ -1081,7 +1090,21 @@ const hourWheelVert = document.getElementById('hourWheelVert');
 const hourItemsV = document.querySelectorAll('.hour-item-v');
 let wheelScrollTimeoutV = null;
 
+// Rad auf die gespeicherte Stunden-Auswahl stellen (ohne Animation)
+function syncHourWheel() {
+    const item = document.querySelector(`.hour-item-v[data-hours="${selectedHours}"]`);
+    if (!item) return;
+    hourItemsV.forEach(it => it.classList.toggle('active', it === item));
+    const top = item.offsetTop - (hourWheelVert.offsetHeight / 2) + (item.offsetHeight / 2);
+    hourWheelVert.style.scrollBehavior = 'auto';
+    hourWheelVert.scrollTop = top;
+    hourWheelVert.style.scrollBehavior = '';
+}
+
 function initHourWheelVert() {
+    // Aktive Markierung gleich beim Start passend zur gespeicherten Auswahl
+    hourItemsV.forEach(it => it.classList.toggle('active', parseInt(it.dataset.hours, 10) === selectedHours));
+
     hourWheelVert.addEventListener('scroll', () => {
         clearTimeout(wheelScrollTimeoutV);
         wheelScrollTimeoutV = setTimeout(updateActiveHourByScrollVert, 60);
@@ -1122,6 +1145,7 @@ function updateActiveHourByScrollVert() {
         if (selectedHours !== hours) {
             selectedHours = hours;
             hourItemsV.forEach(it => it.classList.toggle('active', it === closestItem));
+            try { localStorage.setItem(HOURS_KEY, hours); } catch (e) {}
             applyFilter();
         }
     }
