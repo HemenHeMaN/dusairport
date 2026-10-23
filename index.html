@@ -800,7 +800,7 @@ let showFlag = true;
 const HOURS_KEY = 'dus_selected_hours';
 const HOURS_VALID = [0, 1, 2, 3, 4, 5, 6];
 let selectedHours = 0; // 0 = Alle (max. 8 Std.), 1-6 = Filter nach Stunden
-// Gespeicherte Auswahl wiederherstellen (bleibt, bis man sie selbst ändert)
+
 try {
     const savedHours = parseInt(localStorage.getItem(HOURS_KEY), 10);
     if (HOURS_VALID.includes(savedHours)) selectedHours = savedHours;
@@ -929,7 +929,6 @@ const menuBox = document.getElementById('menuBox');
 function setMenu(open) {
     menuBox.classList.toggle('active', open);
     menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    // Das Rad kann erst positioniert werden, wenn das Menü sichtbar ist
     if (open) syncHourWheel();
 }
 
@@ -1090,7 +1089,6 @@ const hourWheelVert = document.getElementById('hourWheelVert');
 const hourItemsV = document.querySelectorAll('.hour-item-v');
 let wheelScrollTimeoutV = null;
 
-// Rad auf die gespeicherte Stunden-Auswahl stellen (ohne Animation)
 function syncHourWheel() {
     const item = document.querySelector(`.hour-item-v[data-hours="${selectedHours}"]`);
     if (!item) return;
@@ -1102,7 +1100,6 @@ function syncHourWheel() {
 }
 
 function initHourWheelVert() {
-    // Aktive Markierung gleich beim Start passend zur gespeicherten Auswahl
     hourItemsV.forEach(it => it.classList.toggle('active', parseInt(it.dataset.hours, 10) === selectedHours));
 
     hourWheelVert.addEventListener('scroll', () => {
@@ -1211,12 +1208,10 @@ function loadData() {
         });
 }
 
-// Sofort neu laden, wenn der Tab/die App wieder sichtbar wird
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) loadData();
 });
 
-    
 function emptyText() {
     if (currentFilter === 'landing') return 'Gerade keine Flüge im Anflug.';
     if (currentFilter === 'landed') return 'Noch keine gelandeten Flüge.';
@@ -1224,8 +1219,6 @@ function emptyText() {
     return 'Keine Flüge gefunden.';
 }
 
-// Echter Zeitstempel (Sekunden) der Landung inkl. Datum.
-// Reserve für ältere Daten ohne dt_real: Plan-Zeitstempel + Verspätung.
 function realTs(f) {
     if (f.dt_real) return f.dt_real;
     const base = f.dt || 0;
@@ -1236,7 +1229,6 @@ function realTs(f) {
     return base + diff * 60;
 }
 
-// Minuten bis zur Landung (negativ = schon vorbei), mit Datum gerechnet
 function minsUntil(f) {
     return (realTs(f) - Date.now() / 1000) / 60;
 }
@@ -1259,16 +1251,21 @@ function getFilteredList() {
         list = list.filter(f => String(f.status).toLowerCase() !== 'landed');
     }
 
-    /* FILTERN NACH ZUKÜNFTIGEN STUNDEN */
+    /* FILTERN NACH ZUKÜNFTIGEN STUNDEN (Wirkt nur nach vorne, gelandete bleiben unberührt) */
     if (selectedHours > 0) {
         const maxMin = selectedHours * 60;
+        const nowTs = Date.now() / 1000;
 
         list = list.filter(f => {
             const s = String(f.status).toLowerCase();
-            if (s === 'landed') return false;
+            
+            // Gelandete Flüge vom Stunden-Filter ausschließen (bleiben erhalten)
+            if (s === 'landed') return true; 
 
-            const d = minsUntil(f);
-            return d > -1 && d <= maxMin;
+            const diffMins = (realTs(f) - nowTs) / 60;
+
+            // Zeigt nur Flüge ab jetzt in der Zukunft bis zum gewählten Limit
+            return diffMins >= -1 && diffMins <= maxMin;
         });
     }
 
@@ -1328,9 +1325,10 @@ function updateRemaining() {
     if (selectedHours > 0) {
         label += ` (nächste ${selectedHours} Std.)`;
         const maxMin = selectedHours * 60;
+        const nowTs = Date.now() / 1000;
         list = list.filter(f => {
-            const d = minsUntil(f);
-            return d > -1 && d <= maxMin;
+            const diffMins = (realTs(f) - nowTs) / 60;
+            return diffMins >= -1 && diffMins <= maxMin;
         });
     }
 
