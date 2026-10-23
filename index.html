@@ -1251,7 +1251,7 @@ function getFilteredList() {
         list = list.filter(f => String(f.status).toLowerCase() !== 'landed');
     }
 
-    /* FILTERN NACH ZUKÜNFTIGEN STUNDEN (Wirkt nur nach vorne, gelandete bleiben unberührt) */
+    /* FILTERN NACH ZUKÜNFTIGEN STUNDEN (Gelandete und Annullierte bleiben völlig unberührt) */
     if (selectedHours > 0) {
         const maxMin = selectedHours * 60;
         const nowTs = Date.now() / 1000;
@@ -1259,8 +1259,8 @@ function getFilteredList() {
         list = list.filter(f => {
             const s = String(f.status).toLowerCase();
             
-            // Gelandete Flüge vom Stunden-Filter ausschließen (bleiben erhalten)
-            if (s === 'landed') return true; 
+            // Gelandete und annullierte/umgeleitete/gestörte Flüge werden vom Stundenfilter ignoriert
+            if (s === 'landed' || s === 'cancelled' || s === 'diverted' || s === 'incident') return true; 
 
             const diffMins = (realTs(f) - nowTs) / 60;
 
@@ -1327,6 +1327,8 @@ function updateRemaining() {
         const maxMin = selectedHours * 60;
         const nowTs = Date.now() / 1000;
         list = list.filter(f => {
+            const s = String(f.status).toLowerCase();
+            if (s === 'cancelled' || s === 'diverted' || s === 'incident') return true;
             const diffMins = (realTs(f) - nowTs) / 60;
             return diffMins >= -1 && diffMins <= maxMin;
         });
