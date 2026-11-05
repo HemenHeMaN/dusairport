@@ -111,6 +111,17 @@
       </div>
     </div>
 
+    <!-- Top 10 Herkunft -->
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+      <div class="flex justify-between items-baseline mb-3">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Top 10 Herkunft</h2>
+        <span class="text-[10px] text-slate-400">nach Landungen</span>
+      </div>
+      <ol id="topCitiesList" class="space-y-1.5">
+        <li class="text-sm text-slate-400">Keine Daten</li>
+      </ol>
+    </div>
+
     <!-- View Navigation Tabs -->
     <div class="flex border-b border-slate-200 dark:border-slate-700 gap-2">
       <button id="tabList" onclick="switchTab('list')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2">
@@ -357,6 +368,23 @@
           topCity = city;
         }
       });
+
+      // Top 10 Herkunft
+      const top10 = Object.entries(cityCounts)
+        .sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))
+        .slice(0, 10);
+      const maxCnt = top10.length ? top10[0][1] : 1;
+      const escHtml = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const listEl = document.getElementById('topCitiesList');
+      listEl.innerHTML = top10.length ? top10.map(([city, cnt], i) => `
+        <li class="flex items-center gap-3 text-sm">
+          <span class="w-5 text-right font-mono text-xs font-bold text-slate-400">${i + 1}</span>
+          <span class="w-40 sm:w-56 truncate font-semibold text-slate-800 dark:text-slate-200">${escHtml(city)}</span>
+          <span class="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+            <span class="block h-full rounded-full bg-amber-500" style="width:${Math.max(4, Math.round(cnt / maxCnt * 100))}%"></span>
+          </span>
+          <span class="w-24 text-right font-mono text-xs text-slate-600 dark:text-slate-300">${cnt} ${cnt === 1 ? 'Landung' : 'Landungen'}</span>
+        </li>`).join('') : '<li class="text-sm text-slate-400">Keine Daten</li>';
 
       document.getElementById('statTotal').textContent = total;
       document.getElementById('statRoutes').textContent = uniqueRoutes;
