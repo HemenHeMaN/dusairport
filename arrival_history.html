@@ -440,7 +440,13 @@
         return;
       }
 
-      flightNos.slice(0, 12).forEach(fn => {
+      const histLen = fn => {
+        const h = rawHistoryData[fn].history;
+        return Array.isArray(h) ? h.length : Object.keys(h || {}).length;
+      };
+      flightNos.sort((a, b) => histLen(b) - histLen(a) || a.localeCompare(b));
+
+      flightNos.forEach(fn => {
         const item = rawHistoryData[fn];
         const history = Array.isArray(item.history) ? item.history : Object.values(item.history || {});
         
@@ -450,15 +456,27 @@
         const typeCounts = {};
 
         history.forEach(h => {
-          if (h.gate && h.gate !== '----') gateCounts[h.gate] = (gateCounts[h.gate] || 0) + 1;
-          if (h.baggage && h.baggage !== '----') baggageCounts[h.baggage] = (baggageCounts[h.baggage] || 0) + 1;
+          const t = h.type || '';
+          if (h.gate && h.gate !== '----') { const k = h.gate + '|' + t; gateCounts[k] = (gateCounts[k] || 0) + 1; }
+          if (h.baggage && h.baggage !== '----') { const k = h.baggage + '|' + t; baggageCounts[k] = (baggageCounts[k] || 0) + 1; }
           if (h.type) typeCounts[h.type] = (typeCounts[h.type] || 0) + 1;
         });
 
-        // Format probabilities
+        // Verteilung: eine Zeile pro Wert, Prozent bezogen auf Landungen mit Angabe
         const totalEntries = history.length;
-        const gateStats = Object.entries(gateCounts).map(([g, c]) => `${g}: ${Math.round((c/totalEntries)*100)}% (${c}x)`).join(', ') || 'Keine Daten';
-        const baggageStats = Object.entries(baggageCounts).map(([b, c]) => `Band ${b}: ${Math.round((c/totalEntries)*100)}% (${c}x)`).join(', ') || 'Keine Daten';
+        const fmtStats = (counts, prefix) => {
+          const entries = Object.entries(counts).sort((x, y) => y[1] - x[1]);
+          const sum = entries.reduce((acc, e) => acc + e[1], 0);
+          if (!sum) return '<span class="text-slate-400">Keine Daten</span>';
+          return entries.map(([key, c]) => {
+            const [v, t] = key.split('|');
+            const cls = t === 'Charter' ? 'badge-charter' : 'badge-linie';
+            const typeHtml = t ? ` <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${cls}">${t}</span>` : '';
+            return `<div class="flex justify-between gap-2"><span>${prefix}${v}${typeHtml}</span><span class="whitespace-nowrap">${Math.round((c / sum) * 100)}% (${c}x)</span></div>`;
+          }).join('');
+        };
+        const gateStats = fmtStats(gateCounts, '');
+        const baggageStats = fmtStats(baggageCounts, 'Band ');
 
         const card = document.createElement('div');
         card.className = "bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3";
@@ -469,17 +487,17 @@
               <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">${item.city || 'Unbekannt'}</p>
               <p class="text-[11px] text-slate-400">${item.airline || ''}</p>
             </div>
-            <span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded font-bold text-slate-600 dark:text-slate-300">${totalEntries} Landungen</span>
+            <span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded font-bold text-slate-600 dark:text-slate-300">${totalEntries} ${totalEntries === 1 ? 'Landung' : 'Landungen'}</span>
           </div>
 
           <div class="space-y-1.5 text-xs">
             <div>
               <span class="text-slate-400 font-semibold block uppercase text-[10px]">Häufigste Ausgänge (Gates):</span>
-              <span class="font-mono font-medium text-slate-800 dark:text-slate-200">${gateStats}</span>
+              <div class="font-mono font-medium text-slate-800 dark:text-slate-200">${gateStats}</div>
             </div>
             <div>
               <span class="text-slate-400 font-semibold block uppercase text-[10px]">Häufigste Gepäckbänder:</span>
-              <span class="font-mono font-medium text-slate-800 dark:text-slate-200">${baggageStats}</span>
+              <div class="font-mono font-medium text-slate-800 dark:text-slate-200">${baggageStats}</div>
             </div>
           </div>
         `;
