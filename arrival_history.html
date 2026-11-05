@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUS Airport - Ankunfts-Historie & Analytics</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&family=B612+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Barlow', 'sans-serif'],
+          condensed: ['Barlow Condensed', 'sans-serif'],
+          mono: ['B612 Mono', 'monospace'],
+        },
+        colors: {
+          dus: {
+            blue: '#0d47a1',
+            blueLight: '#eaf3ff',
+            orange: '#e65100',
+            orangeLight: '#fff3e6',
+            darkBg: '#0f172a',
+            darkCard: '#1e293b',
+            darkBorder: '#334155'
+          }
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+  .dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+  .badge-linie { background-color: #cfe5ff; color: #08306b; }
+  .dark .badge-linie { background-color: #1e3a8a; color: #93c5fd; }
+  
+  .badge-charter { background-color: #ffdcb8; color: #8a3000; }
+  .dark .badge-charter { background-color: #7c2d12; color: #ffedd5; }
+</style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+
+  <!-- Header Bar -->
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-blue-700 text-white flex items-center justify-center font-black text-xl shadow-md">
+          DUS
+        </div>
+        <div>
+          <h1 class="text-lg font-bold leading-tight text-slate-900 dark:text-white">Ankunfts-Historie</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Firebase Analytics & Patterns</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="btnRefresh" onclick="loadHistoryData()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition" title="Daten aktualisieren">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </button>
+
+        <button id="btnExport" onclick="exportCSV()" class="hidden sm:flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Export CSV
+        </button>
+
+        <!-- Darkmode Toggle -->
+        <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+          <svg id="themeSun" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path></svg>
+          <svg id="themeMoon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- KPI Dashboard Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Gelandete Flüge</p>
+        <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1" id="statTotal">0</p>
+        <span class="text-[10px] text-slate-400">In Historie gespeichert</span>
+      </div>
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Flugnummern</p>
+        <p class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 mt-1" id="statRoutes">0</p>
+        <span class="text-[10px] text-slate-400">Einzigartige Verbindungen</span>
+      </div>
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Linie vs. Charter</p>
+        <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1" id="statRatio">0 / 0</p>
+        <span class="text-[10px] text-slate-400">Typenverteilung</span>
+      </div>
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Top Herkunft</p>
+        <p class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1 truncate" id="statTopCity">-</p>
+        <span class="text-[10px] text-slate-400" id="statTopCityCount">0 Landungen</span>
+      </div>
+    </div>
+
+    <!-- View Navigation Tabs -->
+    <div class="flex border-b border-slate-200 dark:border-slate-700 gap-2">
+      <button id="tabList" onclick="switchTab('list')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+        Alle Historischen Landungen
+      </button>
+      <button id="tabPatterns" onclick="switchTab('patterns')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        Prognose- & Pattern-Inspektor
+      </button>
+    </div>
+
+    <!-- TAB 1: LIST / TABLE VIEW -->
+    <div id="viewList" class="space-y-4">
+      
+      <!-- Filter & Search Panel -->
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          
+          <!-- Search input -->
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="Flug-Nr., Airline, Stadt..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white">
+            <svg class="w-4 h-4 absolute left-3 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+
+          <!-- Type Filter -->
+          <select id="typeFilter" class="w-full py-2 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white">
+            <option value="ALL">Alle Flugtypen (Linie & Charter)</option>
+            <option value="Linie">Nur Linie</option>
+            <option value="Charter">Nur Charter</option>
+          </select>
+
+          <!-- Weekday Filter -->
+          <select id="dayFilter" class="w-full py-2 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white">
+            <option value="ALL">Alle Wochentage</option>
+            <option value="Monday">Montag</option>
+            <option value="Tuesday">Dienstag</option>
+            <option value="Wednesday">Mittwoch</option>
+            <option value="Thursday">Donnerstag</option>
+            <option value="Friday">Freitag</option>
+            <option value="Saturday">Samstag</option>
+            <option value="Sunday">Sonntag</option>
+          </select>
+
+          <!-- Sorting -->
+          <select id="sortOrder" class="w-full py-2 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white">
+            <option value="date-desc">Datum: Neueste zuerst</option>
+            <option value="date-asc">Datum: Älteste zuerst</option>
+            <option value="flight-asc">Flugnummer (A-Z)</option>
+            <option value="time-asc">Uhrzeit (früheste zuerst)</option>
+          </select>
+
+        </div>
+      </div>
+
+      <!-- Loading / Status indicator -->
+      <div id="loadingBox" class="py-12 text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2"></div>
+        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Lade arrival_history.json von Firebase...</p>
+      </div>
+
+      <div id="emptyBox" class="hidden py-12 text-center bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <svg class="w-12 h-12 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+        <p class="text-slate-600 dark:text-slate-300 font-bold">Keine historischen Flüge gefunden.</p>
+        <p class="text-xs text-slate-400 mt-1">Überprüfe die Suchfilter oder ob Daten in arrival_history.json vorhanden sind.</p>
+      </div>
+
+      <!-- Data Table -->
+      <div id="tableContainer" class="hidden bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] tracking-wider border-b border-slate-200 dark:border-slate-700">
+              <tr>
+                <th class="py-3 px-4">Datum & Tag</th>
+                <th class="py-3 px-4">Planzeit</th>
+                <th class="py-3 px-4">Flug-Nr.</th>
+                <th class="py-3 px-4">Airline & Herkunft</th>
+                <th class="py-3 px-4">Typ</th>
+                <th class="py-3 px-4">Ausgang</th>
+                <th class="py-3 px-4">Gepäckband</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/50">
+              <!-- Dynamic Rows -->
+            </tbody>
+          </table>
+        </div>
+        <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center">
+          <span id="filteredCountText">0 Einträge angezeigt</span>
+          <span>DUS Airport Realtime Database</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: PATTERN & PROGNOSE INSPEKTOR -->
+    <div id="viewPatterns" class="hidden space-y-4">
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Flugnummer suchen für Prognose-Analyse</label>
+        <div class="flex gap-2 max-w-md">
+          <input type="text" id="patternSearchInput" placeholder="z.B. TK1529, IB1325 oder EW9345..." class="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white uppercase font-mono">
+        </div>
+      </div>
+
+      <!-- Pattern Cards Container -->
+      <div id="patternCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const FIREBASE_HISTORY_URL = 'https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/arrival_history.json';
+    
+    let rawHistoryData = {};
+    let flatFlightsList = [];
+    let currentTab = 'list';
+
+    // Theme Management
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeSun = document.getElementById('themeSun');
+    const themeMoon = document.getElementById('themeMoon');
+
+    function initTheme() {
+      const isDark = localStorage.getItem('dus_history_theme') === 'dark' || 
+        (!('dus_history_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        themeSun.classList.remove('hidden');
+        themeMoon.classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        themeSun.classList.add('hidden');
+        themeMoon.classList.remove('hidden');
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('dus_history_theme', isDark ? 'dark' : 'light');
+      themeSun.classList.toggle('hidden', !isDark);
+      themeMoon.classList.toggle('hidden', isDark);
+    });
+
+    // Translate Weekdays to German
+    const weekdayMap = {
+      'Monday': 'Montag',
+      'Tuesday': 'Dienstag',
+      'Wednesday': 'Mittwoch',
+      'Thursday': 'Donnerstag',
+      'Friday': 'Freitag',
+      'Saturday': 'Samstag',
+      'Sunday': 'Sonntag'
+    };
+
+    // Load Data
+    async function loadHistoryData() {
+      document.getElementById('loadingBox').classList.remove('hidden');
+      document.getElementById('tableContainer').classList.add('hidden');
+      document.getElementById('emptyBox').classList.add('hidden');
+
+      try {
+        const response = await fetch(FIREBASE_HISTORY_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        
+        rawHistoryData = await response.json() || {};
+        flattenData(rawHistoryData);
+        
+        updateKPIs();
+        renderList();
+        renderPatternInspector();
+      } catch (err) {
+        console.error("Fehler beim Laden der Firebase Historie:", err);
+        document.getElementById('loadingBox').classList.add('hidden');
+        document.getElementById('emptyBox').classList.remove('hidden');
+      }
+    }
+
+    // Convert Nested Firebase Structure to Flat Array
+    function flattenData(data) {
+      flatFlightsList = [];
+
+      Object.keys(data).forEach(flightNo => {
+        const flightGroup = data[flightNo];
+        const airline = flightGroup.airline || 'Unbekannt';
+        const city = flightGroup.city || 'Unbekannt';
+        const historyList = Array.isArray(flightGroup.history) ? flightGroup.history : Object.values(flightGroup.history || {});
+
+        historyList.forEach(entry => {
+          flatFlightsList.push({
+            flight_no: flightNo,
+            airline: airline,
+            city: city,
+            date: entry.date || '',
+            weekday: entry.weekday || '',
+            scheduled_time: entry.scheduled_time || '00:00',
+            gate: entry.gate || '----',
+            baggage: entry.baggage || '----',
+            type: entry.type || 'Linie'
+          });
+        });
+      });
+    }
+
+    // KPI Summary
+    function updateKPIs() {
+      const total = flatFlightsList.length;
+      const uniqueRoutes = Object.keys(rawHistoryData).length;
+      
+      let linieCount = 0;
+      let charterCount = 0;
+      const cityCounts = {};
+
+      flatFlightsList.forEach(f => {
+        if (f.type === 'Charter') charterCount++;
+        else linieCount++;
+
+        if (f.city) {
+          cityCounts[f.city] = (cityCounts[f.city] || 0) + 1;
+        }
+      });
+
+      // Top City
+      let topCity = '-';
+      let topCityCount = 0;
+      Object.entries(cityCounts).forEach(([city, cnt]) => {
+        if (cnt > topCityCount) {
+          topCityCount = cnt;
+          topCity = city;
+        }
+      });
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statRoutes').textContent = uniqueRoutes;
+      document.getElementById('statRatio').textContent = `${linieCount} / ${charterCount}`;
+      document.getElementById('statTopCity').textContent = topCity;
+      document.getElementById('statTopCityCount').textContent = `${topCityCount} Landungen`;
+    }
+
+    // Render Filtered List
+    function renderList() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const type = document.getElementById('typeFilter').value;
+      const day = document.getElementById('dayFilter').value;
+      const sort = document.getElementById('sortOrder').value;
+
+      let filtered = flatFlightsList.filter(f => {
+        if (type !== 'ALL' && f.type !== type) return false;
+        if (day !== 'ALL' && f.weekday !== day) return false;
+
+        if (search) {
+          const matchNo = f.flight_no.toLowerCase().includes(search);
+          const matchAirline = f.airline.toLowerCase().includes(search);
+          const matchCity = f.city.toLowerCase().includes(search);
+          const matchDate = f.date.includes(search);
+          if (!matchNo && !matchAirline && !matchCity && !matchDate) return false;
+        }
+
+        return true;
+      });
+
+      // Sorting
+      filtered.sort((a, b) => {
+        if (sort === 'date-desc') return b.date.localeCompare(a.date) || b.scheduled_time.localeCompare(a.scheduled_time);
+        if (sort === 'date-asc') return a.date.localeCompare(b.date) || a.scheduled_time.localeCompare(b.scheduled_time);
+        if (sort === 'flight-asc') return a.flight_no.localeCompare(b.flight_no);
+        if (sort === 'time-asc') return a.scheduled_time.localeCompare(b.scheduled_time);
+        return 0;
+      });
+
+      document.getElementById('loadingBox').classList.add('hidden');
+
+      if (filtered.length === 0) {
+        document.getElementById('tableContainer').classList.add('hidden');
+        document.getElementById('emptyBox').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('emptyBox').classList.add('hidden');
+      document.getElementById('tableContainer').classList.remove('hidden');
+
+      const tbody = document.getElementById('historyTableBody');
+      tbody.innerHTML = '';
+
+      filtered.forEach(f => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors";
+
+        const badgeClass = f.type === 'Charter' ? 'badge-charter' : 'badge-linie';
+        const dayDe = weekdayMap[f.weekday] || f.weekday;
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono text-xs">
+            <span class="font-bold text-slate-800 dark:text-slate-200">${f.date}</span>
+            <span class="block text-[11px] text-slate-400">${dayDe}</span>
+          </td>
+          <td class="py-3 px-4 font-mono font-bold text-blue-600 dark:text-blue-400">${f.scheduled_time} Uhr</td>
+          <td class="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">${f.flight_no}</td>
+          <td class="py-3 px-4">
+            <div class="font-semibold text-slate-800 dark:text-slate-200">${f.city}</div>
+            <div class="text-xs text-slate-400">${f.airline}</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${badgeClass}">${f.type}</span>
+          </td>
+          <td class="py-3 px-4 font-mono font-semibold text-slate-700 dark:text-slate-300">${f.gate}</td>
+          <td class="py-3 px-4 font-mono font-semibold text-slate-700 dark:text-slate-300">Band ${f.baggage}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('filteredCountText').textContent = `${filtered.length} von ${flatFlightsList.length} Landungen angezeigt`;
+    }
+
+    // Pattern Inspector Tab
+    function renderPatternInspector() {
+      const search = document.getElementById('patternSearchInput').value.toUpperCase().trim();
+      const grid = document.getElementById('patternCardsGrid');
+      grid.innerHTML = '';
+
+      const flightNos = Object.keys(rawHistoryData).filter(fn => !search || fn.includes(search));
+
+      if (flightNos.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm">Keine Flugmuster für "${search}" gefunden.</div>`;
+        return;
+      }
+
+      flightNos.slice(0, 12).forEach(fn => {
+        const item = rawHistoryData[fn];
+        const history = Array.isArray(item.history) ? item.history : Object.values(item.history || {});
+        
+        // Count gates & baggages
+        const gateCounts = {};
+        const baggageCounts = {};
+        const typeCounts = {};
+
+        history.forEach(h => {
+          if (h.gate && h.gate !== '----') gateCounts[h.gate] = (gateCounts[h.gate] || 0) + 1;
+          if (h.baggage && h.baggage !== '----') baggageCounts[h.baggage] = (baggageCounts[h.baggage] || 0) + 1;
+          if (h.type) typeCounts[h.type] = (typeCounts[h.type] || 0) + 1;
+        });
+
+        // Format probabilities
+        const totalEntries = history.length;
+        const gateStats = Object.entries(gateCounts).map(([g, c]) => `${g}: ${Math.round((c/totalEntries)*100)}% (${c}x)`).join(', ') || 'Keine Daten';
+        const baggageStats = Object.entries(baggageCounts).map(([b, c]) => `Band ${b}: ${Math.round((c/totalEntries)*100)}% (${c}x)`).join(', ') || 'Keine Daten';
+
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3";
+        card.innerHTML = `
+          <div class="flex justify-between items-start border-b border-slate-100 dark:border-slate-700/50 pb-2">
+            <div>
+              <span class="font-mono font-black text-lg text-blue-600 dark:text-blue-400">${fn}</span>
+              <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">${item.city || 'Unbekannt'}</p>
+              <p class="text-[11px] text-slate-400">${item.airline || ''}</p>
+            </div>
+            <span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded font-bold text-slate-600 dark:text-slate-300">${totalEntries} Landungen</span>
+          </div>
+
+          <div class="space-y-1.5 text-xs">
+            <div>
+              <span class="text-slate-400 font-semibold block uppercase text-[10px]">Häufigste Ausgänge (Gates):</span>
+              <span class="font-mono font-medium text-slate-800 dark:text-slate-200">${gateStats}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 font-semibold block uppercase text-[10px]">Häufigste Gepäckbänder:</span>
+              <span class="font-mono font-medium text-slate-800 dark:text-slate-200">${baggageStats}</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // CSV Export
+    function exportCSV() {
+      if (flatFlightsList.length === 0) return;
+
+      let csv = 'Datum;Wochentag;Planzeit;Flugnummer;Airline;Herkunft;Typ;Ausgang;Gepaeckband\n';
+      flatFlightsList.forEach(f => {
+        csv += `${f.date};${f.weekday};${f.scheduled_time};${f.flight_no};"${f.airline}";"${f.city}";${f.type};"${f.gate}";"${f.baggage}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dus_arrival_history_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Switch Tabs
+    function switchTab(tab) {
+      currentTab = tab;
+      const tabList = document.getElementById('tabList');
+      const tabPatterns = document.getElementById('tabPatterns');
+      const viewList = document.getElementById('viewList');
+      const viewPatterns = document.getElementById('viewPatterns');
+
+      if (tab === 'list') {
+        tabList.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2";
+        tabPatterns.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2";
+        viewList.classList.remove('hidden');
+        viewPatterns.classList.add('hidden');
+      } else {
+        tabPatterns.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2";
+        tabList.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2";
+        viewPatterns.classList.remove('hidden');
+        viewList.classList.add('hidden');
+      }
+    }
+
+    // Event Listeners
+    document.getElementById('searchInput').addEventListener('input', renderList);
+    document.getElementById('typeFilter').addEventListener('change', renderList);
+    document.getElementById('dayFilter').addEventListener('change', renderList);
+    document.getElementById('sortOrder').addEventListener('change', renderList);
+    document.getElementById('patternSearchInput').addEventListener('input', renderPatternInspector);
+
+    // Initial Load
+    initTheme();
+    loadHistoryData();
+  </script>
+</body>
+</html>
