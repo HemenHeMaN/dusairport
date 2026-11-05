@@ -269,10 +269,19 @@
     };
 
     // Load Data
-    async function loadHistoryData() {
-      document.getElementById('loadingBox').classList.remove('hidden');
-      document.getElementById('tableContainer').classList.add('hidden');
-      document.getElementById('emptyBox').classList.add('hidden');
+    const REFRESH_MS = 2 * 60 * 1000;
+    const TAB_KEY = 'dus_history_tab';
+    let isLoading = false;
+
+    async function loadHistoryData(silent) {
+      if (isLoading) return;
+      isLoading = true;
+      // Beim automatischen Update bleibt die Ansicht stehen (kein Spinner, kein Flackern)
+      if (silent !== true) {
+        document.getElementById('loadingBox').classList.remove('hidden');
+        document.getElementById('tableContainer').classList.add('hidden');
+        document.getElementById('emptyBox').classList.add('hidden');
+      }
 
       try {
         const response = await fetch(FIREBASE_HISTORY_URL, { cache: 'no-store' });
@@ -286,8 +295,12 @@
         renderPatternInspector();
       } catch (err) {
         console.error("Fehler beim Laden der Firebase Historie:", err);
-        document.getElementById('loadingBox').classList.add('hidden');
-        document.getElementById('emptyBox').classList.remove('hidden');
+        if (silent !== true) {
+          document.getElementById('loadingBox').classList.add('hidden');
+          document.getElementById('emptyBox').classList.remove('hidden');
+        }
+      } finally {
+        isLoading = false;
       }
     }
 
@@ -534,6 +547,7 @@
     // Switch Tabs
     function switchTab(tab) {
       currentTab = tab;
+      try { localStorage.setItem(TAB_KEY, tab); } catch (e) {}
       const tabList = document.getElementById('tabList');
       const tabPatterns = document.getElementById('tabPatterns');
       const viewList = document.getElementById('viewList');
@@ -561,7 +575,14 @@
 
     // Initial Load
     initTheme();
+    try {
+      if (localStorage.getItem(TAB_KEY) === 'patterns') switchTab('patterns');
+    } catch (e) {}
     loadHistoryData();
+
+    // Automatisches Update alle 2 Minuten (nur wenn der Tab sichtbar ist)
+    setInterval(() => { if (!document.hidden) loadHistoryData(true); }, REFRESH_MS);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) loadHistoryData(true); });
   </script>
 </body>
 </html>
