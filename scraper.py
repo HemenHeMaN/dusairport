@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 """
-DUS-Ankünfte-Scraper mit Firebase-Historie und Prognosen.
+DUS-Ankünfte-Scraper mit Firebase-Historie und historischen Prognosen.
 
-Beibehaltener Funktionsumfang:
+Funktionen:
 - dus.com Flight-API mit Pagination und Retry
-- bisherige Zeit-, Codeshare-, Tages- und Airline-Filter
+- bestehende Zeit-, Codeshare-, Tages- und Airline-Filter
 - Linie/Charter-Erkennung und Status-/Verspätungsaufbereitung
 - lokale arrival.json, Firebase-Live-Daten und GitHub-Reserve
-- zusätzliche arrival_history.json für gelandete Flüge
-- historische Prognosen für Ausgang, Gepäckband und ggf. Flugtyp
+- arrival_history.json mit maximal 21 Tagen echter Flugdaten
+- Prognosen für Ausgang, Gepäckband und Flugtyp
+- echte DUS.com-Werte haben immer Vorrang
+- Historie wird pro Lauf nur einmal aus Firebase gelesen
 
-Wichtige Datenregel:
-Nur echte API-Werte werden in die Historie geschrieben. Bereits vorhandene
-Live-Werte werden niemals durch Prognosen ersetzt.
+WICHTIG:
+Die Historie enthält ausschließlich gelandete Flüge und echte API-Informationen.
+Prognosewerte und reine Airline-Standardannahmen werden nicht als Tatsachen
+in arrival_history.json gespeichert.
 """
 
+import base64
 import json
 import os
 import random
@@ -49,7 +53,6 @@ FIREBASE_HISTORY_URL = FIREBASE_URL.rsplit("/", 1)[0] + "/arrival_history.json"
 
 TZ = ZoneInfo("Europe/Berlin")
 
-# Lokales Abruffenster: 05:00 Uhr bis 00:35 Uhr am Folgetag.
 WINDOW_START = (5, 0)
 WINDOW_END = (0, 35)
 
@@ -65,9 +68,8 @@ MAX_PAGES = 10
 API_RETRIES = 3
 API_TIMEOUT = 20
 
-# Historische Zuordnung: maximal eine Stunde Abweichung zur Planzeit.
+HISTORY_DAYS = 21
 HISTORY_TIME_TOLERANCE_MINUTES = 60
-MIN_HISTORY_VOTES = 1
 
 HEADERS = {
     "Accept": "application/json, text/plain, */*",
@@ -122,7 +124,6 @@ def in_run_window(now_local):
         hour=WINDOW_END[0], minute=WINDOW_END[1], second=0, microsecond=0
     )
 
-    # Das Zeitfenster läuft über Mitternacht.
     if end < start:
         if now_local >= start:
             end += timedelta(days=1)
@@ -133,7 +134,6 @@ def in_run_window(now_local):
 
 
 def write_json_atomic(path, data):
-    """Schreibt erst in eine temporäre Datei und ersetzt dann die Zieldatei."""
     temp_path = path + ".tmp"
     with open(temp_path, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=2)
@@ -197,12 +197,20 @@ def remark_text(flight):
     return clean_text(public_remark.get("name") or remark.get("description"))
 
 
+def history_entry_key(entry):
+    """Eindeutiger Schlüssel: Flugdatum plus planmäßige Uhrzeit."""
+    return (
+        str(entry.get("date") or ""),
+        str(entry.get("scheduled_time") or ""),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Flugtyp, Status und Flughafeninformationen
 # ---------------------------------------------------------------------------
 
 def classify(flight, airline_name, airline_iata):
-    """Die bisherige Reihenfolge der Linie-/Charter-Erkennung bleibt erhalten."""
+    """Bestehende Reihenfolge der Linie-/Charter-Erkennung."""
     exit_number = first_int(flight.get("arrivalExit"))
     if exit_number is not None:
         return ("Linie" if exit_number <= 2 else "Charter"), "Ausgang"
@@ -229,8 +237,6 @@ def exit_text(flight, flight_type):
     exit_number = first_int(flight.get("arrivalExit"))
     if exit_number is not None:
         return f"Ausgang {exit_number} ({flight_type})"
-
-    # Bestehende Anzeige-Fallbacks bleiben erhalten.
     return "Ausgang 4 (Charter)" if flight_type == "Charter" else "Ausgang 1 (Linie)"
 
 
@@ -288,7 +294,6 @@ def get_json(url, retries=API_RETRIES):
             return payload["data"]
 
         except urllib.error.HTTPError as error:
-            # 403/429 werden nicht durch weitere schnelle Versuche verschärft.
             if error.code in (403, 429):
                 raise
             last_error = error
@@ -393,10 +398,12 @@ def build_flights(raw_flights, now):
         remark = remark_text(raw)
         status_detail = status_text + (", " + remark if remark and status_text else remark)
 
-        # Nur diese beiden Felder gelten als echte, direkt von dus.com gelieferte
-        # Werte. "gate" enthält weiterhin die bisherige Fallback-Anzeige.
         actual_exit_number = first_int(raw.get("arrivalExit"))
         actual_baggage = belts_text(raw.get("belt"))
+
+        # Ein Flugtyp ist nur dann historisch belastbar, wenn er nicht bloß
+        # aus dem Airline-Namen bzw. Airline-Code abgeleitet wurde.
+        type_is_api_based = type_source in ("Ausgang", "Gepäckband", "Flugtyp")
 
         flights.append({
             "dt": scheduled.timestamp(),
@@ -417,16 +424,13 @@ def build_flights(raw_flights, now):
             "status_detail": status_detail,
             "remark": remark,
             "delay": delay,
-
-            # Interne Felder für Historie/Prognose. Sie verhindern, dass
-            # Fallback-Anzeigen fälschlich als echte Flughafendaten gelten.
             "gate_actual": f"Ausgang {actual_exit_number}" if actual_exit_number is not None else None,
             "baggage_actual": actual_baggage or None,
+            "type_actual": flight_type if type_is_api_based else None,
         })
 
     flights.sort(key=lambda item: (item["dt_real"], item["dt"]))
 
-    # Codeshare- und Mehrfachtreffer desselben Fluges zusammenfassen.
     unique = []
     seen = set()
     for flight in flights:
@@ -483,98 +487,20 @@ def firebase_request(url, credentials, method="GET", data=None, timeout=15):
 
 
 def load_history(credentials):
+    if credentials is None:
+        return None
+
     try:
         _, data = firebase_request(
             FIREBASE_HISTORY_URL, credentials, method="GET", timeout=15
         )
         return data if isinstance(data, dict) else {}
     except Exception as error:
-        # Bei einem Leseproblem NICHT automatisch eine leere Historie schreiben.
         log(f"Historie konnte nicht gelesen werden: {error}")
         return None
 
 
-# ---------------------------------------------------------------------------
-# Historische Daten speichern
-# ---------------------------------------------------------------------------
-
-def update_historical_database(flights, credentials):
-    """
-    Speichert ausschließlich gelandete Flüge und ausschließlich echte
-    Ausgangs-/Gepäckbandwerte. Ein später korrigierter Wert ersetzt den
-    bisherigen Wert desselben Fluges am selben Datum.
-    """
-    if credentials is None:
-        return
-
-    history_data = load_history(credentials)
-    if history_data is None:
-        log("Historie bleibt unverändert, da sie nicht sicher gelesen werden konnte.")
-        return
-
-    changed = False
-
-    for flight in flights:
-        if str(flight.get("status", "")).lower() != "landed":
-            continue
-
-        actual_gate = flight.get("gate_actual")
-        actual_baggage = flight.get("baggage_actual")
-
-        # Keine Historienzeile ohne mindestens eine echte Flughafeninformation.
-        if not actual_gate and not actual_baggage:
-            continue
-
-        flight_no = flight.get("flight_no")
-        if not flight_no:
-            continue
-
-        flight_date = timestamp_to_local(flight["dt"]).strftime("%Y-%m-%d")
-        weekday = timestamp_to_local(flight["dt"]).strftime("%A")
-
-        flight_record = history_data.setdefault(
-            flight_no,
-            {
-                "airline": flight.get("airline"),
-                "city": flight.get("city"),
-                "history": [],
-            },
-        )
-        flight_record["airline"] = flight.get("airline") or flight_record.get("airline")
-        flight_record["city"] = flight.get("city") or flight_record.get("city")
-
-        entries = flight_record.setdefault("history", [])
-        existing = next(
-            (entry for entry in entries if entry.get("date") == flight_date),
-            None,
-        )
-
-        new_entry = {
-            "date": flight_date,
-            "weekday": weekday,
-            "scheduled_time": flight.get("time_scheduled"),
-            "gate": actual_gate,
-            "baggage": actual_baggage,
-            "type": flight.get("type"),
-        }
-
-        if existing is None:
-            entries.append(new_entry)
-            changed = True
-        else:
-            # Vorhandene echte Werte behalten, fehlende Werte ergänzen und
-            # geänderte Live-Werte desselben Tages aktualisieren.
-            for key, value in new_entry.items():
-                if value is None or value == "":
-                    continue
-                if existing.get(key) != value:
-                    existing[key] = value
-                    changed = True
-
-    if not changed:
-        log("Historie: keine neuen oder korrigierten gelandeten Flüge.")
-        return
-
+def save_history(history_data, credentials):
     try:
         status, _ = firebase_request(
             FIREBASE_HISTORY_URL,
@@ -584,8 +510,135 @@ def update_historical_database(flights, credentials):
             timeout=20,
         )
         log(f"arrival_history.json aktualisiert (HTTP {status}).")
+        return True
     except Exception as error:
         log(f"Fehler beim Schreiben der Historie: {error}")
+        return False
+
+
+# ---------------------------------------------------------------------------
+# Historische Daten: Aufbewahrung und Speicherung
+# ---------------------------------------------------------------------------
+
+def prune_history(history_data, now):
+    """Entfernt Historieneinträge, die älter als 21 Tage sind."""
+    cutoff_date = (now.date() - timedelta(days=HISTORY_DAYS - 1)).isoformat()
+    changed = False
+
+    for flight_no in list(history_data.keys()):
+        record = history_data.get(flight_no)
+        if not isinstance(record, dict):
+            history_data.pop(flight_no, None)
+            changed = True
+            continue
+
+        entries = record.get("history", [])
+        if not isinstance(entries, list):
+            entries = []
+
+        kept = [
+            entry for entry in entries
+            if isinstance(entry, dict)
+            and str(entry.get("date") or "") >= cutoff_date
+        ]
+
+        if len(kept) != len(entries):
+            record["history"] = kept
+            changed = True
+
+        if not kept:
+            history_data.pop(flight_no, None)
+            changed = True
+
+    return changed
+
+
+def update_historical_database(flights, history_data, now):
+    """
+    Aktualisiert die bereits geladene Historie.
+    Es werden nur gelandete Flüge mit mindestens einem echten Flughafenwert
+    gespeichert. Identität = Flugnummer + Datum + Planzeit.
+    """
+    if history_data is None:
+        return False
+
+    changed = prune_history(history_data, now)
+
+    for flight in flights:
+        if str(flight.get("status", "")).lower() != "landed":
+            continue
+
+        actual_gate = flight.get("gate_actual")
+        actual_baggage = flight.get("baggage_actual")
+        actual_type = flight.get("type_actual")
+
+        if not actual_gate and not actual_baggage and not actual_type:
+            continue
+
+        flight_no = flight.get("flight_no")
+        if not flight_no:
+            continue
+
+        scheduled_dt = timestamp_to_local(flight["dt"])
+        flight_date = scheduled_dt.strftime("%Y-%m-%d")
+        weekday = scheduled_dt.strftime("%A")
+
+        flight_record = history_data.setdefault(
+            flight_no,
+            {
+                "airline": flight.get("airline"),
+                "city": flight.get("city"),
+                "history": [],
+            },
+        )
+        if flight_record.get("airline") != flight.get("airline") and flight.get("airline"):
+            flight_record["airline"] = flight.get("airline")
+            changed = True
+        if flight_record.get("city") != flight.get("city") and flight.get("city"):
+            flight_record["city"] = flight.get("city")
+            changed = True
+
+        entries = flight_record.setdefault("history", [])
+        if not isinstance(entries, list):
+            entries = []
+            flight_record["history"] = entries
+            changed = True
+
+        existing = next(
+            (
+                entry for entry in entries
+                if history_entry_key(entry) == (flight_date, flight.get("time_scheduled"))
+            ),
+            None,
+        )
+
+        new_entry = {
+            "date": flight_date,
+            "weekday": weekday,
+            "scheduled_time": flight.get("time_scheduled"),
+            "gate": actual_gate,
+            "baggage": actual_baggage,
+            "type": actual_type,
+            "city": flight.get("city"),
+            "airline": flight.get("airline"),
+        }
+
+        if existing is None:
+            entries.append(new_entry)
+            changed = True
+        else:
+            # Nur echte, aktuell gelieferte Werte aktualisieren. Fehlende API-
+            # Werte löschen keine bereits gespeicherten echten Angaben.
+            for key, value in new_entry.items():
+                if value in (None, ""):
+                    continue
+                if existing.get(key) != value:
+                    existing[key] = value
+                    changed = True
+
+        entries.sort(key=lambda entry: history_entry_key(entry))
+
+    return changed
 
 
 # ---------------------------------------------------------------------------
@@ -607,7 +660,6 @@ def time_difference_minutes(first_time, second_time):
         return None
 
     difference = abs(first - second)
-    # Berücksichtigt auch Flüge rund um Mitternacht.
     return min(difference, 1440 - difference)
 
 
@@ -623,7 +675,7 @@ def find_historical_matches(flight, history_data):
     target_weekday = timestamp_to_local(flight["dt"]).strftime("%A")
     target_time = flight.get("time_scheduled")
 
-    # 1. Exakte Flugnummer hat Vorrang.
+    # 1. Exakte Flugnummer, gleicher Wochentag und ähnliche Planzeit.
     exact_matches = []
     exact_record = history_data.get(flight_no, {})
     for entry in exact_record.get("history", []):
@@ -637,19 +689,22 @@ def find_historical_matches(flight, history_data):
     if exact_matches:
         return exact_matches, "Flugnummer"
 
-    # 2. Fallback: Airline + Herkunftsstadt + Wochentag + ähnliche Planzeit.
+    # 2. Fallback: Airline + Herkunft + Wochentag + ähnliche Planzeit.
     fallback_matches = []
     target_city = flight.get("city")
     target_airline = flight.get("airline")
 
     for record in history_data.values():
-        if (
-            record.get("city") != target_city
-            or record.get("airline") != target_airline
-        ):
+        if not isinstance(record, dict):
             continue
 
         for entry in record.get("history", []):
+            entry_city = entry.get("city") or record.get("city")
+            entry_airline = entry.get("airline") or record.get("airline")
+
+            if entry_city != target_city or entry_airline != target_airline:
+                continue
+
             difference = time_difference_minutes(
                 entry.get("scheduled_time"), target_time
             )
@@ -657,19 +712,15 @@ def find_historical_matches(flight, history_data):
                 if difference <= HISTORY_TIME_TOLERANCE_MINUTES:
                     fallback_matches.append(entry)
 
-    return fallback_matches, "Airline/Stadt"
+    return fallback_matches, "Airline/Herkunft"
 
 
-def apply_historical_predictions(flights, credentials):
+def apply_historical_predictions(flights, history_data):
     """
-    Ergänzt nur fehlende Werte. Tatsächliche API-Werte bleiben unverändert.
-    Historische Prognosen werden mit '(Prognose)' gekennzeichnet.
+    Ergänzt ausschließlich fehlende Felder.
+    DUS.com-Echtwerte bleiben unangetastet; Prognosen werden gekennzeichnet.
     """
-    if credentials is None:
-        return flights
-
-    history_data = load_history(credentials)
-    if not history_data:
+    if not isinstance(history_data, dict) or not history_data:
         return flights
 
     for flight in flights:
@@ -685,18 +736,15 @@ def apply_historical_predictions(flights, credentials):
             continue
 
         gates = [
-            entry.get("gate")
-            for entry in matches
+            entry.get("gate") for entry in matches
             if entry.get("gate") and "?" not in str(entry.get("gate"))
         ]
         baggages = [
-            entry.get("baggage")
-            for entry in matches
+            entry.get("baggage") for entry in matches
             if entry.get("baggage") and "?" not in str(entry.get("baggage"))
         ]
         types = [
-            entry.get("type")
-            for entry in matches
+            entry.get("type") for entry in matches
             if entry.get("type") in ("Linie", "Charter")
         ]
 
@@ -704,29 +752,32 @@ def apply_historical_predictions(flights, credentials):
         predicted_baggage = most_common_value(baggages) if needs_baggage else None
         predicted_type = most_common_value(types) if can_predict_type else None
 
+        if predicted_type:
+            flight["type"] = predicted_type
+            flight["type_source"] = "Prognose (Historie)"
+            flight["type_prediction_source"] = match_source
+
         if predicted_gate:
-            # Historie speichert z.B. "Ausgang 3"; Anzeige ergänzt den Flugtyp.
             flight_type = predicted_type or flight.get("type")
             flight["gate"] = f"{predicted_gate} ({flight_type}, Prognose)"
             flight["gate_source"] = "Prognose (Historie)"
             flight["prediction_match"] = match_source
+        elif needs_gate and predicted_type:
+            # Nur der Fallback-Ausgang wird an den prognostizierten Typ angepasst.
+            flight["gate"] = (
+                "Ausgang 4 (Charter, Prognose)"
+                if predicted_type == "Charter"
+                else "Ausgang 1 (Linie, Prognose)"
+            )
+            flight["gate_source"] = "Typ-Prognose (Historie)"
 
         if predicted_baggage:
             flight["baggage"] = f"{predicted_baggage} (Prognose)"
             flight["baggage_source"] = "Prognose (Historie)"
-            flight["prediction_match"] = match_source
 
-        if predicted_type and predicted_type != flight.get("type"):
-            flight["type"] = predicted_type
-            flight["type_source"] = "Prognose (Historie)"
-            # Wenn der Ausgang nur ein Fallback war, Anzeige an den
-            # prognostizierten Flugtyp anpassen.
-            if not flight.get("gate_actual") and not predicted_gate:
-                flight["gate"] = (
-                    "Ausgang 4 (Charter)"
-                    if predicted_type == "Charter"
-                    else "Ausgang 1 (Linie)"
-                )
+        if predicted_gate or predicted_baggage or predicted_type:
+            flight["prediction_match"] = match_source
+            flight["prediction_votes"] = len(matches)
 
     return flights
 
@@ -815,9 +866,6 @@ def push_to_data_repo():
             check=True,
         )
 
-        # Token nur für diesen Git-Aufruf verwenden, nicht dauerhaft in der
-        # gespeicherten Git-Remote-URL ablegen.
-        import base64
         auth = base64.b64encode(f"x-access-token:{token}".encode()).decode()
         subprocess.run(
             [
@@ -877,15 +925,25 @@ def main():
             + ", ".join(sorted(unknown_status))
         )
 
-    # Zugangsdaten einmal anmelden und für beide Firebase-Pfade wiederverwenden.
     credentials = create_firebase_credentials()
 
-    # Zuerst echte gelandete API-Werte sichern. Prognosen dürfen niemals in
-    # die Historie gelangen.
-    update_historical_database(flights, credentials)
+    # Historie nur EINMAL pro Lauf laden. Bei Lesefehler wird sie weder
+    # überschrieben noch werden auf Basis einer leeren Historie Prognosen gebaut.
+    history_data = load_history(credentials) if credentials else None
+    history_read_ok = history_data is not None
 
-    # Erst danach fehlende Live-Anzeigewerte anhand der Historie ergänzen.
-    flights = apply_historical_predictions(flights, credentials)
+    if history_read_ok:
+        history_changed = update_historical_database(flights, history_data, now)
+
+        # Prognosen verwenden auch neu eingetroffene echte Daten aus diesem Lauf.
+        flights = apply_historical_predictions(flights, history_data)
+
+        if history_changed:
+            save_history(history_data, credentials)
+        else:
+            log("Historie: keine Änderungen; kein Firebase-Schreibzugriff.")
+    else:
+        log("Historie nicht verfügbar; Prognosen und Historien-Update übersprungen.")
 
     output = {
         "updated_at": now.strftime("%d.%m.%Y %H:%M"),
@@ -900,7 +958,6 @@ def main():
         log(f"Fehler beim lokalen Schreiben von {CACHE_FILE}: {error}")
         sys.exit(1)
 
-    # Firebase bei jedem erfolgreichen Lauf; GitHub als zeitgesteuerte Reserve.
     push_to_firebase(credentials)
 
     if "--force" in sys.argv or now.minute % DATA_REPO_EVERY_MIN < 3:
