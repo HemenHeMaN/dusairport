@@ -67,16 +67,7 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <button id="btnRefresh" onclick="loadHistoryData()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition" title="Daten aktualisieren">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        </button>
-
-        <button id="btnExport" onclick="exportCSV()" class="hidden sm:flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          Export CSV
-        </button>
-
-        <!-- Darkmode Toggle -->
+                        <!-- Darkmode Toggle -->
         <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
           <svg id="themeSun" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path></svg>
           <svg id="themeMoon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -113,9 +104,12 @@
 
     <!-- Top 10 Herkunft -->
     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-      <div class="flex justify-between items-baseline mb-3">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Top 10 Herkunft</h2>
-        <span class="text-[10px] text-slate-400">nach Landungen</span>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+        <div class="inline-flex rounded-lg bg-slate-100 dark:bg-slate-700 p-0.5" role="tablist" aria-label="Top 10 Ansicht">
+          <button id="topBtnCity" type="button" onclick="setTopMode('city')" class="px-3 py-1.5 text-xs font-bold rounded-md transition">Top Herkunft</button>
+          <button id="topBtnFlight" type="button" onclick="setTopMode('flight')" class="px-3 py-1.5 text-xs font-bold rounded-md transition">Top Flugnummern</button>
+        </div>
+        <span class="text-[10px] text-slate-400">Top 10 nach Landungen</span>
       </div>
       <ol id="topCitiesList" class="space-y-1.5">
         <li class="text-sm text-slate-400">Keine Daten</li>
@@ -341,6 +335,56 @@
       });
     }
 
+    // Top 10 (Herkunft / Flugnummern) mit Umschalter
+    const TOPMODE_KEY = 'dus_history_topmode';
+    let topMode = 'city';
+    try { if (localStorage.getItem(TOPMODE_KEY) === 'flight') topMode = 'flight'; } catch (e) {}
+
+    function setTopMode(mode) {
+      topMode = mode === 'flight' ? 'flight' : 'city';
+      try { localStorage.setItem(TOPMODE_KEY, topMode); } catch (e) {}
+      renderTop10();
+    }
+
+    function renderTop10() {
+      const on = 'px-3 py-1.5 text-xs font-bold rounded-md transition bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm';
+      const off = 'px-3 py-1.5 text-xs font-bold rounded-md transition text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200';
+      document.getElementById('topBtnCity').className = topMode === 'city' ? on : off;
+      document.getElementById('topBtnFlight').className = topMode === 'flight' ? on : off;
+
+      const counts = {};
+      const meta = {};
+      flatFlightsList.forEach(f => {
+        const key = topMode === 'city' ? f.city : f.flight_no;
+        if (!key) return;
+        counts[key] = (counts[key] || 0) + 1;
+        meta[key] = f;
+      });
+
+      const top10 = Object.entries(counts)
+        .sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))
+        .slice(0, 10);
+      const maxCnt = top10.length ? top10[0][1] : 1;
+      const escHtml = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+      const listEl = document.getElementById('topCitiesList');
+      listEl.innerHTML = top10.length ? top10.map(([key, cnt], i) => {
+        const m = meta[key];
+        const label = topMode === 'flight'
+          ? `<span class="font-mono font-bold">${escHtml(key)}</span> <span class="text-xs font-normal text-slate-400">${escHtml(m.city)} · ${escHtml(m.airline)}</span>`
+          : escHtml(key);
+        return `
+        <li class="flex items-center gap-3 text-sm">
+          <span class="w-5 text-right font-mono text-xs font-bold text-slate-400">${i + 1}</span>
+          <span class="w-44 sm:w-72 truncate font-semibold text-slate-800 dark:text-slate-200">${label}</span>
+          <span class="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+            <span class="block h-full rounded-full ${topMode === 'flight' ? 'bg-blue-500' : 'bg-amber-500'}" style="width:${Math.max(4, Math.round(cnt / maxCnt * 100))}%"></span>
+          </span>
+          <span class="w-24 text-right font-mono text-xs text-slate-600 dark:text-slate-300">${cnt} ${cnt === 1 ? 'Landung' : 'Landungen'}</span>
+        </li>`;
+      }).join('') : '<li class="text-sm text-slate-400">Keine Daten</li>';
+    }
+
     // KPI Summary
     function updateKPIs() {
       const total = flatFlightsList.length;
@@ -369,22 +413,7 @@
         }
       });
 
-      // Top 10 Herkunft
-      const top10 = Object.entries(cityCounts)
-        .sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))
-        .slice(0, 10);
-      const maxCnt = top10.length ? top10[0][1] : 1;
-      const escHtml = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      const listEl = document.getElementById('topCitiesList');
-      listEl.innerHTML = top10.length ? top10.map(([city, cnt], i) => `
-        <li class="flex items-center gap-3 text-sm">
-          <span class="w-5 text-right font-mono text-xs font-bold text-slate-400">${i + 1}</span>
-          <span class="w-40 sm:w-56 truncate font-semibold text-slate-800 dark:text-slate-200">${escHtml(city)}</span>
-          <span class="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-            <span class="block h-full rounded-full bg-amber-500" style="width:${Math.max(4, Math.round(cnt / maxCnt * 100))}%"></span>
-          </span>
-          <span class="w-24 text-right font-mono text-xs text-slate-600 dark:text-slate-300">${cnt} ${cnt === 1 ? 'Landung' : 'Landungen'}</span>
-        </li>`).join('') : '<li class="text-sm text-slate-400">Keine Daten</li>';
+      renderTop10();
 
       document.getElementById('statTotal').textContent = total;
       document.getElementById('statRoutes').textContent = uniqueRoutes;
@@ -551,25 +580,6 @@
         `;
         grid.appendChild(card);
       });
-    }
-
-    // CSV Export
-    function exportCSV() {
-      if (flatFlightsList.length === 0) return;
-
-      let csv = 'Datum;Wochentag;Planzeit;Flugnummer;Airline;Herkunft;Typ;Ausgang;Gepaeckband\n';
-      flatFlightsList.forEach(f => {
-        csv += `${f.date};${f.weekday};${f.scheduled_time};${f.flight_no};"${f.airline}";"${f.city}";${f.type};"${f.gate}";"${f.baggage}"\n`;
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `dus_arrival_history_${new Date().toISOString().slice(0,10)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
     }
 
     // Switch Tabs
