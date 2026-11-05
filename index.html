@@ -492,6 +492,12 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 
 .tf-remark { display: none; }
 
+/* Dezente Kennzeichnung prognostizierter Werte */
+.prog {
+    font-size: .78em; font-weight: 500; font-style: italic; opacity: .72;
+    text-transform: none; letter-spacing: 0;
+}
+
 .tf-empty { padding: 24px 14px; color: var(--tf-dim); background: var(--tf-row); text-align: center; }
 .tf-footer { margin-top: 12px; color: var(--tf-dim); font-size: .62rem; line-height: 1.6; max-width: 62ch; }
 
@@ -1167,6 +1173,203 @@ let loadTimer = null;
 const FIREBASE_URL = 'https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/arrival.json';
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/HemenHeMaN/dusflugdaten/main/arrival.json';
 
+/* ===== Historische Prognose (nur Anzeige, wird nirgends zurückgeschrieben) ===== */
+const HISTORY_URL = 'https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/arrival_history.json';
+const HISTORY_REFRESH_MIN = 10;     // Historie höchstens alle 10 Min. neu laden
+const HIST_TOLERANCE_MIN = 60;      // ±60 Min. zur geplanten Uhrzeit
+let historyByNo = {};               // Flugnummer -> Einträge
+let historyAll = [];                // alle Einträge flach
+let historyRaw = '';                // Rohtext zum Erkennen von Änderungen
+let historyLoadedAt = 0;
+let historyLoading = false;
+let predCache = new WeakMap();      // Flug-Objekt -> Prognose (wird bei neuer Historie geleert)
+
+function histClean(v) {
+    if (v == null) return null;
+    const t = String(v).trim();
+    if (!t || t === EMPTY_MARK || t.indexOf('?') !== -1 || /prognose/i.test(t)) return null;
+    return t;
+}
+
+function weekdayFromDateStr(d) {
+    const dt = new Date(String(d) + 'T12:00:00Z');
+    if (isNaN(dt.getTime())) return '';
+    return dt.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
+}
+
+function weekdayOfTs(ts) {
+    return new Date(ts * 1000).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Europe/Berlin' });
+}
+
+function buildHistoryIndex(data) {
+    const byNo = {};
+    const all = [];
+    Object.keys(data || {}).forEach(no => {
+        const rec = data[no];
+        if (!rec || typeof rec !== 'object') return;
+        const hist = Array.isArray(rec.history) ? rec.history : Object.values(rec.history || {});
+        const list = [];
+        hist.forEach(e => {
+            if (!e || typeof e !== 'object') return;
+            const entry = {
+                airline: rec.airline || '',
+                city: rec.city || '',
+                date: e.date || '',
+                weekday: e.weekday || weekdayFromDateStr(e.date),
+                time: e.scheduled_time || '',
+                gate: histClean(e.gate),
+                baggage: histClean(e.baggage),
+                type: (e.type === 'Linie' || e.type === 'Charter') ? e.type : null
+            };
+            list.push(entry);
+            all.push(entry);
+        });
+        byNo[no] = list;
+    });
+    historyByNo = byNo;
+    historyAll = all;
+}
+
+function loadHistoryIfStale(force) {
+    if (historyLoading) return;
+    if (!force && historyLoadedAt && (Date.now() - historyLoadedAt) < HISTORY_REFRESH_MIN * 60000) return;
+    historyLoading = true;
+    fetch(HISTORY_URL, { cache: 'no-store' })
+        .then(res => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.text();
+        })
+        .then(text => {
+            historyLoadedAt = Date.now();
+            if (text === historyRaw) return;          // unverändert: nichts neu berechnen
+            const data = JSON.parse(text);
+            if (!data || typeof data !== 'object') return;
+            historyRaw = text;
+            buildHistoryIndex(data);
+            predCache = new WeakMap();
+            if (allFlights.length > 0) applyFilter(); // Prognosen mit neuer Historie aktualisieren
+        })
+        .catch(() => { /* Historie nicht erreichbar: normale Anzeige läuft weiter */ })
+        .finally(() => { historyLoading = false; });
+}
+
+function gateIsReal(f) {
+    if (f.gate_actual) return true;
+    if (f.gate_actual === null) return false;
+    return f.type_source === 'Ausgang' && !/prognose/i.test(String(f.gate || ''));
+}
+
+function baggageIsReal(f) {
+    if (f.baggage_actual) return true;
+    if (f.baggage_actual === null) return false;
+    const b = String(f.baggage == null ? '' : f.baggage).trim();
+    return b !== '' && b !== EMPTY_MARK && !/prognose/i.test(b);
+}
+
+function typeIsMissing(f) {
+    return f.type_source === 'Airline' || /prognose/i.test(String(f.type_source || ''));
+}
+
+function timeDiffMin(a, b) {
+    if (!a || !b) return Infinity;
+    const d = Math.abs(timeToMinutes(a) - timeToMinutes(b));
+    return Math.min(d, 1440 - d);
+}
+
+function histMajority(entries, key) {
+    const m = new Map();
+    entries.forEach(e => {
+        const v = e[key];
+        if (!v) return;
+        const c = m.get(v) || { n: 0, last: '' };
+        c.n++;
+        if (e.date > c.last) c.last = e.date;
+        m.set(v, c);
+    });
+    let best = null, bc = null;
+    m.forEach((c, v) => {
+        if (!bc || c.n > bc.n || (c.n === bc.n && c.last > bc.last)) { best = v; bc = c; }
+    });
+    return best;
+}
+
+/* Kandidatenlisten nach Priorität (lazy, nur wenn ein Feld fehlt) */
+function histLevels(f) {
+    const no = String(f.flight_no || '').replace(/\s+/g, '');
+    const wd = weekdayOfTs(f.dt);
+    const t = f.time_scheduled;
+    const sameAirCity = e => e.airline === f.airline && e.city === f.city;
+    const wdTime = historyAll.filter(e => e.weekday === wd && timeDiffMin(e.time, t) <= HIST_TOLERANCE_MIN);
+    return [
+        () => historyByNo[no] || [],                                        // 1: exakte Flugnummer
+        () => wdTime.filter(sameAirCity),                                   // 2a: Wochentag + Uhrzeit + Airline + Ort
+        () => wdTime.filter(e => e.airline === f.airline),                  // 2b: Wochentag + Uhrzeit + Airline
+        () => historyAll.filter(e => sameAirCity(e) && e.weekday === wd)   // 3: Airline + Ort + Wochentag
+    ];
+}
+
+function predictFlight(f) {
+    if (predCache.has(f)) return predCache.get(f);
+    const res = { gate: null, baggage: null, type: null };
+    const s = String(f.status).toLowerCase();
+    const skip = s === 'cancelled' || s === 'diverted' || s === 'incident';
+
+    const needGate = !gateIsReal(f);
+    const needBag = !baggageIsReal(f);
+    const needType = typeIsMissing(f);
+
+    if (!skip && (needGate || needBag || needType) && historyAll.length > 0) {
+        const levels = histLevels(f);
+        // Jedes Feld wird getrennt und mit eigener Priorität bestimmt
+        const pick = key => {
+            for (const lv of levels) {
+                const v = histMajority(lv(), key);
+                if (v) return v;
+            }
+            return null;
+        };
+        if (needGate) res.gate = pick('gate');
+        if (needBag) res.baggage = pick('baggage');
+        if (needType) res.type = pick('type');
+    }
+
+    // Falls der Scraper bereits eine Prognose in die Anzeigewerte geschrieben hat
+    if (!skip) {
+        if (needGate && !res.gate && /prognose/i.test(String(f.gate || ''))) {
+            const m = String(f.gate).match(/Ausgang\s*\d+/i);
+            if (m) res.gate = m[0];
+        }
+        if (needBag && !res.baggage && /prognose/i.test(String(f.baggage || ''))) {
+            const b = String(f.baggage).replace(/\(.*?\)/g, '').trim();
+            if (b && b !== EMPTY_MARK) res.baggage = b;
+        }
+        if (needType && !res.type && /prognose/i.test(String(f.type_source || ''))) {
+            res.type = f.type;
+        }
+    }
+
+    predCache.set(f, res);
+    return res;
+}
+
+function effTypeOf(f) {
+    return predictFlight(f).type || f.type;
+}
+
+function progTag() { return '<span class="prog">(Prognose)</span>'; }
+
+function gateDisplay(f) {
+    const p = predictFlight(f);
+    if (!gateIsReal(f) && p.gate) return { text: p.gate, prog: true };
+    return { text: cleanGate(f.gate), prog: false };
+}
+
+function baggageDisplay(f) {
+    const p = predictFlight(f);
+    if (!baggageIsReal(f) && p.baggage) return { text: p.baggage, prog: true };
+    return { text: String(f.baggage == null ? '' : f.baggage).trim() || EMPTY_MARK, prog: false };
+}
+
 function parseUpdated(s) {
     const m = String(s).match(/(\d+)\.(\d+)\.(\d+) (\d+):(\d+)/);
     return m ? new Date(+m[3], m[2] - 1, +m[1], +m[4], +m[5]) : null;
@@ -1186,6 +1389,7 @@ function fetchData(url) {
 }
 
 function loadData() {
+    loadHistoryIfStale();
     fetchData(FIREBASE_URL)
         .catch(() => fetchData(GITHUB_RAW_URL + '?t=' + Date.now()))
         .then(data => {
@@ -1244,7 +1448,7 @@ function getFilteredList() {
     } else if (currentFilter === 'landed') {
         list = list.filter(f => String(f.status).toLowerCase() === 'landed');
     } else if (currentFilter !== 'all') {
-        list = list.filter(f => f.type === currentFilter);
+        list = list.filter(f => effTypeOf(f) === currentFilter);
     }
 
     if (!showLandedInLists && (currentFilter === 'all' || currentFilter === 'Linie' || currentFilter === 'Charter')) {
@@ -1307,10 +1511,10 @@ function updateRemaining() {
     let label = 'Noch zu landen';
 
     if (currentFilter === 'Linie') {
-        list = list.filter(f => f.type === 'Linie');
+        list = list.filter(f => effTypeOf(f) === 'Linie');
         label = 'Noch zu landen (Linie)';
     } else if (currentFilter === 'Charter') {
-        list = list.filter(f => f.type === 'Charter');
+        list = list.filter(f => effTypeOf(f) === 'Charter');
         label = 'Noch zu landen (Charter)';
     } else if (currentFilter === 'landing') {
         list = list.filter(f => {
@@ -1373,7 +1577,9 @@ function renderFlights(flights) {
     flights.forEach(f => {
         const st = String(f.status).toLowerCase();
         const isCancelled = st === 'cancelled' || st === 'diverted' || st === 'incident';
-        const isCharter = f.type === "Charter";
+        const pr = predictFlight(f);
+        const effType = effTypeOf(f);
+        const isCharter = effType === "Charter";
 
         let cardClass = isCharter ? "flight-card card-charter" : "flight-card card-linie";
         if (isCancelled) {
@@ -1382,7 +1588,8 @@ function renderFlights(flights) {
 
         const badgeClass = isCharter ? "badge-charter" : "badge-linie";
 
-        const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
+        const typeProg = !!pr.type;
+        const isGuess = !typeProg && (f.type_source === 'Airline' || f.type_source === 'Flugtyp');
         const guessMark = isGuess ? ' ?' : '';
         const guessTitle = isGuess ? ' title="Vorläufig, Art noch nicht sicher"' : '';
 
@@ -1414,7 +1621,10 @@ function renderFlights(flights) {
 
         const countryHtml = f.country ? ` <span class="country">${f.country}</span>` : '';
         const fromText = f.country ? `${f.city}, ${f.country}` : f.city;
-        const beltHtml = f.baggage ? `<div><strong>Band:</strong> ${f.baggage}</div>` : '';
+        const gd = gateDisplay(f);
+        const bd = baggageDisplay(f);
+        const beltHtml = (f.baggage || bd.prog)
+            ? `<div><strong>Band:</strong> ${esc(bd.text)}${bd.prog ? ' ' + progTag() : ''}</div>` : '';
 
         let iconHtml = '';
         if (st === 'active' || st === 'en-route') {
@@ -1434,7 +1644,7 @@ function renderFlights(flights) {
                 <div class="main-info">
                     <div class="city-name">${f.city}${countryHtml}</div>
                     <div class="gate-info">
-                        <span class="${badgeClass}">${esc(cleanGate(f.gate))}</span>
+                        <span class="${badgeClass}">${esc(gd.text)}${gd.prog ? ' ' + progTag() : ''}</span>
                     </div>
                 </div>
                 ${iconHtml}
@@ -1445,7 +1655,7 @@ function renderFlights(flights) {
                     <div><strong>Flug-Nr.:</strong> ${f.flight_no}</div>
                     <div><strong>Airline:</strong> ${f.airline}</div>
                     <div><strong>Von:</strong> ${fromText}</div>
-                    <div${guessTitle}><strong>Typ:</strong> ${f.type}${guessMark}</div>
+                    <div${guessTitle}><strong>Typ:</strong> ${esc(effType)}${typeProg ? ' ' + progTag() : guessMark}</div>
                     <div><strong>Status:</strong> ${statusText}</div>
                     ${beltHtml}
                 </div>
@@ -1547,13 +1757,18 @@ function renderBoard(flights) {
         const st = tfStatus(f);
         const s = String(f.status).toLowerCase();
         const isCancelled = s === 'cancelled' || s === 'diverted' || s === 'incident';
-        const art = isCancelled ? 'cancelled' : (f.type === 'Charter' ? 'charter' : 'linie');
+        const pr = predictFlight(f);
+        const effType = effTypeOf(f);
+        const art = isCancelled ? 'cancelled' : (effType === 'Charter' ? 'charter' : 'linie');
 
         const zeit = f.time_estimated || f.time_scheduled || '';
-        const isGuess = f.type_source === 'Airline' || f.type_source === 'Flugtyp';
+        const typeProg = !!pr.type;
+        const isGuess = !typeProg && (f.type_source === 'Airline' || f.type_source === 'Flugtyp');
 
-        const gateText = cleanGate(f.gate);
-        const beltText = String(f.baggage == null ? '' : f.baggage).trim() || EMPTY_MARK;
+        const gd = gateDisplay(f);
+        const bd = baggageDisplay(f);
+        const gateText = gd.text;
+        const beltText = bd.text;
 
         const cc = getFlagCode(f.country);
         const flagUrl = `https://flagcdn.com/${cc}.svg`;
@@ -1574,8 +1789,8 @@ function renderBoard(flights) {
             ${remarkText ? '<div class="tf-remark">' + esc(remarkText) + '</div>' : ''}
             <div class="tf-city">${esc(f.city)}${countryHtml}</div>
             <div class="tf-time">${esc(zeit)}</div>
-            <div class="tf-exit">${esc(gateText)}<small>Band ${esc(beltText)}</small></div>
-            <div class="tf-kind"${isGuess ? ' title="Vorläufig, Art noch nicht sicher"' : ''}>${esc(f.type)}${isGuess ? ' ?' : ''}</div>
+            <div class="tf-exit">${esc(gateText)}${gd.prog ? ' ' + progTag() : ''}<small>Band ${esc(beltText)}${bd.prog ? ' ' + progTag() : ''}</small></div>
+            <div class="tf-kind"${isGuess ? ' title="Vorläufig, Art noch nicht sicher"' : ''}>${esc(effType)}${typeProg ? ' ' + progTag() : (isGuess ? ' ?' : '')}</div>
             <div class="tf-status"><span class="tf-dot"></span><span>${st.label}${!isCancelled && f.delay > 0 ? '<span class="tf-delay">+' + esc(f.delay) + ' Min.</span>' : ''}${remarkText ? '<span class="tf-delay tf-delay-inline">' + esc(remarkText) + '</span>' : ''}</span></div>
         `;
         body.appendChild(row);
