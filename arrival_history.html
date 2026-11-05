@@ -209,9 +209,9 @@
     <!-- TAB 2: PATTERN & PROGNOSE INSPEKTOR -->
     <div id="viewPatterns" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Flugnummer suchen für Prognose-Analyse</label>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Flugnummer, Airline oder Herkunft suchen</label>
         <div class="flex gap-2 max-w-md">
-          <input type="text" id="patternSearchInput" placeholder="z.B. TK1529, IB1325 oder EW9345..." class="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white uppercase font-mono">
+          <input type="text" id="patternSearchInput" placeholder="z.B. TK1529, Eurowings oder Ibiza..." class="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white font-mono">
         </div>
       </div>
 
@@ -429,14 +429,21 @@
 
     // Pattern Inspector Tab
     function renderPatternInspector() {
-      const search = document.getElementById('patternSearchInput').value.toUpperCase().trim();
+      const searchRaw = document.getElementById('patternSearchInput').value.trim();
+      const search = searchRaw.toLowerCase();
       const grid = document.getElementById('patternCardsGrid');
       grid.innerHTML = '';
 
-      const flightNos = Object.keys(rawHistoryData).filter(fn => !search || fn.includes(search));
+      const flightNos = Object.keys(rawHistoryData).filter(fn => {
+        if (!search) return true;
+        const item = rawHistoryData[fn] || {};
+        return fn.toLowerCase().includes(search) ||
+               String(item.airline || '').toLowerCase().includes(search) ||
+               String(item.city || '').toLowerCase().includes(search);
+      });
 
       if (flightNos.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm">Keine Flugmuster für "${search}" gefunden.</div>`;
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm">Keine Flugmuster für "${searchRaw}" gefunden.</div>`;
         return;
       }
 
