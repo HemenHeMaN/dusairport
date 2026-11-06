@@ -1267,7 +1267,8 @@ function baggageIsReal(f) {
 }
 
 function typeIsMissing(f) {
-    return f.type_source === 'Airline' || /prognose/i.test(String(f.type_source || ''));
+    // Alles, was in der Anzeige als "?" erscheint, gilt als nicht gesichert
+    return f.type_source === 'Airline' || f.type_source === 'Flugtyp' || /prognose/i.test(String(f.type_source || ''));
 }
 
 function timeDiffMin(a, b) {
