@@ -67,7 +67,7 @@
       </div>
 
       <div class="flex items-center gap-3">
-                        <!-- Darkmode Toggle -->
+        <!-- Darkmode Toggle -->
         <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
           <svg id="themeSun" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path></svg>
           <svg id="themeMoon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -135,10 +135,13 @@
       <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           
-          <!-- Search input -->
+          <!-- Search input with Clear Button -->
           <div class="relative">
-            <input type="text" id="searchInput" placeholder="Flug-Nr., Airline, Stadt..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white">
+            <input type="text" id="searchInput" placeholder="Flug-Nr., Airline, Stadt..." class="w-full pl-9 pr-9 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white">
             <svg class="w-4 h-4 absolute left-3 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <button id="clearSearchBtn" type="button" onclick="clearSearch()" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
           </div>
 
           <!-- Type Filter -->
@@ -215,8 +218,11 @@
     <div id="viewPatterns" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Flugnummer, Airline oder Herkunft suchen</label>
-        <div class="flex gap-2 max-w-md">
-          <input type="text" id="patternSearchInput" placeholder="z.B. TK1529, Eurowings oder Ibiza..." class="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white font-mono">
+        <div class="flex gap-2 max-w-md relative">
+          <input type="text" id="patternSearchInput" placeholder="z.B. TK1529, Eurowings oder Ibiza..." class="w-full px-4 pr-9 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white font-mono">
+          <button id="clearPatternSearchBtn" type="button" onclick="clearSearch()" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
         </div>
       </div>
 
@@ -234,6 +240,7 @@
     let rawHistoryData = {};
     let flatFlightsList = [];
     let currentTab = 'list';
+    let globalSearchQuery = '';
 
     // Theme Management
     const themeToggleBtn = document.getElementById('themeToggle');
@@ -281,7 +288,6 @@
     async function loadHistoryData(silent) {
       if (isLoading) return;
       isLoading = true;
-      // Beim automatischen Update bleibt die Ansicht stehen (kein Spinner, kein Flackern)
       if (silent !== true) {
         document.getElementById('loadingBox').classList.remove('hidden');
         document.getElementById('tableContainer').classList.add('hidden');
@@ -403,7 +409,6 @@
         }
       });
 
-      // Top City
       let topCity = '-';
       let topCityCount = 0;
       Object.entries(cityCounts).forEach(([city, cnt]) => {
@@ -422,9 +427,39 @@
       document.getElementById('statTopCityCount').textContent = `${topCityCount} Landungen`;
     }
 
+    // Synchronisierte Suche steuern
+    function handleSearchInput(value) {
+      globalSearchQuery = value;
+      
+      // Beide Input-Felder synchron halten
+      const searchInput = document.getElementById('searchInput');
+      const patternSearchInput = document.getElementById('patternSearchInput');
+      
+      if (searchInput.value !== value) searchInput.value = value;
+      if (patternSearchInput.value !== value) patternSearchInput.value = value;
+
+      // Clear-Buttons ein-/ausblenden
+      const clearBtn1 = document.getElementById('clearSearchBtn');
+      const clearBtn2 = document.getElementById('clearPatternSearchBtn');
+      if (value.trim().length > 0) {
+        clearBtn1.classList.remove('hidden');
+        clearBtn2.classList.remove('hidden');
+      } else {
+        clearBtn1.classList.add('hidden');
+        clearBtn2.classList.add('hidden');
+      }
+
+      renderList();
+      renderPatternInspector();
+    }
+
+    function clearSearch() {
+      handleSearchInput('');
+    }
+
     // Render Filtered List
     function renderList() {
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const search = globalSearchQuery.toLowerCase().trim();
       const type = document.getElementById('typeFilter').value;
       const day = document.getElementById('dayFilter').value;
       const sort = document.getElementById('sortOrder').value;
@@ -499,8 +534,7 @@
 
     // Pattern Inspector Tab
     function renderPatternInspector() {
-      const searchRaw = document.getElementById('patternSearchInput').value.trim();
-      const search = searchRaw.toLowerCase();
+      const search = globalSearchQuery.toLowerCase().trim();
       const grid = document.getElementById('patternCardsGrid');
       grid.innerHTML = '';
 
@@ -513,7 +547,7 @@
       });
 
       if (flightNos.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm">Keine Flugmuster für "${searchRaw}" gefunden.</div>`;
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm">Keine Flugmuster für "${globalSearchQuery}" gefunden.</div>`;
         return;
       }
 
@@ -527,7 +561,6 @@
         const item = rawHistoryData[fn];
         const history = Array.isArray(item.history) ? item.history : Object.values(item.history || {});
         
-        // Count gates & baggages
         const gateCounts = {};
         const baggageCounts = {};
         const typeCounts = {};
@@ -539,7 +572,6 @@
           if (h.type) typeCounts[h.type] = (typeCounts[h.type] || 0) + 1;
         });
 
-        // Verteilung: eine Zeile pro Wert, Prozent bezogen auf Landungen mit Angabe
         const totalEntries = history.length;
         const fmtStats = (counts, prefix) => {
           const entries = Object.entries(counts).sort((x, y) => y[1] - x[1]);
@@ -604,12 +636,13 @@
       }
     }
 
-    // Event Listeners
-    document.getElementById('searchInput').addEventListener('input', renderList);
+    // Event Listeners für Live-Eingabe in beiden Suchfeldern
+    document.getElementById('searchInput').addEventListener('input', (e) => handleSearchInput(e.target.value));
+    document.getElementById('patternSearchInput').addEventListener('input', (e) => handleSearchInput(e.target.value));
+
     document.getElementById('typeFilter').addEventListener('change', renderList);
     document.getElementById('dayFilter').addEventListener('change', renderList);
     document.getElementById('sortOrder').addEventListener('change', renderList);
-    document.getElementById('patternSearchInput').addEventListener('input', renderPatternInspector);
 
     // Initial Load
     initTheme();
@@ -618,7 +651,7 @@
     } catch (e) {}
     loadHistoryData();
 
-    // Automatisches Update alle 2 Minuten (nur wenn der Tab sichtbar ist)
+    // Automatisches Update alle 2 Minuten
     setInterval(() => { if (!document.hidden) loadHistoryData(true); }, REFRESH_MS);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) loadHistoryData(true); });
   </script>
