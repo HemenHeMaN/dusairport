@@ -280,6 +280,16 @@
       'Sunday': 'Sonntag'
     };
 
+    // Format Date from YYYY-MM-DD to DD.MM.YYYY
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}.${parts[1]}.${parts[0]}`;
+      }
+      return dateStr;
+    }
+
     // Load Data
     const REFRESH_MS = 2 * 60 * 1000;
     const TAB_KEY = 'dus_history_tab';
@@ -431,14 +441,12 @@
     function handleSearchInput(value) {
       globalSearchQuery = value;
       
-      // Beide Input-Felder synchron halten
       const searchInput = document.getElementById('searchInput');
       const patternSearchInput = document.getElementById('patternSearchInput');
       
       if (searchInput.value !== value) searchInput.value = value;
       if (patternSearchInput.value !== value) patternSearchInput.value = value;
 
-      // Clear-Buttons ein-/ausblenden
       const clearBtn1 = document.getElementById('clearSearchBtn');
       const clearBtn2 = document.getElementById('clearPatternSearchBtn');
       if (value.trim().length > 0) {
@@ -508,10 +516,11 @@
 
         const badgeClass = f.type === 'Charter' ? 'badge-charter' : 'badge-linie';
         const dayDe = weekdayMap[f.weekday] || f.weekday;
+        const formattedDate = formatDate(f.date);
 
         tr.innerHTML = `
           <td class="py-3 px-4 font-mono text-xs">
-            <span class="font-bold text-slate-800 dark:text-slate-200">${f.date}</span>
+            <span class="font-bold text-slate-800 dark:text-slate-200">${formattedDate}</span>
             <span class="block text-[11px] text-slate-400">${dayDe}</span>
           </td>
           <td class="py-3 px-4 font-mono font-bold text-blue-600 dark:text-blue-400">${f.scheduled_time} Uhr</td>
@@ -636,7 +645,7 @@
       }
     }
 
-    // Event Listeners für Live-Eingabe in beiden Suchfeldern
+    // Event Listeners
     document.getElementById('searchInput').addEventListener('input', (e) => handleSearchInput(e.target.value));
     document.getElementById('patternSearchInput').addEventListener('input', (e) => handleSearchInput(e.target.value));
 
