@@ -54,7 +54,7 @@ FIREBASE_HISTORY_URL = FIREBASE_URL.rsplit("/", 1)[0] + "/arrival_history.json"
 TZ = ZoneInfo("Europe/Berlin")
 
 WINDOW_START = (5, 0)
-WINDOW_END = (0, 35)
+WINDOW_END = (3, 35)
 
 MINUTES_PAST = 120
 HOURS_FUTURE = 8
