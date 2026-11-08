@@ -7,8 +7,11 @@ Funktionen:
 - bestehende Zeit-, Codeshare-, Tages- und Airline-Filter
 - Linie/Charter-Erkennung und Status-/Verspätungsaufbereitung
 - lokale arrival.json, Firebase-Live-Daten und GitHub-Reserve
-- arrival_history.json mit maximal 21 Tagen echter Flugdaten
-- Prognosen für Ausgang, Gepäckband und Flugtyp
+- arrival_history.json mit maximal 180 Tagen echter Flugdaten
+- Prognosen für Ausgang, Gepäckband und Flugtyp per klarer Mehrheit
+- Ausgang und Gepäckband werden nur aus Historieneinträgen mit passendem
+  Flugtyp (Linie/Charter) ermittelt
+- bei Gleichstand oder ohne klare Mehrheit gibt es KEINE Prognose
 - echte DUS.com-Werte haben immer Vorrang
 - Historie wird pro Lauf nur einmal aus Firebase gelesen
 
@@ -70,6 +73,9 @@ API_TIMEOUT = 20
 
 HISTORY_DAYS = 180
 HISTORY_TIME_TOLERANCE_MINUTES = 60
+
+# Mindestanteil, den der häufigste Wert haben muss (strikt größer als).
+MAJORITY_MIN_SHARE = 0.5
 
 HEADERS = {
     "Accept": "application/json, text/plain, */*",
@@ -528,7 +534,7 @@ def save_history(history_data, credentials):
 # ---------------------------------------------------------------------------
 
 def prune_history(history_data, now):
-    """Entfernt Historieneinträge, die älter als 21 Tage sind."""
+    """Entfernt Historieneinträge, die älter als HISTORY_DAYS Tage sind."""
     cutoff_date = (now.date() - timedelta(days=HISTORY_DAYS - 1)).isoformat()
     changed = False
 
@@ -649,7 +655,7 @@ def update_historical_database(flights, history_data, now):
 
 
 # ---------------------------------------------------------------------------
-# Historische Prognosen
+# Historische Prognosen (klare Mehrheit, typkonsistent)
 # ---------------------------------------------------------------------------
 
 def time_to_minutes(value):
@@ -670,11 +676,25 @@ def time_difference_minutes(first_time, second_time):
     return min(difference, 1440 - difference)
 
 
-def most_common_value(values):
+def majority_value(values, min_share=MAJORITY_MIN_SHARE):
+    """
+    Liefert den häufigsten Wert nur bei klarer Mehrheit.
+    Gleichstand oder zu geringer Anteil -> None (keine Prognose).
+    """
     cleaned = [value for value in values if value not in (None, "", "----")]
     if not cleaned:
         return None
-    return Counter(cleaned).most_common(1)[0][0]
+
+    counts = Counter(cleaned).most_common()
+    top_value, top_count = counts[0]
+
+    if len(counts) > 1 and counts[1][1] == top_count:
+        return None
+
+    if top_count / len(cleaned) <= min_share:
+        return None
+
+    return top_value
 
 
 def find_historical_matches(flight, history_data):
@@ -682,17 +702,18 @@ def find_historical_matches(flight, history_data):
     target_weekday = timestamp_to_local(flight["dt"]).strftime("%A")
     target_time = flight.get("time_scheduled")
 
-    # 1. Exakte Flugnummer und ähnliche Planzeit. Der Wochentag spielt hier
-    #    keine Rolle: dieselbe Flugnummer fliegt in der Regel dieselbe Strecke
-    #    (sonst würde z.B. ein Flug am Sonntag nichts von Fr/Sa lernen).
+    # 1. Exakte Flugnummer und ähnliche Planzeit (Wochentag egal).
     exact_matches = []
     exact_record = history_data.get(flight_no, {})
-    for entry in exact_record.get("history", []):
-        difference = time_difference_minutes(
-            entry.get("scheduled_time"), target_time
-        )
-        if difference is not None and difference <= HISTORY_TIME_TOLERANCE_MINUTES:
-            exact_matches.append(entry)
+    if isinstance(exact_record, dict):
+        for entry in exact_record.get("history", []):
+            if not isinstance(entry, dict):
+                continue
+            difference = time_difference_minutes(
+                entry.get("scheduled_time"), target_time
+            )
+            if difference is not None and difference <= HISTORY_TIME_TOLERANCE_MINUTES:
+                exact_matches.append(entry)
 
     if exact_matches:
         return exact_matches, "Flugnummer"
@@ -707,6 +728,9 @@ def find_historical_matches(flight, history_data):
             continue
 
         for entry in record.get("history", []):
+            if not isinstance(entry, dict):
+                continue
+
             entry_city = entry.get("city") or record.get("city")
             entry_airline = entry.get("airline") or record.get("airline")
 
@@ -716,9 +740,12 @@ def find_historical_matches(flight, history_data):
             difference = time_difference_minutes(
                 entry.get("scheduled_time"), target_time
             )
-            if entry.get("weekday") == target_weekday and difference is not None:
-                if difference <= HISTORY_TIME_TOLERANCE_MINUTES:
-                    fallback_matches.append(entry)
+            if (
+                entry.get("weekday") == target_weekday
+                and difference is not None
+                and difference <= HISTORY_TIME_TOLERANCE_MINUTES
+            ):
+                fallback_matches.append(entry)
 
     return fallback_matches, "Airline/Herkunft"
 
@@ -727,13 +754,21 @@ def apply_historical_predictions(flights, history_data):
     """
     Ergänzt ausschließlich fehlende Felder.
     DUS.com-Echtwerte bleiben unangetastet; Prognosen werden gekennzeichnet.
+
+    Ablauf pro Flug:
+    1. Flugtyp per klarer Mehrheit bestimmen (nur wenn nicht von der API belegt).
+    2. Ausgang und Gepäckband nur aus Einträgen mit demselben Typ abstimmen.
+    3. Ohne klare Mehrheit wird nichts prognostiziert.
     """
     if not isinstance(history_data, dict) or not history_data:
         return flights
 
     for flight in flights:
-        needs_gate = not flight.get("gate_actual")
-        needs_baggage = not flight.get("baggage_actual")
+        status = str(flight.get("status", "")).lower()
+        is_cancelled = status in ("cancelled", "diverted", "incident")
+
+        needs_gate = not is_cancelled and not flight.get("gate_actual")
+        needs_baggage = not is_cancelled and not flight.get("baggage_actual")
         can_predict_type = flight.get("type_source") == "Airline"
 
         if not needs_gate and not needs_baggage and not can_predict_type:
@@ -743,22 +778,31 @@ def apply_historical_predictions(flights, history_data):
         if not matches:
             continue
 
-        gates = [
-            entry.get("gate") for entry in matches
-            if entry.get("gate") and "?" not in str(entry.get("gate"))
-        ]
-        baggages = [
-            entry.get("baggage") for entry in matches
-            if entry.get("baggage") and "?" not in str(entry.get("baggage"))
-        ]
+        # Schritt 1: Typ
         types = [
             entry.get("type") for entry in matches
             if entry.get("type") in ("Linie", "Charter")
         ]
+        predicted_type = majority_value(types) if can_predict_type else None
+        target_type = predicted_type or flight.get("type")
 
-        predicted_gate = most_common_value(gates) if needs_gate else None
-        predicted_baggage = most_common_value(baggages) if needs_baggage else None
-        predicted_type = most_common_value(types) if can_predict_type else None
+        # Schritt 2: Ausgang/Band nur aus Einträgen mit passendem Typ
+        typed_matches = [
+            entry for entry in matches
+            if entry.get("type") == target_type
+        ]
+
+        gates = [
+            entry.get("gate") for entry in typed_matches
+            if entry.get("gate") and "?" not in str(entry.get("gate"))
+        ]
+        baggages = [
+            entry.get("baggage") for entry in typed_matches
+            if entry.get("baggage") and "?" not in str(entry.get("baggage"))
+        ]
+
+        predicted_gate = majority_value(gates) if needs_gate else None
+        predicted_baggage = majority_value(baggages) if needs_baggage else None
 
         if predicted_type:
             flight["type"] = predicted_type
@@ -769,7 +813,6 @@ def apply_historical_predictions(flights, history_data):
             flight_type = predicted_type or flight.get("type")
             flight["gate"] = f"{predicted_gate} ({flight_type}, Prognose)"
             flight["gate_source"] = "Prognose (Historie)"
-            flight["prediction_match"] = match_source
         elif needs_gate and predicted_type:
             # Nur der Fallback-Ausgang wird an den prognostizierten Typ angepasst.
             flight["gate"] = (
