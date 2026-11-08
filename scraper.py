@@ -380,7 +380,15 @@ def build_flights(raw_flights, now):
 
         actual = parse_dt(raw.get("actualTime"))
         estimated = parse_dt(raw.get("estimatedTime"))
-        real_time = actual or estimated or scheduled
+        status, status_text = map_status(raw)
+
+        # Annullierte/umgeleitete Flüge (z.B. "annulliert, Folgetag") haben oft
+        # eine erwartete Zeit am nächsten Tag. Sie werden nach ihrer GEPLANTEN
+        # Zeit einsortiert, damit sie im heutigen Anzeigefenster erscheinen.
+        if status in ("cancelled", "diverted"):
+            real_time = scheduled
+        else:
+            real_time = actual or estimated or scheduled
 
         if not (time_min <= real_time <= time_max):
             continue
@@ -389,7 +397,6 @@ def build_flights(raw_flights, now):
             continue
 
         delay = max(0, int(round((real_time - scheduled).total_seconds() / 60)))
-        status, status_text = map_status(raw)
         if status == "scheduled" and status_text:
             unknown_status.add(status_text)
 
