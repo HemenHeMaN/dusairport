@@ -675,16 +675,17 @@ def find_historical_matches(flight, history_data):
     target_weekday = timestamp_to_local(flight["dt"]).strftime("%A")
     target_time = flight.get("time_scheduled")
 
-    # 1. Exakte Flugnummer, gleicher Wochentag und ähnliche Planzeit.
+    # 1. Exakte Flugnummer und ähnliche Planzeit. Der Wochentag spielt hier
+    #    keine Rolle: dieselbe Flugnummer fliegt in der Regel dieselbe Strecke
+    #    (sonst würde z.B. ein Flug am Sonntag nichts von Fr/Sa lernen).
     exact_matches = []
     exact_record = history_data.get(flight_no, {})
     for entry in exact_record.get("history", []):
         difference = time_difference_minutes(
             entry.get("scheduled_time"), target_time
         )
-        if entry.get("weekday") == target_weekday and difference is not None:
-            if difference <= HISTORY_TIME_TOLERANCE_MINUTES:
-                exact_matches.append(entry)
+        if difference is not None and difference <= HISTORY_TIME_TOLERANCE_MINUTES:
+            exact_matches.append(entry)
 
     if exact_matches:
         return exact_matches, "Flugnummer"

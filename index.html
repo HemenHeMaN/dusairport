@@ -1319,7 +1319,9 @@ function predictFlight(f) {
     const needBag = !baggageIsReal(f);
     const needType = typeIsMissing(f);
 
-    if (!skip && (needGate || needBag || needType) && historyAll.length > 0) {
+    // Bei annullierten/umgeleiteten Flügen gibt es keinen Ausgang/kein Band mehr,
+    // der Flugtyp (Linie/Charter) darf aber weiterhin aus der Historie kommen.
+    if (((!skip && (needGate || needBag)) || needType) && historyAll.length > 0) {
         const levels = histLevels(f);
         // Jedes Feld wird getrennt und mit eigener Priorität bestimmt
         const pick = key => {
@@ -1329,8 +1331,8 @@ function predictFlight(f) {
             }
             return null;
         };
-        if (needGate) res.gate = pick('gate');
-        if (needBag) res.baggage = pick('baggage');
+        if (!skip && needGate) res.gate = pick('gate');
+        if (!skip && needBag) res.baggage = pick('baggage');
         if (needType) res.type = pick('type');
     }
 
@@ -1344,9 +1346,9 @@ function predictFlight(f) {
             const b = String(f.baggage).replace(/\(.*?\)/g, '').trim();
             if (b && b !== EMPTY_MARK) res.baggage = b;
         }
-        if (needType && !res.type && /prognose/i.test(String(f.type_source || ''))) {
-            res.type = f.type;
-        }
+    }
+    if (needType && !res.type && /prognose/i.test(String(f.type_source || ''))) {
+        res.type = f.type;
     }
 
     predCache.set(f, res);
