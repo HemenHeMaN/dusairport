@@ -1278,20 +1278,20 @@ function timeDiffMin(a, b) {
 }
 
 function histMajority(entries, key) {
+    // Nur bei klarer Mehrheit (> 50 %) und ohne Gleichstand, sonst keine Prognose
     const m = new Map();
+    let total = 0;
     entries.forEach(e => {
         const v = e[key];
         if (!v) return;
-        const c = m.get(v) || { n: 0, last: '' };
-        c.n++;
-        if (e.date > c.last) c.last = e.date;
-        m.set(v, c);
+        m.set(v, (m.get(v) || 0) + 1);
+        total++;
     });
-    let best = null, bc = null;
-    m.forEach((c, v) => {
-        if (!bc || c.n > bc.n || (c.n === bc.n && c.last > bc.last)) { best = v; bc = c; }
-    });
-    return best;
+    if (total === 0) return null;
+    const sorted = [...m.entries()].sort((a, b) => b[1] - a[1]);
+    if (sorted.length > 1 && sorted[1][1] === sorted[0][1]) return null;
+    if (sorted[0][1] / total <= 0.5) return null;
+    return sorted[0][0];
 }
 
 /* Kandidatenlisten nach Priorität (lazy, nur wenn ein Feld fehlt) */
@@ -1319,19 +1319,24 @@ function predictFlight(f) {
     const needBag = !baggageIsReal(f);
     const needType = typeIsMissing(f);
 
-    if (!skip && (needGate || needBag || needType) && historyAll.length > 0) {
+    // Bei annullierten/umgeleiteten Flügen gibt es keinen Ausgang/kein Band mehr,
+    // der Flugtyp (Linie/Charter) darf aber weiterhin aus der Historie kommen.
+    if (((!skip && (needGate || needBag)) || needType) && historyAll.length > 0) {
         const levels = histLevels(f);
-        // Jedes Feld wird getrennt und mit eigener Priorität bestimmt
-        const pick = key => {
+        // Die erste Ebene mit Treffern entscheidet (kein Mischen mehrerer Ebenen)
+        const pick = (key, typeFilter) => {
             for (const lv of levels) {
-                const v = histMajority(lv(), key);
-                if (v) return v;
+                const list = lv().filter(e => !typeFilter || e.type === typeFilter);
+                if (list.length === 0) continue;
+                return histMajority(list, key);
             }
             return null;
         };
-        if (needGate) res.gate = pick('gate');
-        if (needBag) res.baggage = pick('baggage');
+        // Erst der Typ, dann Ausgang/Band nur aus Einträgen mit demselben Typ
         if (needType) res.type = pick('type');
+        const targetType = res.type || f.type;
+        if (!skip && needGate) res.gate = pick('gate', targetType);
+        if (!skip && needBag) res.baggage = pick('baggage', targetType);
     }
 
     // Falls der Scraper bereits eine Prognose in die Anzeigewerte geschrieben hat
@@ -1344,9 +1349,9 @@ function predictFlight(f) {
             const b = String(f.baggage).replace(/\(.*?\)/g, '').trim();
             if (b && b !== EMPTY_MARK) res.baggage = b;
         }
-        if (needType && !res.type && /prognose/i.test(String(f.type_source || ''))) {
-            res.type = f.type;
-        }
+    }
+    if (needType && !res.type && /prognose/i.test(String(f.type_source || ''))) {
+        res.type = f.type;
     }
 
     predCache.set(f, res);
