@@ -1325,21 +1325,36 @@ function timeDiffMin(a, b) {
     return Math.min(d, 1440 - d);
 }
 
-function histMajority(entries, key) {
-    // Nur bei klarer Mehrheit (> 50 %) und ohne Gleichstand, sonst keine Prognose
+function histMajority(entries, key, allowTie) {
+    // Typ: nur bei klarer Mehrheit (> 50 %) und ohne Gleichstand.
+    // Ausgang/Band (allowTie): häufigster Wert, bei Gleichstand gewinnt der jüngste Eintrag.
     const m = new Map();
+    const latest = new Map();
     let total = 0;
     entries.forEach(e => {
         const v = e[key];
         if (!v) return;
         m.set(v, (m.get(v) || 0) + 1);
+        const stamp = (e.date || '') + ' ' + (e.time || '');
+        if (!latest.has(v) || stamp > latest.get(v)) latest.set(v, stamp);
         total++;
     });
     if (total === 0) return null;
-    const sorted = [...m.entries()].sort((a, b) => b[1] - a[1]);
+    const sorted = [...m.entries()].sort((a, b) => b[1] - a[1] || (latest.get(b[0]) > latest.get(a[0]) ? 1 : -1));
+    if (allowTie) return sorted[0][0];
     if (sorted.length > 1 && sorted[1][1] === sorted[0][1]) return null;
     if (sorted[0][1] / total <= 0.5) return null;
     return sorted[0][0];
+}
+
+function histEntryType(e) {
+    if (e.type) return e.type;
+    const num = s => { const m = String(s || '').match(/\d+/); return m ? parseInt(m[0], 10) : null; };
+    const g = num(e.gate);
+    if (g !== null) return g <= 2 ? 'Linie' : 'Charter';
+    const b = num(e.baggage);
+    if (b !== null) return b <= 6 ? 'Linie' : 'Charter';
+    return null;
 }
 
 /* Kandidatenlisten nach Priorität (lazy, nur wenn ein Feld fehlt) */
@@ -1374,9 +1389,10 @@ function predictFlight(f) {
         // Die erste Ebene mit Treffern entscheidet (kein Mischen mehrerer Ebenen)
         const pick = (key, typeFilter) => {
             for (const lv of levels) {
-                const list = lv().filter(e => !typeFilter || e.type === typeFilter);
+                const list = lv().filter(e => !typeFilter || histEntryType(e) === typeFilter);
                 if (list.length === 0) continue;
-                return histMajority(list, key);
+                if (key === 'type') return histMajority(list.map(e => ({ type: histEntryType(e), date: e.date, time: e.time })), 'type', false);
+                return histMajority(list, key, true);
             }
             return null;
         };
