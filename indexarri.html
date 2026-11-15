@@ -1384,7 +1384,7 @@ function predictFlight(f) {
 
     // Bei annullierten/umgeleiteten Flügen gibt es keinen Ausgang/kein Band mehr,
     // der Flugtyp (Linie/Charter) darf aber weiterhin aus der Historie kommen.
-    if (((!skip && (needGate || needBag)) || needType) && historyAll.length > 0) {
+    if (((needGate || needBag) || needType) && historyAll.length > 0) {
         const levels = histLevels(f);
         // Die erste Ebene mit Treffern entscheidet (kein Mischen mehrerer Ebenen)
         const pick = (key, typeFilter) => {
@@ -1399,19 +1399,22 @@ function predictFlight(f) {
         // Erst der Typ, dann Ausgang/Band nur aus Einträgen mit demselben Typ
         if (needType) res.type = pick('type');
         const targetType = res.type || f.type;
-        if (!skip && needGate) res.gate = pick('gate', targetType);
-        if (!skip && needBag) res.baggage = pick('baggage', targetType);
+        if (needGate) res.gate = pick('gate', targetType);
+        if (needBag) res.baggage = pick('baggage', targetType);
     }
 
-    // Falls der Scraper bereits eine Prognose in die Anzeigewerte geschrieben hat
-    if (!skip) {
+    // Falls der Scraper bereits eine Prognose geschrieben hat (nur wenn sie zum Typ passt)
+    {
+        const effT = res.type || f.type;
+        const typeOfNum = (n, limit) => n === null ? null : (n <= limit ? 'Linie' : 'Charter');
+        const numOf = s => { const m = String(s || '').match(/\d+/); return m ? parseInt(m[0], 10) : null; };
         if (needGate && !res.gate && /prognose/i.test(String(f.gate || ''))) {
             const m = String(f.gate).match(/Ausgang\s*\d+/i);
-            if (m) res.gate = m[0];
+            if (m && (!effT || typeOfNum(numOf(m[0]), 2) === effT)) res.gate = m[0];
         }
         if (needBag && !res.baggage && /prognose/i.test(String(f.baggage || ''))) {
             const b = String(f.baggage).replace(/\(.*?\)/g, '').trim();
-            if (b && b !== EMPTY_MARK) res.baggage = b;
+            if (b && b !== EMPTY_MARK && (!effT || typeOfNum(numOf(b), 6) === effT)) res.baggage = b;
         }
     }
     if (needType && !res.type && /prognose/i.test(String(f.type_source || ''))) {
