@@ -51,7 +51,7 @@ TZ = ZoneInfo("Europe/Berlin")
 WINDOW_START = (5, 0)
 WINDOW_END = (3, 35)
 
-MINUTES_PAST = 180
+MINUTES_PAST = 120
 HOURS_FUTURE = 8
 ONLY_TODAY = True
 
