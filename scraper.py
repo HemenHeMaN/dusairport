@@ -656,6 +656,43 @@ def most_common_value(values):
     return Counter(cleaned).most_common(1)[0][0]
 
 
+def entry_type(entry):
+    """Typ eines Historien-Eintrags; fehlt er, wird er aus Ausgang/Band abgeleitet."""
+    if entry.get("type") in ("Linie", "Charter"):
+        return entry["type"]
+    gate_number = first_int(entry.get("gate"))
+    if gate_number is not None:
+        return "Linie" if gate_number <= 2 else "Charter"
+    belt_number = first_int(entry.get("baggage"))
+    if belt_number is not None:
+        return "Linie" if belt_number <= 6 else "Charter"
+    return None
+
+
+def plurality_value(entries, key, allow_tie=True):
+    """Häufigster Wert. Bei Gleichstand gewinnt der jüngste Eintrag (allow_tie)
+    oder es gibt keine Prognose (allow_tie=False)."""
+    counts = {}
+    latest = {}
+    for entry in entries:
+        value = entry.get(key)
+        if value in (None, "", "----") or "?" in str(value):
+            continue
+        counts[value] = counts.get(value, 0) + 1
+        stamp = history_entry_key(entry)
+        if value not in latest or stamp > latest[value]:
+            latest[value] = stamp
+
+    if not counts:
+        return None
+
+    best = max(counts.values())
+    leaders = [value for value, count in counts.items() if count == best]
+    if len(leaders) > 1 and not allow_tie:
+        return None
+    return max(leaders, key=lambda value: latest[value])
+
+
 def find_historical_matches(flight, history_data):
     flight_no = flight.get("flight_no")
     target_weekday = timestamp_to_local(flight["dt"]).strftime("%A")
@@ -715,22 +752,29 @@ def apply_historical_predictions(flights, history_data):
         if not matches:
             continue
 
-        gates = [
-            entry.get("gate") for entry in matches
-            if entry.get("gate") and "?" not in str(entry.get("gate"))
-        ]
-        baggages = [
-            entry.get("baggage") for entry in matches
-            if entry.get("baggage") and "?" not in str(entry.get("baggage"))
-        ]
-        types = [
-            entry.get("type") for entry in matches
-            if entry.get("type") in ("Linie", "Charter")
+        # 1. Typ bestimmen (Linie/Charter) - sicherer Typ aus der API hat Vorrang
+        predicted_type = None
+        if can_predict_type:
+            types = [entry_type(entry) for entry in matches]
+            predicted_type = plurality_value(
+                [{"type": t} for t in types if t], "type", allow_tie=False
+            )
+
+        effective_type = predicted_type or flight.get("type")
+
+        # 2. Ausgang und Gepäckband NUR aus Einträgen mit demselben Typ.
+        #    So gehört ein Band immer zum selben Typ wie der Ausgang
+        #    (Linie: Ausgang 1-2 / Band 1-6, Charter: Ausgang 3+ / Band 7+).
+        typed_matches = [
+            entry for entry in matches if entry_type(entry) == effective_type
         ]
 
-        predicted_gate = most_common_value(gates) if needs_gate else None
-        predicted_baggage = most_common_value(baggages) if needs_baggage else None
-        predicted_type = most_common_value(types) if can_predict_type else None
+        predicted_gate = (
+            plurality_value(typed_matches, "gate") if needs_gate else None
+        )
+        predicted_baggage = (
+            plurality_value(typed_matches, "baggage") if needs_baggage else None
+        )
 
         if predicted_type:
             flight["type"] = predicted_type
@@ -738,10 +782,8 @@ def apply_historical_predictions(flights, history_data):
             flight["type_prediction_source"] = match_source
 
         if predicted_gate:
-            flight_type = predicted_type or flight.get("type")
-            flight["gate"] = f"{predicted_gate} ({flight_type}, Prognose)"
+            flight["gate"] = f"{predicted_gate} ({effective_type}, Prognose)"
             flight["gate_source"] = "Prognose (Historie)"
-            flight["prediction_match"] = match_source
         elif needs_gate and predicted_type:
             flight["gate"] = (
                 "Ausgang 4 (Charter, Prognose)"
@@ -756,7 +798,7 @@ def apply_historical_predictions(flights, history_data):
 
         if predicted_gate or predicted_baggage or predicted_type:
             flight["prediction_match"] = match_source
-            flight["prediction_votes"] = len(matches)
+            flight["prediction_votes"] = len(typed_matches or matches)
 
     return flights
 
