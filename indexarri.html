@@ -1521,8 +1521,35 @@ function minsUntil(f) {
     return (realTs(f) - Date.now() / 1000) / 60;
 }
 
+/* ---------- Tageslogik (Europe/Berlin) ---------- */
+function berlinDateStr(ts) {
+    return new Date(ts * 1000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' });
+}
+
+function flightTs(f) {
+    let t = Number(f.dt);
+    if (!t || t < 1e9) return null;
+    if (t > 1e11) t = t / 1000;
+    return t;
+}
+
+// Nur Flüge des heutigen Tages (ab 0 Uhr zählt automatisch der neue Tag)
+function isTodayFlight(f) {
+    const base = flightTs(f);
+    if (base === null) return true;   // ohne Datum: nicht verstecken
+    const today = berlinDateStr(Date.now() / 1000);
+    if (berlinDateStr(base) === today) return true;
+    // Über Mitternacht verspätet und noch nicht gelandet: bleibt sichtbar
+    const s = String(f.status).toLowerCase();
+    const open = s !== 'landed' && s !== 'cancelled' && s !== 'diverted' && s !== 'incident';
+    return open && berlinDateStr(realTs(f)) === today;
+}
+
 function getFilteredList() {
     let list = allFlights;
+
+    // Gelandet-Reiter zeigt weiterhin alle gelandeten Flüge, alles andere nur den heutigen Tag
+    if (currentFilter !== 'landed') list = list.filter(isTodayFlight);
 
     if (currentFilter === 'landing') {
         list = list.filter(f => {
@@ -1591,7 +1618,7 @@ function isStillLanding(f) {
 }
 
 function updateRemaining() {
-    let list = allFlights.filter(isStillLanding);
+    let list = allFlights.filter(f => isStillLanding(f) && isTodayFlight(f));
     let label = 'Noch zu landen';
 
     if (currentFilter === 'Linie') {
