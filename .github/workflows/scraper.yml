@@ -30,6 +30,6 @@ jobs:
         env:
           DUSFLUGDATENKEY: ${{ secrets.DUSFLUGDATENKEY }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          DUS_SSL_UNVERIFIED: "1"
+          DUS_SSL_UNVERIFIED: "0"
         run: |
           python scraper.py
