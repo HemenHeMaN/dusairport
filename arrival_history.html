@@ -272,7 +272,7 @@
           <span class="text-[10px] text-slate-400" id="fbWeekSub"></span>
         </div>
         <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Download gesamt</p>
+          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"><span id="fbTotalLabel">Download Monat</span></p>
           <p class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1" id="fbTotal">-</p>
           <span class="text-[10px] text-slate-400" id="fbTotalSub"></span>
         </div>
@@ -285,6 +285,9 @@
           <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden"><div id="fbSizeBar" class="h-full rounded-full bg-blue-500" style="width:0%"></div></div>
         </div>
         <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-slate-500 dark:text-slate-400">Verbindungen (Spitze heute, Limit 100)</span><span id="fbConn" class="font-mono font-bold">-</span></div>
+        </div>
+        <div>
           <div class="flex justify-between text-xs mb-1"><span class="text-slate-500 dark:text-slate-400">Download diesen Monat (10 GB)</span><span id="fbMonthPct" class="font-mono font-bold"></span></div>
           <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden"><div id="fbMonthBar" class="h-full rounded-full bg-amber-500" style="width:0%"></div></div>
         </div>
@@ -293,14 +296,14 @@
       <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] tracking-wider border-b border-slate-200 dark:border-slate-700">
-            <tr><th class="py-3 px-4">Tag</th><th class="py-3 px-4">Abrufe</th><th class="py-3 px-4 text-right">Download</th></tr>
+            <tr><th class="py-3 px-4">Tag</th><th class="py-3 px-4 text-right">Firebase gesamt</th><th class="py-3 px-4 text-right">Nur diese Seite</th></tr>
           </thead>
           <tbody id="fbDaysBody" class="divide-y divide-slate-100 dark:divide-slate-700/50"></tbody>
         </table>
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <p class="text-[11px] text-slate-400 max-w-2xl">Gemessen werden nur die Downloads dieser Seite in diesem Browser (Größe jeder Antwort von arrival_history.json). Zugriffe des Scrapers und anderer Geräte sind nicht enthalten, die Gesamtnutzung in der Firebase-Konsole (Realtime Database, Nutzung) kann also höher liegen. Der Speicher ist die Größe der gespeicherten Historie.</p>
+        <p id="fbNote" class="text-[11px] text-slate-400 max-w-2xl"></p>
         <button type="button" onclick="resetUsage()" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">Messung zurücksetzen</button>
       </div>
     </div>
@@ -309,6 +312,8 @@
 
   <script>
     const FIREBASE_HISTORY_URL = 'https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/arrival_history.json';
+    const FIREBASE_USAGE_URL = FIREBASE_HISTORY_URL.replace('arrival_history.json', 'usage_stats.json');
+    let serverUsage = null;
     
     let rawHistoryData = {};
     let flatFlightsList = [];
@@ -384,6 +389,11 @@
         const text = await response.text();
         recordDownload(new TextEncoder().encode(text).length);
         rawHistoryData = JSON.parse(text) || {};
+        try {
+          const ur = await fetch(FIREBASE_USAGE_URL, { cache: 'no-store' });
+          const uj = ur.ok ? await ur.json() : null;
+          serverUsage = uj && uj.days ? uj : null;
+        } catch (e) { serverUsage = null; }
         flattenData(rawHistoryData);
         
         updateKPIs();
@@ -635,6 +645,9 @@
         });
 
         const totalEntries = history.length;
+        let kLinie = 0, kCharter = 0;
+        history.forEach(h => { const k = gateKind(h); if (k === 'Linie') kLinie++; else if (k === 'Charter') kCharter++; });
+        const splitBar = typeSplitHtml(kLinie, kCharter);
         const fmtStats = (counts, prefix) => {
           const entries = Object.entries(counts).sort((x, y) => y[1] - x[1]);
           const sum = entries.reduce((acc, e) => acc + e[1], 0);
@@ -661,6 +674,8 @@
             <span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded font-bold text-slate-600 dark:text-slate-300">${totalEntries} ${totalEntries === 1 ? 'Landung' : 'Landungen'}</span>
           </div>
 
+          ${splitBar}
+
           <div class="space-y-1.5 text-xs">
             <div>
               <span class="text-slate-400 font-semibold block uppercase text-[10px]">Häufigste Ausgänge (Gates):</span>
@@ -674,6 +689,22 @@
         `;
         grid.appendChild(card);
       });
+    }
+
+    // Linie/Charter-Balken (nach Ausgängen)
+    function typeSplitHtml(linie, charter) {
+      const total = linie + charter;
+      if (!total) return '';
+      const lp = Math.round(linie / total * 100);
+      const cp = 100 - lp;
+      return `
+          <div title="Anteil Linie/Charter nach Ausgängen">
+            <div class="flex h-2 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700">
+              ${linie ? `<span class="bg-blue-500" style="width:${linie / total * 100}%"></span>` : ''}
+              ${charter ? `<span class="bg-orange-600" style="width:${charter / total * 100}%"></span>` : ''}
+            </div>
+            <div class="flex justify-between text-xs font-bold mt-1"><span class="text-blue-600 dark:text-blue-400">${lp}% Linie</span><span class="text-orange-600 dark:text-orange-400">${cp}% Charter</span></div>
+          </div>`;
     }
 
     // 50 % Flüge: genau so viele Linie- wie Charter-Landungen (nur Ausgänge)
@@ -735,8 +766,7 @@
             </div>
             <span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded font-bold text-slate-600 dark:text-slate-300">${total} Landungen</span>
           </div>
-          <div class="flex h-2 rounded-full overflow-hidden"><span class="w-1/2 bg-blue-500"></span><span class="w-1/2 bg-orange-600"></span></div>
-          <div class="flex justify-between text-xs font-bold"><span class="text-blue-600 dark:text-blue-400">50% Linie</span><span class="text-orange-600 dark:text-orange-400">50% Charter</span></div>
+          ${typeSplitHtml(total / 2, total / 2)}
           <div class="text-xs font-mono font-medium text-slate-800 dark:text-slate-200 space-y-1">${rows}</div>
         </div>`;
       }).join('');
@@ -786,39 +816,77 @@
     }
 
     function renderFirebaseTab() {
-      const u = loadUsage();
-      const today = dayKey();
-      const sumDays = (pred) => Object.entries(u.days).filter(([k]) => pred(k))
-        .reduce((a, [, v]) => ({ bytes: a.bytes + v.bytes, count: a.count + v.count }), { bytes: 0, count: 0 });
-
-      const t = u.days[today] || { bytes: 0, count: 0 };
-      const week = sumDays(k => k >= dayKey(new Date(Date.now() - 6 * 86400000)));
-      const month = sumDays(k => k.slice(0, 7) === today.slice(0, 7));
-
       const GB = 1024 * 1024 * 1024;
-      document.getElementById('fbSize').textContent = lastDbBytes ? fmtBytes(lastDbBytes) : '-';
-      document.getElementById('fbSizeSub').textContent = `${flatFlightsList.length} Landungen, ${Object.keys(rawHistoryData).length} Flugnummern`;
-      document.getElementById('fbToday').textContent = fmtBytes(t.bytes);
-      document.getElementById('fbTodaySub').textContent = `${t.count} Abrufe`;
-      document.getElementById('fbWeek').textContent = fmtBytes(week.bytes);
-      document.getElementById('fbWeekSub').textContent = `${week.count} Abrufe`;
-      document.getElementById('fbTotal').textContent = fmtBytes(u.total.bytes);
-      document.getElementById('fbTotalSub').textContent = `${u.total.count} Abrufe seit ${new Date(u.since).toLocaleDateString('de-DE')}`;
+      const local = loadUsage();
+      const lt = local.days[dayKey()] || { bytes: 0, count: 0 };
+      const set = (id, v) => { document.getElementById(id).textContent = v; };
+      const pct = v => v.toFixed(2).replace('.', ',') + ' %';
+      const bar = (id, v) => { document.getElementById(id).style.width = Math.min(100, Math.max(v, 0.5)) + '%'; };
 
-      const sizePct = lastDbBytes / GB * 100;
-      const monthPct = month.bytes / (10 * GB) * 100;
-      document.getElementById('fbSizePct').textContent = `${fmtBytes(lastDbBytes)} · ${sizePct.toFixed(2).replace('.', ',')} %`;
-      document.getElementById('fbSizeBar').style.width = Math.min(100, Math.max(sizePct, 0.5)) + '%';
-      document.getElementById('fbMonthPct').textContent = `${fmtBytes(month.bytes)} · ${monthPct.toFixed(2).replace('.', ',')} %`;
-      document.getElementById('fbMonthBar').style.width = Math.min(100, Math.max(monthPct, 0.5)) + '%';
+      let size, today, week, month, totalVal, totalLabel, totalSub, rows = [];
+      const su = serverUsage;
 
-      const rows = [];
-      for (let i = 0; i < 7; i++) {
-        const key = dayKey(new Date(Date.now() - i * 86400000));
-        const d = u.days[key] || { bytes: 0, count: 0 };
-        rows.push(`<tr><td class="py-2 px-4 font-mono text-xs">${formatDate(key)}${i === 0 ? ' <span class="text-slate-400">(heute)</span>' : ''}</td><td class="py-2 px-4 font-mono text-xs">${d.count}</td><td class="py-2 px-4 font-mono text-xs text-right font-bold">${fmtBytes(d.bytes)}</td></tr>`);
+      if (su) {
+        // Werte der Firebase-Konsole (vom Scraper über Cloud Monitoring geholt, Tage in UTC)
+        const days = su.days;
+        const utcKey = off => new Date(Date.now() - off * 86400000).toISOString().slice(0, 10);
+        const sum = pred => Object.entries(days).filter(([k]) => pred(k)).reduce((a, [, v]) => a + Number(v || 0), 0);
+        const todayKey = utcKey(0);
+        today = Number(days[todayKey] || 0);
+        week = sum(k => k >= utcKey(6));
+        month = sum(k => k.slice(0, 7) === todayKey.slice(0, 7));
+        size = Number(su.storage_bytes || 0);
+        totalVal = month;
+        totalLabel = 'Download Monat';
+        totalSub = 'laufende Abrechnung';
+        for (let i = 0; i < 7; i++) {
+          const k = utcKey(i);
+          const l = local.days[k] || { bytes: 0 };
+          rows.push({ key: k, a: fmtBytes(Number(days[k] || 0)), b: fmtBytes(l.bytes), today: i === 0 });
+        }
+        set('fbTodaySub', `davon diese Seite: ${fmtBytes(lt.bytes)}`);
+        set('fbWeekSub', 'Firebase-Konsole');
+        set('fbSizeSub', `Stand ${su.updated_at ? new Date(su.updated_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '-'} Uhr`);
+        set('fbConn', su.connections_peak_today != null ? `${su.connections_peak_today} / 100` : '-');
+        set('fbNote', 'Quelle: Firebase-Konsole (Nutzung), vom Scraper über Cloud Monitoring abgefragt und alle ca. 10 Minuten aktualisiert. Tage in UTC. „Nur diese Seite“ ist der Teil, den diese Seite in diesem Browser geladen hat.');
+      } else {
+        // Fallback: nur lokal gemessene Downloads dieser Seite
+        const sumDays = pred => Object.entries(local.days).filter(([k]) => pred(k)).reduce((a, [, v]) => a + v.bytes, 0);
+        today = lt.bytes;
+        week = sumDays(k => k >= dayKey(new Date(Date.now() - 6 * 86400000)));
+        month = sumDays(k => k.slice(0, 7) === dayKey().slice(0, 7));
+        size = lastDbBytes;
+        totalVal = local.total.bytes;
+        totalLabel = 'Download gesamt';
+        totalSub = `${local.total.count} Abrufe seit ${new Date(local.since).toLocaleDateString('de-DE')}`;
+        for (let i = 0; i < 7; i++) {
+          const k = dayKey(new Date(Date.now() - i * 86400000));
+          rows.push({ key: k, a: '-', b: fmtBytes((local.days[k] || { bytes: 0 }).bytes), today: i === 0 });
+        }
+        set('fbTodaySub', `${lt.count} Abrufe`);
+        set('fbWeekSub', 'nur diese Seite');
+        set('fbSizeSub', `${flatFlightsList.length} Landungen (nur Historie)`);
+        set('fbConn', '-');
+        set('fbNote', 'Keine Konsolenwerte gefunden (usage_stats fehlt oder ist nicht lesbar). Angezeigt werden nur die Downloads dieser Seite in diesem Browser, Zugriffe des Scrapers fehlen. Konsolenwerte kommen, sobald der Scraper sie nach usage_stats schreibt und die Regeln das Lesen erlauben.');
       }
-      document.getElementById('fbDaysBody').innerHTML = rows.join('');
+
+      set('fbSize', size ? fmtBytes(size) : '-');
+      set('fbToday', fmtBytes(today));
+      set('fbWeek', fmtBytes(week));
+      set('fbTotal', fmtBytes(totalVal));
+      set('fbTotalLabel', totalLabel);
+      set('fbTotalSub', totalSub);
+
+      const sizePct = size / GB * 100;
+      const monthPct = month / (10 * GB) * 100;
+      set('fbSizePct', `${fmtBytes(size)} · ${pct(sizePct)}`);
+      set('fbMonthPct', `${fmtBytes(month)} · ${pct(monthPct)}`);
+      bar('fbSizeBar', sizePct);
+      bar('fbMonthBar', monthPct);
+
+      document.getElementById('fbDaysBody').innerHTML = rows.map(r =>
+        `<tr><td class="py-2 px-4 font-mono text-xs">${formatDate(r.key)}${r.today ? ' <span class="text-slate-400">(heute)</span>' : ''}</td><td class="py-2 px-4 font-mono text-xs text-right font-bold">${r.a}</td><td class="py-2 px-4 font-mono text-xs text-right text-slate-500 dark:text-slate-400">${r.b}</td></tr>`
+      ).join('');
     }
 
     // Switch Tabs
