@@ -105,10 +105,7 @@
     <!-- Top 10 Herkunft -->
     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
       <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-        <div class="inline-flex rounded-lg bg-slate-100 dark:bg-slate-700 p-0.5" role="tablist" aria-label="Top 10 Ansicht">
-          <button id="topBtnCity" type="button" onclick="setTopMode('city')" class="px-3 py-1.5 text-xs font-bold rounded-md transition">Top Herkunft</button>
-          <button id="topBtnFlight" type="button" onclick="setTopMode('flight')" class="px-3 py-1.5 text-xs font-bold rounded-md transition">Top Flugnummern</button>
-        </div>
+        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-200">Top 10 Herkunft</h2>
         <span class="text-[10px] text-slate-400">Top 10 nach Landungen</span>
       </div>
       <ol id="topCitiesList" class="space-y-1.5">
@@ -117,7 +114,7 @@
     </div>
 
     <!-- View Navigation Tabs -->
-    <div class="flex border-b border-slate-200 dark:border-slate-700 gap-2">
+    <div class="flex border-b border-slate-200 dark:border-slate-700 gap-2 overflow-x-auto whitespace-nowrap">
       <button id="tabList" onclick="switchTab('list')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
         Alle Historischen Landungen
@@ -125,6 +122,14 @@
       <button id="tabPatterns" onclick="switchTab('patterns')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
         Prognose- & Pattern-Inspektor
+      </button>
+      <button id="tabHalf" onclick="switchTab('half')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18m9-9H3"></path></svg>
+        50 % Flüge <span id="halfBadge" class="text-[10px] bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded font-mono">0</span>
+      </button>
+      <button id="tabFirebase" onclick="switchTab('firebase')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zm0 0v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7m-16 5v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5"></path></svg>
+        Firebase
       </button>
     </div>
 
@@ -232,6 +237,74 @@
       </div>
     </div>
 
+    <!-- TAB 3: 50 % LINIE / 50 % CHARTER -->
+    <div id="viewHalf" class="hidden space-y-4">
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Flugnummer, Airline oder Herkunft suchen</label>
+        <div class="flex gap-2 max-w-md relative">
+          <input type="text" id="halfSearchInput" placeholder="z.B. EW5431, Eurowings oder Gran Canaria..." class="w-full px-4 pr-9 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white font-mono">
+          <button id="clearHalfSearchBtn" type="button" onclick="clearSearch()" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <p id="halfInfo" class="text-xs text-slate-500 dark:text-slate-400"></p>
+        <p class="text-[11px] text-slate-400">Nur Ausgänge zählen (Ausgang 1–2 = Linie, ab 3 = Charter), keine Gepäckbänder. Es zählt nur Linie gegen Charter, nicht der einzelne Ausgang. Mindestens 2 Landungen.</p>
+      </div>
+      <div id="halfGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- TAB 4: FIREBASE NUTZUNG -->
+    <div id="viewFirebase" class="hidden space-y-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Speicher</p>
+          <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1" id="fbSize">-</p>
+          <span class="text-[10px] text-slate-400" id="fbSizeSub">arrival_history.json</span>
+        </div>
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Download heute</p>
+          <p class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 mt-1" id="fbToday">-</p>
+          <span class="text-[10px] text-slate-400" id="fbTodaySub"></span>
+        </div>
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Download 7 Tage</p>
+          <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1" id="fbWeek">-</p>
+          <span class="text-[10px] text-slate-400" id="fbWeekSub"></span>
+        </div>
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Download gesamt</p>
+          <p class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1" id="fbTotal">-</p>
+          <span class="text-[10px] text-slate-400" id="fbTotalSub"></span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-200">Spark-Limits (kostenloser Tarif)</h2>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-slate-500 dark:text-slate-400">Speicher (1 GB)</span><span id="fbSizePct" class="font-mono font-bold"></span></div>
+          <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden"><div id="fbSizeBar" class="h-full rounded-full bg-blue-500" style="width:0%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-slate-500 dark:text-slate-400">Download diesen Monat (10 GB)</span><span id="fbMonthPct" class="font-mono font-bold"></span></div>
+          <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden"><div id="fbMonthBar" class="h-full rounded-full bg-amber-500" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] tracking-wider border-b border-slate-200 dark:border-slate-700">
+            <tr><th class="py-3 px-4">Tag</th><th class="py-3 px-4">Abrufe</th><th class="py-3 px-4 text-right">Download</th></tr>
+          </thead>
+          <tbody id="fbDaysBody" class="divide-y divide-slate-100 dark:divide-slate-700/50"></tbody>
+        </table>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="text-[11px] text-slate-400 max-w-2xl">Gemessen werden nur die Downloads dieser Seite in diesem Browser (Größe jeder Antwort von arrival_history.json). Zugriffe des Scrapers und anderer Geräte sind nicht enthalten, die Gesamtnutzung in der Firebase-Konsole (Realtime Database, Nutzung) kann also höher liegen. Der Speicher ist die Größe der gespeicherten Historie.</p>
+        <button type="button" onclick="resetUsage()" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">Messung zurücksetzen</button>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -308,12 +381,16 @@
         const response = await fetch(FIREBASE_HISTORY_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error('HTTP ' + response.status);
         
-        rawHistoryData = await response.json() || {};
+        const text = await response.text();
+        recordDownload(new TextEncoder().encode(text).length);
+        rawHistoryData = JSON.parse(text) || {};
         flattenData(rawHistoryData);
         
         updateKPIs();
         renderList();
         renderPatternInspector();
+        renderHalfFlights();
+        renderFirebaseTab();
       } catch (err) {
         console.error("Fehler beim Laden der Firebase Historie:", err);
         if (silent !== true) {
@@ -351,54 +428,31 @@
       });
     }
 
-    // Top 10 (Herkunft / Flugnummern) mit Umschalter
-    const TOPMODE_KEY = 'dus_history_topmode';
-    let topMode = 'city';
-    try { if (localStorage.getItem(TOPMODE_KEY) === 'flight') topMode = 'flight'; } catch (e) {}
-
-    function setTopMode(mode) {
-      topMode = mode === 'flight' ? 'flight' : 'city';
-      try { localStorage.setItem(TOPMODE_KEY, topMode); } catch (e) {}
-      renderTop10();
-    }
+    // Top 10 Herkunft
+    const escHtml = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     function renderTop10() {
-      const on = 'px-3 py-1.5 text-xs font-bold rounded-md transition bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm';
-      const off = 'px-3 py-1.5 text-xs font-bold rounded-md transition text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200';
-      document.getElementById('topBtnCity').className = topMode === 'city' ? on : off;
-      document.getElementById('topBtnFlight').className = topMode === 'flight' ? on : off;
-
       const counts = {};
-      const meta = {};
       flatFlightsList.forEach(f => {
-        const key = topMode === 'city' ? f.city : f.flight_no;
-        if (!key) return;
-        counts[key] = (counts[key] || 0) + 1;
-        meta[key] = f;
+        if (!f.city) return;
+        counts[f.city] = (counts[f.city] || 0) + 1;
       });
 
       const top10 = Object.entries(counts)
         .sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))
         .slice(0, 10);
       const maxCnt = top10.length ? top10[0][1] : 1;
-      const escHtml = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
       const listEl = document.getElementById('topCitiesList');
-      listEl.innerHTML = top10.length ? top10.map(([key, cnt], i) => {
-        const m = meta[key];
-        const label = topMode === 'flight'
-          ? `<span class="font-mono font-bold">${escHtml(key)}</span> <span class="text-xs font-normal text-slate-400">${escHtml(m.city)} · ${escHtml(m.airline)}</span>`
-          : escHtml(key);
-        return `
+      listEl.innerHTML = top10.length ? top10.map(([city, cnt], i) => `
         <li class="flex items-center gap-3 text-sm">
           <span class="w-5 text-right font-mono text-xs font-bold text-slate-400">${i + 1}</span>
-          <span class="w-44 sm:w-72 truncate font-semibold text-slate-800 dark:text-slate-200">${label}</span>
+          <span class="w-44 sm:w-72 truncate font-semibold text-slate-800 dark:text-slate-200">${escHtml(city)}</span>
           <span class="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-            <span class="block h-full rounded-full ${topMode === 'flight' ? 'bg-blue-500' : 'bg-amber-500'}" style="width:${Math.max(4, Math.round(cnt / maxCnt * 100))}%"></span>
+            <span class="block h-full rounded-full bg-amber-500" style="width:${Math.max(4, Math.round(cnt / maxCnt * 100))}%"></span>
           </span>
           <span class="w-24 text-right font-mono text-xs text-slate-600 dark:text-slate-300">${cnt} ${cnt === 1 ? 'Landung' : 'Landungen'}</span>
-        </li>`;
-      }).join('') : '<li class="text-sm text-slate-400">Keine Daten</li>';
+        </li>`).join('') : '<li class="text-sm text-slate-400">Keine Daten</li>';
     }
 
     // KPI Summary
@@ -446,19 +500,18 @@
       
       if (searchInput.value !== value) searchInput.value = value;
       if (patternSearchInput.value !== value) patternSearchInput.value = value;
+      const halfSearchInput = document.getElementById('halfSearchInput');
+      if (halfSearchInput.value !== value) halfSearchInput.value = value;
 
       const clearBtn1 = document.getElementById('clearSearchBtn');
       const clearBtn2 = document.getElementById('clearPatternSearchBtn');
-      if (value.trim().length > 0) {
-        clearBtn1.classList.remove('hidden');
-        clearBtn2.classList.remove('hidden');
-      } else {
-        clearBtn1.classList.add('hidden');
-        clearBtn2.classList.add('hidden');
-      }
+      const clearBtn3 = document.getElementById('clearHalfSearchBtn');
+      const hasText = value.trim().length > 0;
+      [clearBtn1, clearBtn2, clearBtn3].forEach(b => b.classList.toggle('hidden', !hasText));
 
       renderList();
       renderPatternInspector();
+      renderHalfFlights();
     }
 
     function clearSearch() {
@@ -623,31 +676,176 @@
       });
     }
 
+    // 50 % Flüge: genau so viele Linie- wie Charter-Landungen (nur Ausgänge)
+    function gateKind(entry) {
+      const m = String(entry.gate || '').match(/\d+/);
+      if (!m) return null;
+      return parseInt(m[0], 10) <= 2 ? 'Linie' : 'Charter';
+    }
+
+    function renderHalfFlights() {
+      const search = globalSearchQuery.toLowerCase().trim();
+      const grid = document.getElementById('halfGrid');
+
+      const all = [];
+      Object.keys(rawHistoryData).forEach(fn => {
+        const item = rawHistoryData[fn] || {};
+        const history = Array.isArray(item.history) ? item.history : Object.values(item.history || {});
+        let linie = 0, charter = 0;
+        const gates = {};
+        history.forEach(entry => {
+          const kind = gateKind(entry);
+          if (!kind) return;
+          if (kind === 'Linie') linie++; else charter++;
+          const key = entry.gate + '|' + kind;
+          gates[key] = (gates[key] || 0) + 1;
+        });
+        const total = linie + charter;
+        if (total >= 2 && linie === charter) all.push({ fn, item, total, gates });
+      });
+      all.sort((a, b) => b.total - a.total || a.fn.localeCompare(b.fn));
+      document.getElementById('halfBadge').textContent = all.length;
+
+      const list = all.filter(x => !search ||
+        x.fn.toLowerCase().includes(search) ||
+        String(x.item.airline || '').toLowerCase().includes(search) ||
+        String(x.item.city || '').toLowerCase().includes(search));
+
+      document.getElementById('halfInfo').textContent =
+        `${list.length} von ${all.length} Flugnummern mit genau 50 % Linie und 50 % Charter`;
+
+      if (list.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-8 text-center text-slate-400 text-sm">Keine 50/50-Flüge gefunden.</div>';
+        return;
+      }
+
+      grid.innerHTML = list.map(({ fn, item, total, gates }) => {
+        const rows = Object.entries(gates)
+          .map(([key, c]) => { const [g, kind] = key.split('|'); return { g, kind, c }; })
+          .sort((a, b) => (a.kind === b.kind ? b.c - a.c : (a.kind === 'Linie' ? -1 : 1)))
+          .map(r => `<div class="flex justify-between gap-2"><span>${escHtml(r.g)} <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${r.kind === 'Charter' ? 'badge-charter' : 'badge-linie'}">${r.kind}</span></span><span class="whitespace-nowrap">${Math.round(r.c / total * 100)}% (${r.c}x)</span></div>`)
+          .join('');
+        return `
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+          <div class="flex justify-between items-start border-b border-slate-100 dark:border-slate-700/50 pb-2">
+            <div>
+              <span class="font-mono font-black text-lg text-blue-600 dark:text-blue-400">${escHtml(fn)}</span>
+              <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">${escHtml(item.city || 'Unbekannt')}</p>
+              <p class="text-[11px] text-slate-400">${escHtml(item.airline || '')}</p>
+            </div>
+            <span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded font-bold text-slate-600 dark:text-slate-300">${total} Landungen</span>
+          </div>
+          <div class="flex h-2 rounded-full overflow-hidden"><span class="w-1/2 bg-blue-500"></span><span class="w-1/2 bg-orange-600"></span></div>
+          <div class="flex justify-between text-xs font-bold"><span class="text-blue-600 dark:text-blue-400">50% Linie</span><span class="text-orange-600 dark:text-orange-400">50% Charter</span></div>
+          <div class="text-xs font-mono font-medium text-slate-800 dark:text-slate-200 space-y-1">${rows}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Firebase-Nutzung (nur Downloads dieser Seite in diesem Browser)
+    const USAGE_KEY = 'dus_history_usage';
+    let lastDbBytes = 0;
+
+    function dayKey(date) { return (date || new Date()).toLocaleDateString('sv-SE'); }
+
+    function loadUsage() {
+      try {
+        const u = JSON.parse(localStorage.getItem(USAGE_KEY));
+        if (u && u.days && u.total) return u;
+      } catch (e) {}
+      return { since: new Date().toISOString(), total: { bytes: 0, count: 0 }, days: {} };
+    }
+
+    function saveUsage(u) { try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {} }
+
+    function recordDownload(bytes) {
+      lastDbBytes = bytes;
+      const u = loadUsage();
+      const key = dayKey();
+      const d = u.days[key] || { bytes: 0, count: 0 };
+      d.bytes += bytes; d.count++;
+      u.days[key] = d;
+      u.total.bytes += bytes; u.total.count++;
+      const keys = Object.keys(u.days).sort();
+      while (keys.length > 60) delete u.days[keys.shift()];
+      saveUsage(u);
+    }
+
+    function resetUsage() {
+      if (!confirm('Gemessene Downloads wirklich zurücksetzen?')) return;
+      try { localStorage.removeItem(USAGE_KEY); } catch (e) {}
+      renderFirebaseTab();
+    }
+
+    function fmtBytes(b) {
+      if (b < 1024) return Math.round(b) + ' B';
+      const units = ['KB', 'MB', 'GB', 'TB'];
+      let i = -1;
+      do { b /= 1024; i++; } while (b >= 1024 && i < units.length - 1);
+      return b.toFixed(b >= 100 ? 0 : b >= 10 ? 1 : 2).replace('.', ',') + ' ' + units[i];
+    }
+
+    function renderFirebaseTab() {
+      const u = loadUsage();
+      const today = dayKey();
+      const sumDays = (pred) => Object.entries(u.days).filter(([k]) => pred(k))
+        .reduce((a, [, v]) => ({ bytes: a.bytes + v.bytes, count: a.count + v.count }), { bytes: 0, count: 0 });
+
+      const t = u.days[today] || { bytes: 0, count: 0 };
+      const week = sumDays(k => k >= dayKey(new Date(Date.now() - 6 * 86400000)));
+      const month = sumDays(k => k.slice(0, 7) === today.slice(0, 7));
+
+      const GB = 1024 * 1024 * 1024;
+      document.getElementById('fbSize').textContent = lastDbBytes ? fmtBytes(lastDbBytes) : '-';
+      document.getElementById('fbSizeSub').textContent = `${flatFlightsList.length} Landungen, ${Object.keys(rawHistoryData).length} Flugnummern`;
+      document.getElementById('fbToday').textContent = fmtBytes(t.bytes);
+      document.getElementById('fbTodaySub').textContent = `${t.count} Abrufe`;
+      document.getElementById('fbWeek').textContent = fmtBytes(week.bytes);
+      document.getElementById('fbWeekSub').textContent = `${week.count} Abrufe`;
+      document.getElementById('fbTotal').textContent = fmtBytes(u.total.bytes);
+      document.getElementById('fbTotalSub').textContent = `${u.total.count} Abrufe seit ${new Date(u.since).toLocaleDateString('de-DE')}`;
+
+      const sizePct = lastDbBytes / GB * 100;
+      const monthPct = month.bytes / (10 * GB) * 100;
+      document.getElementById('fbSizePct').textContent = `${fmtBytes(lastDbBytes)} · ${sizePct.toFixed(2).replace('.', ',')} %`;
+      document.getElementById('fbSizeBar').style.width = Math.min(100, Math.max(sizePct, 0.5)) + '%';
+      document.getElementById('fbMonthPct').textContent = `${fmtBytes(month.bytes)} · ${monthPct.toFixed(2).replace('.', ',')} %`;
+      document.getElementById('fbMonthBar').style.width = Math.min(100, Math.max(monthPct, 0.5)) + '%';
+
+      const rows = [];
+      for (let i = 0; i < 7; i++) {
+        const key = dayKey(new Date(Date.now() - i * 86400000));
+        const d = u.days[key] || { bytes: 0, count: 0 };
+        rows.push(`<tr><td class="py-2 px-4 font-mono text-xs">${formatDate(key)}${i === 0 ? ' <span class="text-slate-400">(heute)</span>' : ''}</td><td class="py-2 px-4 font-mono text-xs">${d.count}</td><td class="py-2 px-4 font-mono text-xs text-right font-bold">${fmtBytes(d.bytes)}</td></tr>`);
+      }
+      document.getElementById('fbDaysBody').innerHTML = rows.join('');
+    }
+
     // Switch Tabs
+    const TAB_IDS = {
+      list: ['tabList', 'viewList'],
+      patterns: ['tabPatterns', 'viewPatterns'],
+      half: ['tabHalf', 'viewHalf'],
+      firebase: ['tabFirebase', 'viewFirebase']
+    };
+    const TAB_ACTIVE = "px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2";
+    const TAB_INACTIVE = "px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2";
+
     function switchTab(tab) {
+      if (!TAB_IDS[tab]) tab = 'list';
       currentTab = tab;
       try { localStorage.setItem(TAB_KEY, tab); } catch (e) {}
-      const tabList = document.getElementById('tabList');
-      const tabPatterns = document.getElementById('tabPatterns');
-      const viewList = document.getElementById('viewList');
-      const viewPatterns = document.getElementById('viewPatterns');
-
-      if (tab === 'list') {
-        tabList.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2";
-        tabPatterns.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2";
-        viewList.classList.remove('hidden');
-        viewPatterns.classList.add('hidden');
-      } else {
-        tabPatterns.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2";
-        tabList.className = "px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2";
-        viewPatterns.classList.remove('hidden');
-        viewList.classList.add('hidden');
-      }
+      Object.entries(TAB_IDS).forEach(([key, [btnId, viewId]]) => {
+        document.getElementById(btnId).className = key === tab ? TAB_ACTIVE : TAB_INACTIVE;
+        document.getElementById(viewId).classList.toggle('hidden', key !== tab);
+      });
+      if (tab === 'firebase') renderFirebaseTab();
     }
 
     // Event Listeners
     document.getElementById('searchInput').addEventListener('input', (e) => handleSearchInput(e.target.value));
     document.getElementById('patternSearchInput').addEventListener('input', (e) => handleSearchInput(e.target.value));
+    document.getElementById('halfSearchInput').addEventListener('input', (e) => handleSearchInput(e.target.value));
 
     document.getElementById('typeFilter').addEventListener('change', renderList);
     document.getElementById('dayFilter').addEventListener('change', renderList);
@@ -656,7 +854,8 @@
     // Initial Load
     initTheme();
     try {
-      if (localStorage.getItem(TAB_KEY) === 'patterns') switchTab('patterns');
+      const savedTab = localStorage.getItem(TAB_KEY);
+      if (savedTab && TAB_IDS[savedTab]) switchTab(savedTab);
     } catch (e) {}
     loadHistoryData();
 
