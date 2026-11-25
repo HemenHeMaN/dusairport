@@ -54,7 +54,7 @@ WINDOW_END = (3, 35)
 
 MINUTES_PAST = 120
 HOURS_FUTURE = 8
-ONLY_TODAY = True
+ONLY_TODAY = False   # False: Flüge nach Mitternacht schon vorab laden (die Seite zeigt ab 0 Uhr den neuen Tag)
 
 FETCH_BACK_HOURS = 4
 FETCH_AHEAD_HOURS = HOURS_FUTURE + 1
