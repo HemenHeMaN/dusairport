@@ -70,6 +70,9 @@
     --tf-bar-charter-edge: #e65100;
     --tf-bar-cancelled: rgba(179, 38, 30, .32);
     --tf-bar-cancelled-edge: #b3261e;
+    --tf-tint-linie: rgba(13, 110, 200, .16);
+    --tf-tint-charter: rgba(230, 110, 0, .18);
+    --tf-tint-cancelled: rgba(179, 38, 30, .16);
     --tf-display: "Barlow Condensed", "Arial Narrow", sans-serif;
     --tf-data: "B612 Mono", ui-monospace, "Courier New", monospace;
 }
@@ -127,6 +130,9 @@
     --tf-bar-charter-edge: #ffa24d;
     --tf-bar-cancelled: rgba(255, 144, 130, .44);
     --tf-bar-cancelled-edge: #ff5252;
+    --tf-tint-linie: rgba(96, 190, 255, .26);
+    --tf-tint-charter: rgba(255, 138, 28, .30);
+    --tf-tint-cancelled: rgba(255, 144, 130, .26);
 }
 
 html { font-size: var(--base-font-size); }
@@ -449,6 +455,11 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
 .tf-body .tf-row.s-annulliert { border-left-color: var(--tf-bad); }
 .tf-body .tf-row.s-gelandet { border-left-color: var(--tf-dim); }
 
+/* Grundfarbe je Art, immer sichtbar; der Balken füllt sie beim Näherrücken kräftiger */
+.tf-body .tf-row.art-linie { background: linear-gradient(var(--tf-tint-linie), var(--tf-tint-linie)), var(--tf-row); }
+.tf-body .tf-row.art-charter { background: linear-gradient(var(--tf-tint-charter), var(--tf-tint-charter)), var(--tf-row); }
+.tf-body .tf-row.art-cancelled { background: linear-gradient(var(--tf-tint-cancelled), var(--tf-tint-cancelled)), var(--tf-row); }
+
 .tf-bar {
     position: absolute; z-index: 0; left: 0; top: 0; bottom: 0; width: 0; pointer-events: none;
     transition: width 1.4s cubic-bezier(.2, .7, .2, 1);
@@ -712,7 +723,8 @@ h1 { color: var(--heading-color); font-size: 1.4rem; margin: 0; }
                 <div class="hour-wheel-center-highlight"></div>
                 <div class="hour-wheel-vert" id="hourWheelVert">
                     <div class="hour-wheel-spacer-v"></div>
-                    <div class="hour-item-v active" data-hours="0">Max 8 Std.</div>
+                    <div class="hour-item-v active" data-hours="0">Alle</div>
+                    <div class="hour-item-v" data-hours="8">8 Std.</div>
                     <div class="hour-item-v" data-hours="6">6 Std.</div>
                     <div class="hour-item-v" data-hours="5">5 Std.</div>
                     <div class="hour-item-v" data-hours="4">4 Std.</div>
@@ -852,8 +864,8 @@ let currentFilter = 'all';
 let currentSearch = '';
 let showFlag = true;
 const HOURS_KEY = 'dus_selected_hours';
-const HOURS_VALID = [0, 1, 2, 3, 4, 5, 6];
-let selectedHours = 0; // 0 = Alle (max. 8 Std.), 1-6 = Filter nach Stunden
+const HOURS_VALID = [0, 1, 2, 3, 4, 5, 6, 8];
+let selectedHours = 0; // 0 = Alle (alle Flüge des heutigen Tages), 1-6 und 8 = Filter nach Stunden
 
 try {
     const savedHours = parseInt(localStorage.getItem(HOURS_KEY), 10);
@@ -1510,8 +1522,35 @@ function minsUntil(f) {
     return (realTs(f) - Date.now() / 1000) / 60;
 }
 
+/* ---------- Tageslogik (Europe/Berlin) ---------- */
+function berlinDateStr(ts) {
+    return new Date(ts * 1000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' });
+}
+
+function flightTs(f) {
+    let t = Number(f.dt);
+    if (!t || t < 1e9) return null;
+    if (t > 1e11) t = t / 1000;
+    return t;
+}
+
+// Nur Flüge des heutigen Tages (ab 0 Uhr zählt automatisch der neue Tag)
+function isTodayFlight(f) {
+    const base = flightTs(f);
+    if (base === null) return true;   // ohne Datum: nicht verstecken
+    const today = berlinDateStr(Date.now() / 1000);
+    if (berlinDateStr(base) === today) return true;
+    // Über Mitternacht verspätet und noch nicht gelandet: bleibt sichtbar
+    const s = String(f.status).toLowerCase();
+    const open = s !== 'landed' && s !== 'cancelled' && s !== 'diverted' && s !== 'incident';
+    return open && berlinDateStr(realTs(f)) === today;
+}
+
 function getFilteredList() {
     let list = allFlights;
+
+    // Gelandet-Reiter zeigt weiterhin alle gelandeten Flüge, alles andere nur den heutigen Tag
+    if (currentFilter !== 'landed') list = list.filter(isTodayFlight);
 
     if (currentFilter === 'landing') {
         list = list.filter(f => {
@@ -1580,7 +1619,7 @@ function isStillLanding(f) {
 }
 
 function updateRemaining() {
-    let list = allFlights.filter(isStillLanding);
+    let list = allFlights.filter(f => isStillLanding(f) && isTodayFlight(f));
     let label = 'Noch zu landen';
 
     if (currentFilter === 'Linie') {
@@ -1811,7 +1850,7 @@ function tfFortschritt(zeit, status, ts) {
     if (s === 'landed' || s === 'cancelled' || s === 'diverted' || s === 'incident') return 1;
     let diff;
     if (ts > 0) {
-        // Echte Zeitstempel: Flüge bis 24 Std. voraus (z. B. 12:50 um 00:45) dürfen nicht über Mitternacht "umgebrochen" werden
+        // Echte Zeitstempel: Flüge bis 24 Std. voraus dürfen nicht über Mitternacht "umgebrochen" werden
         diff = (ts - Date.now() / 1000) / 60;
     } else {
         diff = timeToMinutes(zeit) - berlinMin();
@@ -1861,7 +1900,7 @@ function renderBoard(flights) {
 
         const row = document.createElement('div');
         const remarkText = (isCancelled && f.remark) ? String(f.remark) : '';
-        row.className = 'tf-row ' + st.cls + (isCancelled ? ' cancelled' : '') + (remarkText ? ' has-remark' : '');
+        row.className = 'tf-row ' + st.cls + ' art-' + art + (isCancelled ? ' cancelled' : '') + (remarkText ? ' has-remark' : '');
         row.innerHTML = `
             <div class="tf-bar ${art}" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}" data-ts="${realTs(f) || 0}"></div>
             <div class="tf-flight">${esc(f.flight_no)}<small>${esc(f.airline)}</small></div>
