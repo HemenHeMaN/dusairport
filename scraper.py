@@ -53,11 +53,11 @@ WINDOW_START = (5, 0)
 WINDOW_END = (3, 35)
 
 MINUTES_PAST = 120
-HOURS_FUTURE = 12   # Mindest-Vorlauf; zusätzlich wird immer bis zum nächsten 0 Uhr geladen
+HOURS_FUTURE = 16   # Mindest-Vorlauf; zusätzlich wird immer bis zum nächsten 0 Uhr geladen
 ONLY_TODAY = False   # False: Flüge nach Mitternacht schon vorab laden (die Seite zeigt ab 0 Uhr den neuen Tag)
 
 FETCH_BACK_HOURS = 4
-FETCH_AHEAD_HOURS = 25   # deckt "bis 0 Uhr" (max. 24 Std.) plus Reserve ab
+FETCH_AHEAD_HOURS = HOURS_FUTURE + 1   # deckt "bis 0 Uhr" (max. 24 Std.) plus Reserve ab
 
 PAGE_SIZE = 100
 MAX_PAGES = 10
