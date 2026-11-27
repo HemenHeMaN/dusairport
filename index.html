@@ -1778,12 +1778,18 @@ function tfStatus(f) {
     return { cls: 's-luft', label: 'Geplant' };
 }
 
-function tfFortschritt(zeit, status) {
+function tfFortschritt(zeit, status, ts) {
     const s = String(status).toLowerCase();
     if (s === 'landed' || s === 'cancelled' || s === 'diverted' || s === 'incident') return 1;
-    let diff = timeToMinutes(zeit) - berlinMin();
-    if (diff < -720) diff += 1440;
-    if (diff > 720) diff -= 1440;
+    let diff;
+    if (ts > 0) {
+        // Echte Zeitstempel: Flüge bis 24 Std. voraus dürfen nicht über Mitternacht "umgebrochen" werden
+        diff = (ts - Date.now() / 1000) / 60;
+    } else {
+        diff = timeToMinutes(zeit) - berlinMin();
+        if (diff < -720) diff += 1440;
+        if (diff > 720) diff -= 1440;
+    }
     if (diff <= 0) return 1;
     return Math.max(0, Math.min(1, 1 - diff / TF_FENSTER));
 }
@@ -1829,7 +1835,7 @@ function renderBoard(flights) {
         const remarkText = (isCancelled && f.remark) ? String(f.remark) : '';
         row.className = 'tf-row ' + st.cls + ' art-' + art + (isCancelled ? ' cancelled' : '') + (remarkText ? ' has-remark' : '');
         row.innerHTML = `
-            <div class="tf-bar ${art}" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}"></div>
+            <div class="tf-bar ${art}" data-zeit="${esc(zeit)}" data-status="${esc(f.status)}" data-ts="${realTs(f) || 0}"></div>
             <div class="tf-flight">${esc(f.flight_no)}<small>${esc(f.airline)}</small></div>
             ${remarkText ? '<div class="tf-remark">' + esc(remarkText) + '</div>' : ''}
             <div class="tf-city">${esc(f.city)}${countryHtml}</div>
@@ -1845,7 +1851,7 @@ function renderBoard(flights) {
 
 function updateBoardBars() {
     document.querySelectorAll('#tfBody .tf-bar').forEach(bar => {
-        const p = tfFortschritt(bar.dataset.zeit, bar.dataset.status);
+        const p = tfFortschritt(bar.dataset.zeit, bar.dataset.status, Number(bar.dataset.ts));
         bar.style.width = (p * 100).toFixed(1) + '%';
     });
 }
