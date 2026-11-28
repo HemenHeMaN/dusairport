@@ -127,10 +127,6 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18m9-9H3"></path></svg>
         50 % Flüge <span id="halfBadge" class="text-[10px] bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded font-mono">0</span>
       </button>
-      <button id="tabFirebase" onclick="switchTab('firebase')" class="px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zm0 0v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7m-16 5v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5"></path></svg>
-        Firebase
-      </button>
     </div>
 
     <!-- TAB 1: LIST / TABLE VIEW -->
@@ -253,67 +249,10 @@
       <div id="halfGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
 
-    <!-- TAB 4: FIREBASE NUTZUNG -->
-    <div id="viewFirebase" class="hidden space-y-4">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Speicher</p>
-          <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1" id="fbSize">-</p>
-          <span class="text-[10px] text-slate-400" id="fbSizeSub">arrival_history.json</span>
-        </div>
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Download heute</p>
-          <p class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 mt-1" id="fbToday">-</p>
-          <span class="text-[10px] text-slate-400" id="fbTodaySub"></span>
-        </div>
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Download 7 Tage</p>
-          <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1" id="fbWeek">-</p>
-          <span class="text-[10px] text-slate-400" id="fbWeekSub"></span>
-        </div>
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"><span id="fbTotalLabel">Download Monat</span></p>
-          <p class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1" id="fbTotal">-</p>
-          <span class="text-[10px] text-slate-400" id="fbTotalSub"></span>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
-        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-200">Spark-Limits (kostenloser Tarif)</h2>
-        <div>
-          <div class="flex justify-between text-xs mb-1"><span class="text-slate-500 dark:text-slate-400">Speicher (1 GB)</span><span id="fbSizePct" class="font-mono font-bold"></span></div>
-          <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden"><div id="fbSizeBar" class="h-full rounded-full bg-blue-500" style="width:0%"></div></div>
-        </div>
-        <div>
-          <div class="flex justify-between text-xs mb-1"><span class="text-slate-500 dark:text-slate-400">Verbindungen (Spitze heute, Limit 100)</span><span id="fbConn" class="font-mono font-bold">-</span></div>
-        </div>
-        <div>
-          <div class="flex justify-between text-xs mb-1"><span class="text-slate-500 dark:text-slate-400">Download diesen Monat (10 GB)</span><span id="fbMonthPct" class="font-mono font-bold"></span></div>
-          <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden"><div id="fbMonthBar" class="h-full rounded-full bg-amber-500" style="width:0%"></div></div>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] tracking-wider border-b border-slate-200 dark:border-slate-700">
-            <tr><th class="py-3 px-4">Tag</th><th class="py-3 px-4 text-right">Firebase gesamt</th><th class="py-3 px-4 text-right">Nur diese Seite</th></tr>
-          </thead>
-          <tbody id="fbDaysBody" class="divide-y divide-slate-100 dark:divide-slate-700/50"></tbody>
-        </table>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <p id="fbNote" class="text-[11px] text-slate-400 max-w-2xl"></p>
-        <button type="button" onclick="resetUsage()" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">Messung zurücksetzen</button>
-      </div>
-    </div>
-
   </main>
 
   <script>
     const FIREBASE_HISTORY_URL = 'https://dus-airport-default-rtdb.europe-west1.firebasedatabase.app/arrival_history.json';
-    const FIREBASE_USAGE_URL = FIREBASE_HISTORY_URL.replace('arrival_history.json', 'usage_stats.json');
-    let serverUsage = null;
     
     let rawHistoryData = {};
     let flatFlightsList = [];
@@ -387,20 +326,13 @@
         if (!response.ok) throw new Error('HTTP ' + response.status);
         
         const text = await response.text();
-        recordDownload(new TextEncoder().encode(text).length);
         rawHistoryData = JSON.parse(text) || {};
-        try {
-          const ur = await fetch(FIREBASE_USAGE_URL, { cache: 'no-store' });
-          const uj = ur.ok ? await ur.json() : null;
-          serverUsage = uj && uj.days ? uj : null;
-        } catch (e) { serverUsage = null; }
         flattenData(rawHistoryData);
         
         updateKPIs();
         renderList();
         renderPatternInspector();
         renderHalfFlights();
-        renderFirebaseTab();
       } catch (err) {
         console.error("Fehler beim Laden der Firebase Historie:", err);
         if (silent !== true) {
@@ -772,129 +704,11 @@
       }).join('');
     }
 
-    // Firebase-Nutzung (nur Downloads dieser Seite in diesem Browser)
-    const USAGE_KEY = 'dus_history_usage';
-    let lastDbBytes = 0;
-
-    function dayKey(date) { return (date || new Date()).toLocaleDateString('sv-SE'); }
-
-    function loadUsage() {
-      try {
-        const u = JSON.parse(localStorage.getItem(USAGE_KEY));
-        if (u && u.days && u.total) return u;
-      } catch (e) {}
-      return { since: new Date().toISOString(), total: { bytes: 0, count: 0 }, days: {} };
-    }
-
-    function saveUsage(u) { try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {} }
-
-    function recordDownload(bytes) {
-      lastDbBytes = bytes;
-      const u = loadUsage();
-      const key = dayKey();
-      const d = u.days[key] || { bytes: 0, count: 0 };
-      d.bytes += bytes; d.count++;
-      u.days[key] = d;
-      u.total.bytes += bytes; u.total.count++;
-      const keys = Object.keys(u.days).sort();
-      while (keys.length > 60) delete u.days[keys.shift()];
-      saveUsage(u);
-    }
-
-    function resetUsage() {
-      if (!confirm('Gemessene Downloads wirklich zurücksetzen?')) return;
-      try { localStorage.removeItem(USAGE_KEY); } catch (e) {}
-      renderFirebaseTab();
-    }
-
-    function fmtBytes(b) {
-      if (b < 1024) return Math.round(b) + ' B';
-      const units = ['KB', 'MB', 'GB', 'TB'];
-      let i = -1;
-      do { b /= 1024; i++; } while (b >= 1024 && i < units.length - 1);
-      return b.toFixed(b >= 100 ? 0 : b >= 10 ? 1 : 2).replace('.', ',') + ' ' + units[i];
-    }
-
-    function renderFirebaseTab() {
-      const GB = 1024 * 1024 * 1024;
-      const local = loadUsage();
-      const lt = local.days[dayKey()] || { bytes: 0, count: 0 };
-      const set = (id, v) => { document.getElementById(id).textContent = v; };
-      const pct = v => v.toFixed(2).replace('.', ',') + ' %';
-      const bar = (id, v) => { document.getElementById(id).style.width = Math.min(100, Math.max(v, 0.5)) + '%'; };
-
-      let size, today, week, month, totalVal, totalLabel, totalSub, rows = [];
-      const su = serverUsage;
-
-      if (su) {
-        // Werte der Firebase-Konsole (vom Scraper über Cloud Monitoring geholt, Tage in UTC)
-        const days = su.days;
-        const utcKey = off => new Date(Date.now() - off * 86400000).toISOString().slice(0, 10);
-        const sum = pred => Object.entries(days).filter(([k]) => pred(k)).reduce((a, [, v]) => a + Number(v || 0), 0);
-        const todayKey = utcKey(0);
-        today = Number(days[todayKey] || 0);
-        week = sum(k => k >= utcKey(6));
-        month = sum(k => k.slice(0, 7) === todayKey.slice(0, 7));
-        size = Number(su.storage_bytes || 0);
-        totalVal = month;
-        totalLabel = 'Download Monat';
-        totalSub = 'laufende Abrechnung';
-        for (let i = 0; i < 7; i++) {
-          const k = utcKey(i);
-          const l = local.days[k] || { bytes: 0 };
-          rows.push({ key: k, a: fmtBytes(Number(days[k] || 0)), b: fmtBytes(l.bytes), today: i === 0 });
-        }
-        set('fbTodaySub', `davon diese Seite: ${fmtBytes(lt.bytes)}`);
-        set('fbWeekSub', 'Firebase-Konsole');
-        set('fbSizeSub', `Stand ${su.updated_at ? new Date(su.updated_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '-'} Uhr`);
-        set('fbConn', su.connections_peak_today != null ? `${su.connections_peak_today} / 100` : '-');
-        set('fbNote', 'Quelle: Firebase-Konsole (Nutzung), vom Scraper über Cloud Monitoring abgefragt und alle ca. 10 Minuten aktualisiert. Tage in UTC. „Nur diese Seite“ ist der Teil, den diese Seite in diesem Browser geladen hat.');
-      } else {
-        // Fallback: nur lokal gemessene Downloads dieser Seite
-        const sumDays = pred => Object.entries(local.days).filter(([k]) => pred(k)).reduce((a, [, v]) => a + v.bytes, 0);
-        today = lt.bytes;
-        week = sumDays(k => k >= dayKey(new Date(Date.now() - 6 * 86400000)));
-        month = sumDays(k => k.slice(0, 7) === dayKey().slice(0, 7));
-        size = lastDbBytes;
-        totalVal = local.total.bytes;
-        totalLabel = 'Download gesamt';
-        totalSub = `${local.total.count} Abrufe seit ${new Date(local.since).toLocaleDateString('de-DE')}`;
-        for (let i = 0; i < 7; i++) {
-          const k = dayKey(new Date(Date.now() - i * 86400000));
-          rows.push({ key: k, a: '-', b: fmtBytes((local.days[k] || { bytes: 0 }).bytes), today: i === 0 });
-        }
-        set('fbTodaySub', `${lt.count} Abrufe`);
-        set('fbWeekSub', 'nur diese Seite');
-        set('fbSizeSub', `${flatFlightsList.length} Landungen (nur Historie)`);
-        set('fbConn', '-');
-        set('fbNote', 'Keine Konsolenwerte gefunden (usage_stats fehlt oder ist nicht lesbar). Angezeigt werden nur die Downloads dieser Seite in diesem Browser, Zugriffe des Scrapers fehlen. Konsolenwerte kommen, sobald der Scraper sie nach usage_stats schreibt und die Regeln das Lesen erlauben.');
-      }
-
-      set('fbSize', size ? fmtBytes(size) : '-');
-      set('fbToday', fmtBytes(today));
-      set('fbWeek', fmtBytes(week));
-      set('fbTotal', fmtBytes(totalVal));
-      set('fbTotalLabel', totalLabel);
-      set('fbTotalSub', totalSub);
-
-      const sizePct = size / GB * 100;
-      const monthPct = month / (10 * GB) * 100;
-      set('fbSizePct', `${fmtBytes(size)} · ${pct(sizePct)}`);
-      set('fbMonthPct', `${fmtBytes(month)} · ${pct(monthPct)}`);
-      bar('fbSizeBar', sizePct);
-      bar('fbMonthBar', monthPct);
-
-      document.getElementById('fbDaysBody').innerHTML = rows.map(r =>
-        `<tr><td class="py-2 px-4 font-mono text-xs">${formatDate(r.key)}${r.today ? ' <span class="text-slate-400">(heute)</span>' : ''}</td><td class="py-2 px-4 font-mono text-xs text-right font-bold">${r.a}</td><td class="py-2 px-4 font-mono text-xs text-right text-slate-500 dark:text-slate-400">${r.b}</td></tr>`
-      ).join('');
-    }
-
     // Switch Tabs
     const TAB_IDS = {
       list: ['tabList', 'viewList'],
       patterns: ['tabPatterns', 'viewPatterns'],
-      half: ['tabHalf', 'viewHalf'],
-      firebase: ['tabFirebase', 'viewFirebase']
+      half: ['tabHalf', 'viewHalf']
     };
     const TAB_ACTIVE = "px-4 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 transition flex items-center gap-2";
     const TAB_INACTIVE = "px-4 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-2";
@@ -907,7 +721,6 @@
         document.getElementById(btnId).className = key === tab ? TAB_ACTIVE : TAB_INACTIVE;
         document.getElementById(viewId).classList.toggle('hidden', key !== tab);
       });
-      if (tab === 'firebase') renderFirebaseTab();
     }
 
     // Event Listeners
